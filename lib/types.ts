@@ -148,3 +148,24 @@ export interface ReminderItem {
   daysUntil: number
   urgency: "overdue" | "today" | "soon" | "upcoming"
 }
+
+export interface ExportUserData {
+  businesses: Business[]
+  categories: Category[]
+  transactions: Transaction[]
+  schedules: Schedule[]
+  counterparties: Counterparty[]
+  budgets: Budget[]
+  exportedAt: string
+}
+
+export interface Lap68Backup {
+  id: string
+  user_id: string
+  file_path: string
+  file_size: number | null
+  tables_included: string[]
+  label: string | null
+  snapshot: ExportUserData | null
+  created_at: string
+}

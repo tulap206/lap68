@@ -21,6 +21,8 @@ import type {
   BusinessSummary,
   Category,
   Counterparty,
+  ExportUserData,
+  Lap68Backup,
   Schedule,
   Transaction,
 } from "./types"
@@ -38,6 +40,8 @@ export type {
   BusinessSummary,
   Category,
   Counterparty,
+  ExportUserData,
+  Lap68Backup,
   Schedule,
   Transaction,
   TransactionType,
@@ -342,12 +346,14 @@ export async function upsertBudget(item: Omit<Budget, "id" | "created_at">) {
 }
 
 // --- Access logs ---
-export async function fetchAccessLogs(limit = 100) {
-  const { data, error } = await supabase
+export async function fetchAccessLogs(userId?: string, limit = 100) {
+  let q = supabase
     .from("lap68_access_logs")
     .select("*")
     .order("created_at", { ascending: false })
     .limit(limit)
+  if (userId) q = q.eq("user_id", userId)
+  const { data, error } = await q
   if (error) throw error
   return (data || []) as AccessLog[]
 }
@@ -357,7 +363,7 @@ export async function insertAccessLog(log: Omit<AccessLog, "id" | "created_at">)
   if (error) throw error
 }
 
-export async function exportUserData(userId: string) {
+export async function exportUserData(userId: string): Promise<ExportUserData> {
   const [businesses, categories, transactions, schedules, counterparties, budgets] = await Promise.all([
     fetchBusinesses(userId),
     fetchCategories(userId),
@@ -375,6 +381,78 @@ export async function exportUserData(userId: string) {
     budgets,
     exportedAt: new Date().toISOString(),
   }
+}
+
+const BACKUP_TABLES = [
+  "lap68_businesses",
+  "lap68_categories",
+  "lap68_transactions",
+  "lap68_schedules",
+  "lap68_counterparties",
+  "lap68_budgets",
+] as const
+
+const MAX_CLOUD_BACKUPS = 15
+
+export async function fetchCloudBackups(userId: string) {
+  const { data, error } = await supabase
+    .from("lap68_backups")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+    .limit(MAX_CLOUD_BACKUPS)
+  if (error) throw error
+  return (data || []) as Lap68Backup[]
+}
+
+async function pruneCloudBackups(userId: string) {
+  const { data, error } = await supabase
+    .from("lap68_backups")
+    .select("id")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
+  if (error) throw error
+  const rows = data || []
+  if (rows.length <= MAX_CLOUD_BACKUPS) return
+  const toDelete = rows.slice(MAX_CLOUD_BACKUPS).map((r) => r.id)
+  await supabase.from("lap68_backups").delete().in("id", toDelete)
+}
+
+export async function createCloudBackup(userId: string, label?: string) {
+  const snapshot = await exportUserData(userId)
+  const json = JSON.stringify(snapshot)
+  const now = Date.now()
+  const { data, error } = await supabase
+    .from("lap68_backups")
+    .insert({
+      user_id: userId,
+      file_path: `cloud/${userId}/${now}.json`,
+      file_size: new TextEncoder().encode(json).length,
+      tables_included: [...BACKUP_TABLES],
+      label: label || `Sao lưu ${new Date().toLocaleString("vi-VN")}`,
+      snapshot,
+    })
+    .select()
+    .single()
+  if (error) throw error
+  await pruneCloudBackups(userId)
+  return data as Lap68Backup
+}
+
+export async function deleteCloudBackup(id: string) {
+  const { error } = await supabase.from("lap68_backups").delete().eq("id", id)
+  if (error) throw error
+}
+
+export async function getCloudBackupSnapshot(backupId: string) {
+  const { data, error } = await supabase
+    .from("lap68_backups")
+    .select("snapshot, label")
+    .eq("id", backupId)
+    .maybeSingle()
+  if (error) throw error
+  if (!data?.snapshot) throw new Error("Bản sao lưu không có dữ liệu")
+  return { snapshot: data.snapshot as ExportUserData, label: data.label as string | null }
 }
 
 export function subscribeLap68Tables(userId: string, onChange: () => void) {
