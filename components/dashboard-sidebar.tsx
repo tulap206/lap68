@@ -4,7 +4,6 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
-  LayoutGrid,
   Bell,
   Calendar,
   Settings,
@@ -24,7 +23,6 @@ import { useState } from "react"
 
 const globalItems = [
   { title: "Tổng quan", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Việc KD", href: "/dashboard/businesses", icon: LayoutGrid },
   { title: "Nhắc hẹn", href: "/dashboard/reminders", icon: Bell },
   { title: "Lịch", href: "/dashboard/calendar", icon: Calendar },
   { title: "Cài đặt", href: "/dashboard/settings", icon: Settings },
