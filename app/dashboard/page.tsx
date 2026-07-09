@@ -27,8 +27,8 @@ import { displayMoney } from "@/lib/format-money"
 
 function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between mb-3">
-      <h2 className="text-lg font-bold text-zinc-100">{children}</h2>
+    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
+      <h2 className="text-base sm:text-lg font-bold text-zinc-100">{children}</h2>
       {action}
     </div>
   )
@@ -129,7 +129,7 @@ export default function DashboardHubPage() {
           {loading ? (
             <SkeletonMetricCards />
           ) : (
-            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
               <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(portfolio.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" />
               <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(portfolio.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" />
               <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(portfolio.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />

@@ -119,7 +119,7 @@ export default function BusinessDashboardPage() {
       />
 
       {loading ? <SkeletonMetricCards /> : (
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
           <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(stats.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=income`)} />
           <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(stats.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=expense`)} />
           <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(stats.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />

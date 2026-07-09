@@ -29,7 +29,7 @@ export function ModulePageShell({
   className?: string
 }) {
   const theme = getModuleTheme(module)
-  return <div className={cn(theme.adminClass, "space-y-6 w-full relative z-10", className)}>{children}</div>
+  return <div className={cn(theme.adminClass, "space-y-6 w-full max-w-[1600px] mx-auto relative z-10", className)}>{children}</div>
 }
 
 export function ModuleBrandHeader({
@@ -44,14 +44,14 @@ export function ModuleBrandHeader({
   const theme = getModuleTheme(module)
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-zinc-800 pb-5">
-      <div>
-        <h1 className="text-3xl font-black tracking-tight text-zinc-100 italic uppercase">
+      <div className="min-w-0">
+        <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-zinc-100 italic uppercase text-balance">
           QUẢN TRỊ{" "}
           <span className={ACCENT_TITLE_CLASS[theme.accent]}>{theme.titleSuffix}</span>
         </h1>
         <p className="text-zinc-500 text-sm mt-1">{subtitle}</p>
       </div>
-      {actions}
+      {actions && <div className="w-full md:w-auto flex flex-wrap gap-2 shrink-0">{actions}</div>}
     </div>
   )
 }
@@ -68,11 +68,11 @@ export function ModuleSubpageHeader({
 }) {
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-      <div>
-        <h2 className="text-xl font-bold tracking-tight text-zinc-100">{title}</h2>
+      <div className="min-w-0">
+        <h2 className="text-lg sm:text-xl font-bold tracking-tight text-zinc-100">{title}</h2>
         {subtitle && <p className="text-zinc-500 text-sm mt-0.5">{subtitle}</p>}
       </div>
-      {actions}
+      {actions && <div className="w-full sm:w-auto flex flex-wrap gap-2 shrink-0">{actions}</div>}
     </div>
   )
 }
@@ -92,12 +92,12 @@ export function ModuleSectionCard({
 }) {
   return (
     <Card className={cn("border-zinc-800/80 bg-card/80 backdrop-blur-sm py-0 overflow-hidden flex flex-col", className)}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-6 py-4 bg-zinc-900/50 border-b border-zinc-800 shrink-0">
-        <div>
+      <div className="flex flex-col gap-3 px-4 sm:px-6 py-4 bg-zinc-900/50 border-b border-zinc-800 shrink-0 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <h3 className="text-base font-bold text-zinc-100">{title}</h3>
           {description && <p className="text-xs text-zinc-500 mt-0.5">{description}</p>}
         </div>
-        {filters}
+        {filters && <div className="w-full sm:w-auto shrink-0">{filters}</div>}
       </div>
       <CardContent className="p-0 flex-1 flex flex-col min-h-0">{children}</CardContent>
     </Card>
@@ -137,20 +137,20 @@ export function ModuleKpiCard({
     <Comp
       onClick={onClick}
       className={cn(
-        "metric-card card-animate text-left w-full rounded-xl border p-4 shadow-[0_4px_24px_rgba(0,0,0,0.3)]",
+        "metric-card card-animate text-left w-full rounded-xl border p-3 sm:p-4 shadow-[0_4px_24px_rgba(0,0,0,0.3)] min-w-0",
         toneStyles[tone],
         ACCENT_KPI_HOVER_CLASS[theme.accent],
         onClick && "cursor-pointer"
       )}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">{label}</p>
-          <p className="kpi-value text-2xl font-black text-zinc-100 mt-1 font-mono tabular-nums">{value}</p>
-          {hint && <p className="text-xs text-zinc-600 mt-1">{hint}</p>}
+      <div className="flex items-start justify-between gap-2 sm:gap-3">
+        <div className="min-w-0">
+          <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-zinc-500 truncate">{label}</p>
+          <p className="kpi-value text-base sm:text-xl lg:text-2xl font-black text-zinc-100 mt-1 font-mono tabular-nums break-all sm:break-normal">{value}</p>
+          {hint && <p className="text-xs text-zinc-600 mt-1 truncate">{hint}</p>}
         </div>
-        <div className="kpi-icon flex h-10 w-10 items-center justify-center rounded-xl border">
+        <div className="kpi-icon flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl border shrink-0">
           {icon}
         </div>
       </div>
@@ -199,11 +199,11 @@ export function ModuleResponsiveTable({
       </div>
       <div className="md:hidden divide-y divide-zinc-800">
         {rows.map((cells, i) => (
-          <div key={i} className="p-4 space-y-2">
+          <div key={i} className="p-4 space-y-2.5">
             {headers.map((h, j) => (
-              <div key={h} className="flex justify-between gap-3 text-sm">
-                <span className="text-zinc-500 text-xs uppercase">{h}</span>
-                <span className="text-right text-zinc-300">{cells[j]}</span>
+              <div key={h} className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-3 text-sm min-w-0">
+                <span className="text-zinc-500 text-[10px] uppercase tracking-wider shrink-0">{h}</span>
+                <span className="text-zinc-300 min-w-0 break-words sm:text-right">{cells[j]}</span>
               </div>
             ))}
           </div>

@@ -131,9 +131,9 @@ export default function BusinessTransactionsPage() {
       <ModuleSectionCard
         title={`${filtered.length} giao dịch`}
         filters={
-          <div className="flex gap-2">
-            <div className="relative"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" /><Input className="pl-9 w-44 h-9" placeholder="Tìm..." value={search} onChange={(e) => setSearch(e.target.value)} /></div>
-            <Select value={typeFilter} onValueChange={setTypeFilter}><SelectTrigger className="w-28 h-9"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Tất cả</SelectItem><SelectItem value="income">Thu</SelectItem><SelectItem value="expense">Chi</SelectItem></SelectContent></Select>
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <div className="relative w-full sm:w-auto"><Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" /><Input className="pl-9 w-full sm:w-44 h-9" placeholder="Tìm..." value={search} onChange={(e) => setSearch(e.target.value)} /></div>
+            <Select value={typeFilter} onValueChange={setTypeFilter}><SelectTrigger className="w-full sm:w-28 h-9"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">Tất cả</SelectItem><SelectItem value="income">Thu</SelectItem><SelectItem value="expense">Chi</SelectItem></SelectContent></Select>
           </div>
         }
       >
@@ -156,7 +156,7 @@ export default function BusinessTransactionsPage() {
         <DialogContent>
           <DialogHeader><DialogTitle>{editing ? "Sửa giao dịch" : "Thêm giao dịch"}</DialogTitle></DialogHeader>
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-2"><Label>Loại</Label><Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v as "income" | "expense", categoryId: "" })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="income">Thu</SelectItem><SelectItem value="expense">Chi</SelectItem></SelectContent></Select></div>
               <div className="space-y-2"><Label>Ngày</Label><Input type="date" value={toDateInputValue(form.transactionDate)} onChange={(e) => setForm({ ...form, transactionDate: e.target.value })} /></div>
             </div>

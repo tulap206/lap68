@@ -62,7 +62,7 @@ export function BusinessHubCard({
 
       <div className="flex items-center justify-between mt-4 pt-3 border-t border-zinc-800">
         <span className="text-xs text-zinc-500">{summary.transaction_count} giao dịch</span>
-        <span className="text-xs text-green-400 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <span className="text-xs text-green-400 flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           Mở <ArrowRight className="h-3 w-3" />
         </span>
       </div>

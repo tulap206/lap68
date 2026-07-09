@@ -77,23 +77,23 @@ export default function CalendarPage() {
     <ModulePageShell module="cashflow">
       <ModuleSubpageHeader module="cashflow" title="Lịch thu/chi" subtitle="Xem lịch đến hạn theo tháng" />
 
-      <div className="grid xl:grid-cols-3 gap-4">
-        <div className="xl:col-span-2">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
+        <div className="xl:col-span-2 min-w-0">
         <ModuleSectionCard title=" ">
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-4">
-              <Button variant="ghost" size="icon" onClick={() => setCursor(new Date(year, month - 1, 1))}><ChevronLeft className="h-4 w-4" /></Button>
-              <h3 className="font-bold text-zinc-100">Tháng {month + 1}/{year}</h3>
-              <Button variant="ghost" size="icon" onClick={() => setCursor(new Date(year, month + 1, 1))}><ChevronRight className="h-4 w-4" /></Button>
+          <div className="p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-3 sm:mb-4 gap-2">
+              <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setCursor(new Date(year, month - 1, 1))}><ChevronLeft className="h-4 w-4" /></Button>
+              <h3 className="font-bold text-zinc-100 text-sm sm:text-base text-center">Tháng {month + 1}/{year}</h3>
+              <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setCursor(new Date(year, month + 1, 1))}><ChevronRight className="h-4 w-4" /></Button>
             </div>
             {loading ? (
-              <div className="h-64 animate-pulse bg-zinc-800/50 rounded-xl" />
+              <div className="h-56 sm:h-64 animate-pulse bg-zinc-800/50 rounded-xl" />
             ) : (
               <>
-                <div className="grid grid-cols-7 gap-1 mb-1">
-                  {WEEKDAYS.map((w) => <div key={w} className="text-center text-xs text-zinc-500 py-1">{w}</div>)}
+                <div className="grid grid-cols-7 gap-0.5 sm:gap-1 mb-1">
+                  {WEEKDAYS.map((w) => <div key={w} className="text-center text-[10px] sm:text-xs text-zinc-500 py-1">{w}</div>)}
                 </div>
-                <div className="grid grid-cols-7 gap-1">
+                <div className="grid grid-cols-7 gap-0.5 sm:gap-1">
                   {cells.map((day, i) => {
                     if (day === null) return <div key={`e-${i}`} />
                     const key = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
@@ -106,13 +106,13 @@ export default function CalendarPage() {
                         type="button"
                         onClick={() => setSelected(key)}
                         className={cn(
-                          "aspect-square rounded-lg border text-sm flex flex-col items-center justify-center gap-0.5 transition-colors",
+                          "aspect-square rounded-md sm:rounded-lg border text-xs sm:text-sm flex flex-col items-center justify-center gap-0.5 transition-colors min-h-[36px]",
                           isSelected ? "border-green-500/50 bg-green-500/10" : "border-zinc-800 hover:border-zinc-600",
                           isToday && "ring-1 ring-green-500/40"
                         )}
                       >
-                        <span className={cn("font-medium", isToday ? "text-green-400" : "text-zinc-300")}>{day}</span>
-                        {count > 0 && <span className="text-[10px] text-amber-400">{count}</span>}
+                        <span className={cn("font-medium leading-none", isToday ? "text-green-400" : "text-zinc-300")}>{day}</span>
+                        {count > 0 && <span className="text-[9px] sm:text-[10px] text-amber-400 leading-none">{count}</span>}
                       </button>
                     )
                   })}

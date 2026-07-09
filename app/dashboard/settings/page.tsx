@@ -23,7 +23,7 @@ export default function SettingsPage() {
           <ModuleSectionCard
             title="Sao lưu dữ liệu"
             description="Trực tuyến trên cloud hoặc xuất/nhập file JSON"
-            className="min-h-[min(560px,80vh)]"
+            className="min-h-[420px] lg:min-h-[min(560px,80vh)]"
           >
             <BackupPanel userId={user.id} onLog={logAction} />
           </ModuleSectionCard>
@@ -31,7 +31,7 @@ export default function SettingsPage() {
           <ModuleSectionCard
             title="Lịch sử hoạt động"
             description="10 bản ghi mỗi trang"
-            className="min-h-[min(560px,80vh)]"
+            className="min-h-[420px] lg:min-h-[min(560px,80vh)]"
           >
             <ActivityLogPanel userId={user.id} />
           </ModuleSectionCard>

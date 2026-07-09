@@ -30,7 +30,7 @@ export function CapitalOverviewCard({
         <p className="text-sm font-semibold text-zinc-100">Vốn & số dư</p>
         <p className="text-[11px] text-zinc-500 mt-0.5">Vốn gốc + lợi nhuận tích lũy từ thu chi</p>
       </div>
-      <div className={cn("grid gap-px bg-zinc-800/50", compact ? "grid-cols-3" : "grid-cols-1 sm:grid-cols-3")}>
+      <div className={cn("grid gap-px bg-zinc-800/50", compact ? "grid-cols-1 min-[420px]:grid-cols-3" : "grid-cols-1 sm:grid-cols-3")}>
         {items.map((item) => (
           <div key={item.label} className="bg-card/80 px-4 py-3">
             <p className="text-[10px] uppercase tracking-wider text-zinc-500">{item.label}</p>

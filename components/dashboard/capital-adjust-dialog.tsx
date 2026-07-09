@@ -144,7 +144,7 @@ export function CapitalAdjustDialog({
 
           {mode === "adjust" ? (
             <>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-2">
                   <Label>Loại</Label>
                   <Select value={adjustType} onValueChange={(v) => setAdjustType(v as "deposit" | "withdraw")}>

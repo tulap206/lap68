@@ -49,7 +49,7 @@ export function ReminderPanel({
             </div>
           </div>
           {onComplete && (
-            <AccentButton module="cashflow" className="shrink-0 text-xs h-8" onClick={() => onComplete(schedule.id)}>
+            <AccentButton module="cashflow" className="shrink-0 text-xs h-8 w-full sm:w-auto" onClick={() => onComplete(schedule.id)}>
               <CheckCircle2 className="h-3.5 w-3.5" />
               Đã {schedule.direction === "collect" ? "thu" : "chi"}
             </AccentButton>

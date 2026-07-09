@@ -35,7 +35,7 @@ export default function LoginPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-black">
+      <div className="min-h-dvh flex items-center justify-center bg-black">
         <Loader2 className="w-8 h-8 animate-spin text-green-500" />
       </div>
     )
@@ -44,7 +44,7 @@ export default function LoginPage() {
   if (user) return null
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden bg-black">
+    <div className="min-h-dvh flex flex-col items-center justify-center p-4 sm:p-6 safe-top safe-bottom relative overflow-hidden bg-black">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(239,68,68,0.08),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,197,94,0.1),transparent_50%)]" />
       <div className="absolute inset-0 opacity-[0.03]" style={{
         backgroundImage: "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
@@ -71,7 +71,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="w-full glass-panel rounded-2xl p-8 space-y-5 shadow-2xl shadow-black/50">
+        <form onSubmit={handleSubmit} className="w-full glass-panel rounded-2xl p-6 sm:p-8 space-y-5 shadow-2xl shadow-black/50">
           {error && (
             <div className="rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-3 text-sm text-red-300">
               {error}

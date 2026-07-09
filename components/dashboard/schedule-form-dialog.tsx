@@ -117,7 +117,7 @@ export function ScheduleFormDialog({
           <DialogDescription>Nhắc hẹn đóng tiền hoặc thu tiền theo thời gian</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Loại</Label>
               <Select value={form.direction} onValueChange={(v) => setForm({ ...form, direction: v as ScheduleDirection, categoryId: "" })}>
@@ -143,7 +143,7 @@ export function ScheduleFormDialog({
             <Label>Tiêu đề</Label>
             <Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} placeholder="VD: Tiền thuê mặt bằng" />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Ngày đến hạn</Label>
               <Input type="date" value={form.dueDate} onChange={(e) => setForm({ ...form, dueDate: e.target.value })} />

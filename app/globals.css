@@ -81,15 +81,37 @@
   }
   html {
     color-scheme: dark;
+    overflow-x: hidden;
   }
   body {
     @apply bg-background text-foreground antialiased;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    min-height: 100dvh;
+    overflow-x: hidden;
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
     background-image:
       radial-gradient(ellipse 80% 50% at 50% -20%, var(--glow-green), transparent),
       radial-gradient(ellipse 60% 40% at 100% 100%, var(--glow-red), transparent);
     background-attachment: fixed;
   }
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top);
 }
 
 .dark-grain::before {

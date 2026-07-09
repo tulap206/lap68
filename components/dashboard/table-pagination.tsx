@@ -34,7 +34,7 @@ export function TablePagination({
   })()
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-zinc-800 bg-zinc-900/30">
+    <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-3 sm:px-4 py-3 border-t border-zinc-800 bg-zinc-900/30">
       <p className="text-xs text-zinc-500">
         {from}–{to} / {totalItems} bản ghi
       </p>
