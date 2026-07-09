@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { Card, CardContent } from "@/components/ui/card"
+import { KpiAutoFitValue } from "@/components/dashboard/kpi-auto-fit-value"
 import {
   type ModuleId,
   ACCENT_BTN_CLASS,
@@ -137,23 +138,37 @@ export function ModuleKpiCard({
     <Comp
       onClick={onClick}
       className={cn(
-        "metric-card card-animate text-left w-full rounded-xl border p-3 sm:p-4 shadow-[0_4px_24px_rgba(0,0,0,0.3)] min-w-0",
+        "metric-card card-animate text-left w-full h-full rounded-xl border p-3 shadow-[0_4px_24px_rgba(0,0,0,0.3)] min-w-0 flex flex-col",
         toneStyles[tone],
         ACCENT_KPI_HOVER_CLASS[theme.accent],
         onClick && "cursor-pointer"
       )}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <div className="flex items-start justify-between gap-2 sm:gap-3">
-        <div className="min-w-0">
-          <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-zinc-500 truncate">{label}</p>
-          <p className="kpi-value text-base sm:text-xl lg:text-2xl font-black text-zinc-100 mt-1 font-mono tabular-nums break-all sm:break-normal">{value}</p>
-          {hint && <p className="text-xs text-zinc-600 mt-1 truncate">{hint}</p>}
-        </div>
-        <div className="kpi-icon flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center rounded-xl border shrink-0">
+      <div className="flex items-start justify-between gap-2 shrink-0">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 leading-tight line-clamp-2 min-h-[26px] pr-1 flex-1">
+          {label}
+        </p>
+        <div className="kpi-icon flex h-9 w-9 items-center justify-center rounded-xl border shrink-0 [&_svg]:h-[18px] [&_svg]:w-[18px]">
           {icon}
         </div>
       </div>
+
+      <div className="flex-1 flex items-center min-h-[40px] mt-1.5 py-0.5">
+        <KpiAutoFitValue
+          value={value}
+          className={cn(
+            tone === "income" && "[&_.kpi-value]:text-green-400",
+            tone === "expense" && "[&_.kpi-value]:text-red-400",
+            tone === "profit" && "[&_.kpi-value]:text-zinc-100",
+            tone === "neutral" && "[&_.kpi-value]:text-zinc-100"
+          )}
+        />
+      </div>
+
+      <p className="text-[10px] text-zinc-600 mt-1 min-h-[14px] truncate shrink-0">
+        {hint || "\u00A0"}
+      </p>
     </Comp>
   )
 }
