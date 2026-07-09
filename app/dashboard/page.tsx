@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { Plus, LayoutGrid, Landmark, SlidersHorizontal, TrendingUp, TrendingDown, PiggyBank, BarChart3 } from "lucide-react"
+import { Plus, LayoutGrid, Landmark, SlidersHorizontal, TrendingUp, TrendingDown, PiggyBank, BarChart3, Wallet } from "lucide-react"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth-context"
 import { ModulePageShell, ModuleBrandHeader, ModuleKpiCard, AccentButton } from "@/components/dashboard/module-shell"
@@ -11,10 +11,13 @@ import { ReminderPanel } from "@/components/dashboard/reminder-panel"
 import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section"
 import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog"
 import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card"
+import { AccountBalanceDialog } from "@/components/dashboard/account-balance-dialog"
+import { AccountBalanceCard } from "@/components/dashboard/account-balance-card"
 import { SkeletonMetricCards } from "@/components/ui/skeleton-loader"
 import {
   fetchBusinessSummaries,
   fetchBusinesses,
+  fetchPortfolioSettings,
   fetchSchedules,
   fetchTransactions,
   subscribeLap68Tables,
@@ -22,6 +25,8 @@ import {
 } from "@/lib/supabase"
 import { buildReminderItems } from "@/lib/schedule-engine"
 import { computeCapitalSnapshot, computePortfolioCapital, parseBusinessCapital } from "@/lib/capital"
+import { totalLiquidBalance } from "@/lib/account-balance"
+import type { UserPortfolioSettings } from "@/lib/account-balance"
 import type { Business, BusinessSummary, Schedule, Transaction } from "@/lib/types"
 import { displayMoney } from "@/lib/format-money"
 
@@ -42,21 +47,25 @@ export default function DashboardHubPage() {
   const [schedules, setSchedules] = useState<Schedule[]>([])
   const [loading, setLoading] = useState(true)
   const [capitalOpen, setCapitalOpen] = useState(false)
+  const [accountOpen, setAccountOpen] = useState(false)
+  const [portfolioSettings, setPortfolioSettings] = useState<UserPortfolioSettings>({ liquid_accounts: [], updated_at: null })
 
   const load = useCallback(async () => {
     if (!user) return
     try {
       await syncScheduleStatuses(user.id)
-      const [s, biz, txs, sch] = await Promise.all([
+      const [s, biz, txs, sch, portfolio] = await Promise.all([
         fetchBusinessSummaries(user.id),
         fetchBusinesses(user.id),
         fetchTransactions(user.id),
         fetchSchedules(user.id),
+        fetchPortfolioSettings(user.id),
       ])
       setSummaries(s)
       setBusinesses(biz)
       setTransactions(txs)
       setSchedules(sch)
+      setPortfolioSettings(portfolio)
     } catch {
       toast.error("Không tải được dữ liệu")
     } finally {
@@ -93,6 +102,8 @@ export default function DashboardHubPage() {
     [businesses, summaries]
   )
 
+  const liquidTotal = useMemo(() => totalLiquidBalance(portfolioSettings), [portfolioSettings])
+
   const capitalByBusiness = useMemo(() => {
     const map = new Map<string, ReturnType<typeof computeCapitalSnapshot>>()
     for (const s of summaries) {
@@ -110,7 +121,10 @@ export default function DashboardHubPage() {
           module="cashflow"
           subtitle="Tổng quan thu chi, vốn và phân tích toàn bộ việc kinh doanh"
           actions={
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 w-full md:w-auto">
+              <AccentButton module="cashflow" type="button" onClick={() => setAccountOpen(true)}>
+                <Wallet className="h-4 w-4" /> Số dư TK
+              </AccentButton>
               <AccentButton module="cashflow" type="button" onClick={() => setCapitalOpen(true)}>
                 <SlidersHorizontal className="h-4 w-4" /> Tinh chỉnh vốn
               </AccentButton>
@@ -129,11 +143,20 @@ export default function DashboardHubPage() {
           {loading ? (
             <SkeletonMetricCards />
           ) : (
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 sm:gap-4">
               <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(portfolio.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" />
               <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(portfolio.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" />
               <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(portfolio.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />
               <ModuleKpiCard module="cashflow" label="Tỷ suất LN" value={`${portfolio.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="neutral" />
+              <ModuleKpiCard
+                module="cashflow"
+                label="Số dư TK"
+                value={displayMoney(liquidTotal)}
+                hint={portfolioSettings.liquid_accounts.length > 0 ? `${portfolioSettings.liquid_accounts.length} tài khoản` : "Chưa cập nhật"}
+                icon={<Wallet className="h-5 w-5" />}
+                tone="neutral"
+                onClick={() => setAccountOpen(true)}
+              />
               <ModuleKpiCard
                 module="cashflow"
                 label="Vốn hiện tại"
@@ -147,11 +170,14 @@ export default function DashboardHubPage() {
           )}
         </section>
 
-        {/* 2. Vốn + nhắc hẹn (ưu tiên hành động) */}
+        {/* 2. Số dư TK + vốn + nhắc hẹn */}
         {!loading && (
-          <section className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-            {summaries.length > 0 && <CapitalOverviewCard snapshot={capitalSnapshot} compact />}
-            <div className={summaries.length === 0 ? "xl:col-span-2" : ""}>
+          <section className="space-y-4">
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+              <AccountBalanceCard settings={portfolioSettings} compact onClick={() => setAccountOpen(true)} />
+              {summaries.length > 0 && <CapitalOverviewCard snapshot={capitalSnapshot} compact />}
+            </div>
+            <div>
               <SectionTitle
                 action={<Link href="/dashboard/reminders" className="text-xs text-zinc-500 hover:text-green-400">Xem tất cả</Link>}
               >
@@ -208,6 +234,7 @@ export default function DashboardHubPage() {
       </div>
 
       <CapitalAdjustDialog open={capitalOpen} onOpenChange={setCapitalOpen} businesses={businesses} onSuccess={load} />
+      <AccountBalanceDialog open={accountOpen} onOpenChange={setAccountOpen} settings={portfolioSettings} onSuccess={load} />
     </ModulePageShell>
   )
 }

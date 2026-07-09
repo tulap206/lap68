@@ -8,6 +8,13 @@ import {
 } from "./schedule-engine"
 import { toStoredDateValue } from "./format-date"
 import {
+  buildPortfolioSettings,
+  defaultLiquidAccounts,
+  parseUserPortfolioSettings,
+  PORTFOLIO_SETTINGS_COUNTERPARTY_NAME,
+  type UserPortfolioSettings,
+} from "./account-balance"
+import {
   buildCapitalGhiChu,
   parseBusinessCapital,
   type CapitalAdjustType,
@@ -159,11 +166,58 @@ export async function deleteCategory(id: string) {
 
 // --- Counterparties ---
 export async function fetchCounterparties(userId: string, businessId?: string) {
-  let q = supabase.from("lap68_counterparties").select("*").eq("user_id", userId).order("name")
+  let q = supabase
+    .from("lap68_counterparties")
+    .select("*")
+    .eq("user_id", userId)
+    .neq("name", PORTFOLIO_SETTINGS_COUNTERPARTY_NAME)
+    .order("name")
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error
   return (data || []) as Counterparty[]
+}
+
+export async function fetchPortfolioSettings(userId: string): Promise<UserPortfolioSettings> {
+  const { data, error } = await supabase
+    .from("lap68_counterparties")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("name", PORTFOLIO_SETTINGS_COUNTERPARTY_NAME)
+    .maybeSingle()
+  if (error) throw error
+  if (!data) {
+    return { liquid_accounts: defaultLiquidAccounts(), updated_at: null }
+  }
+  return parseUserPortfolioSettings(data.ghi_chu)
+}
+
+export async function savePortfolioSettings(userId: string, portfolio: UserPortfolioSettings) {
+  const ghi_chu = {
+    ...buildPortfolioSettings({}, { ...portfolio, updated_at: new Date().toISOString() }),
+    _lap68_internal: true,
+  }
+  const { data: existing, error: fetchError } = await supabase
+    .from("lap68_counterparties")
+    .select("id")
+    .eq("user_id", userId)
+    .eq("name", PORTFOLIO_SETTINGS_COUNTERPARTY_NAME)
+    .maybeSingle()
+  if (fetchError) throw fetchError
+
+  if (existing?.id) {
+    return updateCounterparty(existing.id, { ghi_chu })
+  }
+
+  return insertCounterparty({
+    user_id: userId,
+    business_id: null,
+    name: PORTFOLIO_SETTINGS_COUNTERPARTY_NAME,
+    phone: null,
+    email: null,
+    role: "both",
+    ghi_chu,
+  })
 }
 
 export async function insertCounterparty(item: Omit<Counterparty, "id" | "created_at">) {

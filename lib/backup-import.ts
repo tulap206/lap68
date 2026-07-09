@@ -7,6 +7,7 @@ import {
   insertSchedule,
   insertCounterparty,
 } from "./supabase"
+import { PORTFOLIO_SETTINGS_COUNTERPARTY_NAME } from "./account-balance"
 import type { ExportUserData } from "./types"
 
 export async function importUserDataFromBackup(userId: string, data: ExportUserData) {
@@ -66,6 +67,7 @@ export async function importUserDataFromBackup(userId: string, data: ExportUserD
 
   if (Array.isArray(data.counterparties)) {
     for (const cp of data.counterparties) {
+      if (cp.name === PORTFOLIO_SETTINGS_COUNTERPARTY_NAME) continue
       const businessId = (cp.business_id && bizMap.get(cp.business_id)) || cp.business_id || defaultBizId
       await insertCounterparty({
         user_id: userId,
