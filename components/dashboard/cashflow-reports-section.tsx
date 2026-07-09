@@ -1,7 +1,8 @@
 "use client"
 
-import { MonthlyCashflowChart, CategoryPieChart, ProfitTrendChart } from "@/components/dashboard/cashflow-charts"
+import { CombinedCashflowPanel, CombinedCategoryPanel } from "@/components/dashboard/cashflow-charts"
 import { BusinessComparisonChart } from "@/components/dashboard/business-comparison-chart"
+import { cn } from "@/lib/utils"
 import type { BusinessSummary, Transaction } from "@/lib/types"
 
 export function CashflowReportsSection({
@@ -13,19 +14,21 @@ export function CashflowReportsSection({
   summaries?: BusinessSummary[]
   showComparison?: boolean
 }) {
+  const hasComparison = showComparison && summaries && summaries.length > 0
+
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <MonthlyCashflowChart transactions={transactions} />
-        <ProfitTrendChart transactions={transactions} />
+      <CombinedCashflowPanel transactions={transactions} />
+
+      <div
+        className={cn(
+          "grid gap-4 items-stretch",
+          hasComparison ? "grid-cols-1 xl:grid-cols-2" : "grid-cols-1"
+        )}
+      >
+        <CombinedCategoryPanel transactions={transactions} />
+        {hasComparison && <BusinessComparisonChart summaries={summaries} className="h-full min-h-0" />}
       </div>
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-        <CategoryPieChart transactions={transactions} type="income" />
-        <CategoryPieChart transactions={transactions} type="expense" />
-      </div>
-      {showComparison && summaries && summaries.length > 0 && (
-        <BusinessComparisonChart summaries={summaries} />
-      )}
     </div>
   )
 }

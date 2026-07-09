@@ -22,9 +22,15 @@ import {
 } from "./chart-primitives"
 import type { BusinessSummary } from "@/lib/types"
 
-const CHART_HEIGHT = 220
+const CHART_HEIGHT = 200
 
-export function BusinessComparisonChart({ summaries }: { summaries: BusinessSummary[] }) {
+export function BusinessComparisonChart({
+  summaries,
+  className,
+}: {
+  summaries: BusinessSummary[]
+  className?: string
+}) {
   const data = summaries.map((s) => ({
     name: s.business_name.length > 14 ? `${s.business_name.slice(0, 14)}…` : s.business_name,
     fullName: s.business_name,
@@ -38,6 +44,7 @@ export function BusinessComparisonChart({ summaries }: { summaries: BusinessSumm
       title="So sánh việc kinh doanh"
       description="Thu và chi theo từng mảng"
       accent="blue"
+      className={className}
       footer={
         data.length > 0 ? (
           <ChartLegendPills

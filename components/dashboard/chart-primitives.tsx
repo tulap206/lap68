@@ -2,6 +2,7 @@
 
 import { displayMoney } from "@/lib/format-money"
 import { MODULE_CHART_PALETTE } from "@/lib/module-theme"
+import { cn } from "@/lib/utils"
 import type { TooltipProps } from "recharts"
 
 export const CHART_COLORS = {
@@ -89,18 +90,20 @@ export function ChartShell({
   accent = "emerald",
   children,
   footer,
+  className,
 }: {
   title: string
   description?: string
   accent?: "emerald" | "red" | "blue" | "amber"
   children: React.ReactNode
   footer?: React.ReactNode
+  className?: string
 }) {
   const accentDot =
     accent === "red" ? CHART_COLORS.expense : accent === "amber" ? "#f59e0b" : accent === "blue" ? "#a1a1aa" : CHART_COLORS.income
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800/90 bg-card/60 backdrop-blur-sm">
+    <div className={cn("relative flex h-full flex-col overflow-hidden rounded-xl border border-zinc-800/90 bg-card/60 backdrop-blur-sm", className)}>
       <div className="flex items-baseline justify-between gap-3 px-4 pt-3.5 pb-2">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
