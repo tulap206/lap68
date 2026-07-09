@@ -26,7 +26,7 @@ export function CashflowReportsSection({
           hasComparison ? "grid-cols-1 xl:grid-cols-2" : "grid-cols-1"
         )}
       >
-        <CombinedCategoryPanel transactions={transactions} />
+        <CombinedCategoryPanel transactions={transactions} summaries={summaries} groupBy="business" />
         {hasComparison && <BusinessComparisonChart summaries={summaries} className="h-full min-h-0" />}
       </div>
     </div>

@@ -31,16 +31,16 @@ import {
   formatChartPercent,
   incomePiePalette,
 } from "./chart-primitives"
-import type { Transaction } from "@/lib/types"
+import type { BusinessSummary, Transaction } from "@/lib/types"
 import { parseDisplayDate } from "@/lib/format-date"
 import { cn } from "@/lib/utils"
 
-type CategoryRow = { name: string; value: number; color?: string; count: number }
+type StructureRow = { name: string; value: number; color?: string; count: number }
 
-type CategorySlice = { name: string; value: number; color: string; percent: number }
+type StructureSlice = { name: string; value: number; color: string; percent: number; total: number }
 
-function groupByCategory(transactions: Transaction[], type: "income" | "expense"): CategoryRow[] {
-  const map = new Map<string, CategoryRow>()
+function groupByCategory(transactions: Transaction[], type: "income" | "expense"): StructureRow[] {
+  const map = new Map<string, StructureRow>()
   transactions
     .filter((t) => t.type === type)
     .forEach((t) => {
@@ -54,28 +54,66 @@ function groupByCategory(transactions: Transaction[], type: "income" | "expense"
   return Array.from(map.values()).sort((a, b) => b.value - a.value)
 }
 
-function buildCategorySlices(
+function groupByBusiness(
   transactions: Transaction[],
   type: "income" | "expense",
-  maxSlices = 4
-): { slices: CategorySlice[]; total: number; txCount: number } {
+  summaries?: BusinessSummary[]
+): StructureRow[] {
+  const summaryMap = new Map((summaries || []).map((s) => [s.business_id, s]))
+  const map = new Map<string, StructureRow>()
+
+  transactions
+    .filter((t) => t.type === type)
+    .forEach((t) => {
+      const id = t.business_id || "unknown"
+      const name =
+        t.business?.name ||
+        summaryMap.get(id)?.business_name ||
+        "Chưa gán việc"
+      const color = t.business?.color || summaryMap.get(id)?.color
+      const row = map.get(id) || { name, value: 0, color, count: 0 }
+      row.value += t.amount
+      row.count += 1
+      if (color) row.color = color
+      map.set(id, row)
+    })
+
+  return Array.from(map.values()).sort((a, b) => b.value - a.value)
+}
+
+function buildStructureSlices(
+  rows: StructureRow[],
+  type: "income" | "expense",
+  options: { maxSlices?: number; mergeSmall?: boolean; otherSuffix?: string } = {}
+): { slices: StructureSlice[]; total: number; txCount: number } {
+  const { maxSlices = 6, mergeSmall = true, otherSuffix = "DM" } = options
   const palette = type === "income" ? incomePiePalette() : expensePiePalette()
-  const raw = groupByCategory(transactions, type)
-  const total = raw.reduce((s, d) => s + d.value, 0)
-  const txCount = raw.reduce((s, d) => s + d.count, 0)
+  const total = rows.reduce((s, d) => s + d.value, 0)
+  const txCount = rows.reduce((s, d) => s + d.count, 0)
 
   if (total <= 0) return { slices: [], total: 0, txCount: 0 }
 
-  const slices: CategorySlice[] = []
+  if (!mergeSmall || rows.length <= maxSlices) {
+    const slices = rows.map((item, i) => ({
+      name: item.name,
+      value: item.value,
+      color: item.color || palette[i % palette.length],
+      percent: (item.value / total) * 100,
+      total,
+    }))
+    return { slices, total, txCount }
+  }
+
+  const slices: StructureSlice[] = []
   let otherValue = 0
   let otherCount = 0
 
-  raw.forEach((item, index) => {
+  rows.forEach((item, index) => {
     const percent = (item.value / total) * 100
     const color = item.color || palette[slices.length % palette.length]
-    const fitsTop = index < maxSlices && (percent >= 3 || slices.length < 2)
-    if (fitsTop && item.name !== "Khác") {
-      slices.push({ name: item.name, value: item.value, color, percent })
+    const fitsTop = index < maxSlices - 1 && (percent >= 2 || slices.length < 2)
+    if (fitsTop) {
+      slices.push({ name: item.name, value: item.value, color, percent, total })
     } else {
       otherValue += item.value
       otherCount += item.count
@@ -84,14 +122,19 @@ function buildCategorySlices(
 
   if (otherValue > 0) {
     slices.push({
-      name: otherCount > 1 ? `Khác (${otherCount} DM)` : "Khác",
+      name: otherCount > 1 ? `Khác (${otherCount} ${otherSuffix})` : "Khác",
       value: otherValue,
       color: palette[palette.length - 1],
       percent: (otherValue / total) * 100,
+      total,
     })
   }
 
   return { slices, total, txCount }
+}
+
+function countBusinesses(transactions: Transaction[]) {
+  return new Set(transactions.map((t) => t.business_id).filter(Boolean)).size
 }
 
 function formatCenterMoney(value: number) {
@@ -182,21 +225,36 @@ function ProfitTrendChartBody({
   )
 }
 
-function CategoryPieBody({
+function StructurePieBody({
   transactions,
   type,
+  groupBy,
+  summaries,
   compact = false,
 }: {
   transactions: Transaction[]
   type: "income" | "expense"
+  groupBy: "business" | "category"
+  summaries?: BusinessSummary[]
   compact?: boolean
 }) {
-  const { slices, total, txCount } = buildCategorySlices(transactions, type, compact ? 4 : 5)
+  const rows =
+    groupBy === "business"
+      ? groupByBusiness(transactions, type, summaries)
+      : groupByCategory(transactions, type)
+
+  const { slices, total, txCount } = buildStructureSlices(rows, type, {
+    maxSlices: groupBy === "business" ? 8 : compact ? 4 : 5,
+    mergeSmall: groupBy === "category",
+    otherSuffix: groupBy === "business" ? "việc" : "DM",
+  })
+
   const height = compact ? 140 : CHART_HEIGHT_COMPACT
   const innerR = compact ? 42 : 48
   const outerR = compact ? 62 : 70
   const accent = type === "income" ? "text-green-400" : "text-red-400"
   const accentMuted = type === "income" ? "text-green-400/70" : "text-red-400/70"
+  const unitLabel = groupBy === "business" ? "việc KD" : "danh mục"
 
   if (slices.length === 0 || total <= 0) {
     return <ChartEmpty label={type === "income" ? "Chưa có khoản thu" : "Chưa có khoản chi"} />
@@ -208,11 +266,14 @@ function CategoryPieBody({
     <div className="flex flex-col gap-3 min-h-0 h-full">
       <div className="flex items-center justify-between gap-2 text-[11px]">
         <span className={cn("font-semibold uppercase tracking-wider", accentMuted)}>
-          {txCount} giao dịch · {slices.length} danh mục
+          {txCount} GD · {slices.length} {unitLabel}
         </span>
         {topSlice && (
-          <span className="text-zinc-500 truncate max-w-[48%]">
-            Lớn nhất: <span className={accent}>{formatChartPercent(topSlice.value, total)}</span>
+          <span className="text-zinc-500 truncate max-w-[52%] text-right">
+            <span className="text-zinc-600">Cao nhất: </span>
+            <span className={cn("font-semibold", accent)}>{topSlice.name}</span>
+            {" "}
+            <span className={accent}>{formatChartPercent(topSlice.value, total)}</span>
           </span>
         )}
       </div>
@@ -235,26 +296,45 @@ function CategoryPieBody({
                 <Cell key={slice.name} fill={slice.color} />
               ))}
             </Pie>
-            <Tooltip content={<ChartTooltipContent />} />
+            <Tooltip
+              content={({ active, payload }) => {
+                if (!active || !payload?.[0]) return null
+                const p = payload[0].payload as StructureSlice
+                return (
+                  <div
+                    className="rounded-lg border px-3 py-2 shadow-2xl backdrop-blur-md min-w-[160px]"
+                    style={{ background: CHART_COLORS.tooltipBg, borderColor: CHART_COLORS.tooltipBorder }}
+                  >
+                    <p className="text-xs font-semibold text-zinc-100 truncate">{p.name}</p>
+                    <p className={cn("text-lg font-mono font-bold tabular-nums mt-1", accent)}>
+                      {formatChartPercent(p.value, p.total)}
+                    </p>
+                    <p className="text-[11px] font-mono text-zinc-400 tabular-nums">{formatCenterMoney(p.value)}</p>
+                  </div>
+                )
+              }}
+            />
           </PieChart>
         </ResponsiveContainer>
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-2 text-center">
-          <span className="text-[9px] uppercase tracking-wider text-zinc-500">Tổng</span>
+          <span className="text-[9px] uppercase tracking-wider text-zinc-500">Tổng {type === "income" ? "thu" : "chi"}</span>
           <span className={cn("text-sm font-mono font-bold tabular-nums leading-tight", accent)}>
             {formatCenterMoney(total)}
           </span>
         </div>
       </div>
 
-      <ul className="flex-1 w-full space-y-2.5 min-h-0 overflow-y-auto max-h-[180px] pr-0.5">
+      <ul className="flex-1 w-full space-y-2.5 min-h-0 overflow-y-auto max-h-[200px] pr-0.5">
         {slices.map((item) => (
           <li key={item.name}>
             <div className="flex items-center justify-between gap-2 mb-1">
-              <span className="flex items-center gap-1.5 min-w-0">
+              <span className="flex items-center gap-1.5 min-w-0 flex-1">
                 <span className="h-2.5 w-2.5 rounded-[3px] shrink-0" style={{ backgroundColor: item.color }} />
-                <span className="truncate text-xs text-zinc-300">{item.name}</span>
+                <span className="truncate text-xs font-medium text-zinc-200" title={item.name}>
+                  {item.name}
+                </span>
               </span>
-              <span className="font-mono text-[11px] tabular-nums text-zinc-400 shrink-0">
+              <span className={cn("font-mono text-xs font-bold tabular-nums shrink-0", accent)}>
                 {formatChartPercent(item.value, total)}
               </span>
             </div>
@@ -357,21 +437,33 @@ export function CombinedCashflowPanel({ transactions }: { transactions: Transact
   )
 }
 
-export function CombinedCategoryPanel({ transactions }: { transactions: Transaction[] }) {
+export function CombinedCategoryPanel({
+  transactions,
+  summaries,
+  groupBy: groupByProp,
+}: {
+  transactions: Transaction[]
+  summaries?: BusinessSummary[]
+  groupBy?: "business" | "category"
+}) {
   const incomeTotal = transactions.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0)
   const expenseTotal = transactions.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0)
   const hasAny = incomeTotal > 0 || expenseTotal > 0
+  const groupBy = groupByProp ?? (countBusinesses(transactions) > 1 ? "business" : "category")
+  const byBusiness = groupBy === "business"
 
   return (
     <ChartShell
-      title="Cơ cấu thu chi"
-      description="Phân bổ theo danh mục · đồng bộ toàn bộ giao dịch"
+      title={byBusiness ? "Cơ cấu thu chi theo việc KD" : "Cơ cấu thu chi theo danh mục"}
+      description={byBusiness ? "Mỗi lát = một việc kinh doanh · % trên tổng thu/chi" : "Phân bổ theo danh mục trong việc này"}
       accent="amber"
       className="h-full"
       footer={
         hasAny ? (
           <p className="text-[10px] text-zinc-600 leading-relaxed">
-            Màu theo danh mục · nhóm nhỏ &lt;3% gộp vào Khác · số tiền là tổng thực tế
+            {byBusiness
+              ? "Màu theo việc kinh doanh · hover xem % và số tiền · danh sách bên dưới sắp theo % giảm dần"
+              : "Màu theo danh mục · nhóm nhỏ gộp Khác"}
           </p>
         ) : undefined
       }
@@ -385,16 +477,16 @@ export function CombinedCategoryPanel({ transactions }: { transactions: Transact
             <div className="min-w-0 rounded-lg border border-green-500/20 bg-green-500/[0.04] p-3 flex flex-col min-h-[320px]">
               <p className="text-xs font-bold text-green-400 mb-3 flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-green-400" />
-                Cơ cấu thu
+                {byBusiness ? "Thu từ việc nào?" : "Cơ cấu thu"}
               </p>
-              <CategoryPieBody transactions={transactions} type="income" compact />
+              <StructurePieBody transactions={transactions} type="income" groupBy={groupBy} summaries={summaries} compact />
             </div>
             <div className="min-w-0 rounded-lg border border-red-500/20 bg-red-500/[0.04] p-3 flex flex-col min-h-[320px]">
               <p className="text-xs font-bold text-red-400 mb-3 flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full bg-red-400" />
-                Cơ cấu chi
+                {byBusiness ? "Chi từ việc nào?" : "Cơ cấu chi"}
               </p>
-              <CategoryPieBody transactions={transactions} type="expense" compact />
+              <StructurePieBody transactions={transactions} type="expense" groupBy={groupBy} summaries={summaries} compact />
             </div>
           </div>
         </div>
@@ -436,7 +528,7 @@ export function CategoryPieChart({
   const title = type === "income" ? "Cơ cấu thu" : "Cơ cấu chi"
   return (
     <ChartShell title={title} description="Theo danh mục" accent={type === "income" ? "emerald" : "red"}>
-      <CategoryPieBody transactions={transactions} type={type} />
+      <StructurePieBody transactions={transactions} type={type} groupBy="category" compact={false} />
     </ChartShell>
   )
 }
