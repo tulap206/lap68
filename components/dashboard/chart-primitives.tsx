@@ -34,7 +34,10 @@ export function formatChartAxisValue(val: number) {
 
 export function formatChartPercent(value: number, total: number) {
   if (total <= 0) return "0%"
-  return `${Math.round((value / total) * 100)}%`
+  const p = (value / total) * 100
+  if (p > 0 && p < 1) return "<1%"
+  if (p < 10) return `${p.toFixed(1)}%`
+  return `${Math.round(p)}%`
 }
 
 type PayloadItem = { name?: string; value?: number; color?: string; dataKey?: string }
