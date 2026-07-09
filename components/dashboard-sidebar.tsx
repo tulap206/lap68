@@ -1,13 +1,12 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { useAuth } from "@/contexts/auth-context"
+import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
-  ArrowLeftRight,
-  Tags,
+  LayoutGrid,
+  Bell,
+  Calendar,
   BarChart3,
   History,
   Settings,
@@ -15,24 +14,47 @@ import {
   Menu,
   X,
   Wallet,
+  ArrowLeftRight,
+  Tags,
+  CalendarClock,
+  Users,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { useAuth } from "@/contexts/auth-context"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 
-const menuItems = [
+const globalItems = [
   { title: "Tổng quan", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Giao dịch", href: "/dashboard/transactions", icon: ArrowLeftRight },
-  { title: "Danh mục", href: "/dashboard/categories", icon: Tags },
+  { title: "Việc KD", href: "/dashboard/businesses", icon: LayoutGrid },
+  { title: "Nhắc hẹn", href: "/dashboard/reminders", icon: Bell },
+  { title: "Lịch", href: "/dashboard/calendar", icon: Calendar },
   { title: "Báo cáo", href: "/dashboard/reports", icon: BarChart3 },
   { title: "Lịch sử", href: "/dashboard/history", icon: History },
   { title: "Cài đặt", href: "/dashboard/settings", icon: Settings },
 ]
+
+function businessSubItems(businessId: string) {
+  const base = `/dashboard/b/${businessId}`
+  return [
+    { title: "Tổng quan", href: base, icon: LayoutDashboard },
+    { title: "Giao dịch", href: `${base}/transactions`, icon: ArrowLeftRight },
+    { title: "Danh mục", href: `${base}/categories`, icon: Tags },
+    { title: "Lịch thu/chi", href: `${base}/schedules`, icon: CalendarClock },
+    { title: "Đối tác", href: `${base}/counterparties`, icon: Users },
+  ]
+}
 
 export function DashboardSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const { user, logout } = useAuth()
   const [mobileOpen, setMobileOpen] = useState(false)
+
+  const businessMatch = pathname.match(/^\/dashboard\/b\/([^/]+)/)
+  const businessId = businessMatch?.[1]
+  const menuItems = businessId ? businessSubItems(businessId) : globalItems
 
   const handleLogout = () => {
     logout()
@@ -50,9 +72,21 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         <span className="absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-black" />
       </Link>
 
+      {businessId && (
+        <Link
+          href="/dashboard"
+          className="mb-3 flex h-8 w-12 items-center justify-center rounded-xl text-zinc-500 hover:text-zinc-200 hover:bg-zinc-800 text-xs"
+          title="Về hub"
+        >
+          ←
+        </Link>
+      )}
+
       <nav className="flex flex-col gap-2 flex-1">
         {menuItems.map((item) => {
-          const active = pathname === item.href
+          const active = pathname === item.href || (item.href !== `/dashboard/b/${businessId}` && pathname.startsWith(item.href + "/"))
+          const isExactBusinessHome = item.href === `/dashboard/b/${businessId}` && pathname === item.href
+          const isActive = businessId && item.href === `/dashboard/b/${businessId}` ? isExactBusinessHome : active
           const Icon = item.icon
           return (
             <Link
@@ -61,7 +95,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
               onClick={() => setMobileOpen(false)}
               className={cn(
                 "group relative flex h-12 w-12 items-center justify-center rounded-2xl transition-all duration-200",
-                active
+                isActive
                   ? "bg-green-600/20 text-green-400 border border-green-500/30 shadow-[0_0_20px_rgba(34,197,94,0.15)]"
                   : "text-zinc-500 border border-transparent hover:bg-zinc-800/80 hover:text-zinc-200 hover:border-zinc-700"
               )}

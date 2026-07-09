@@ -4,21 +4,29 @@ import { useCallback, useEffect, useMemo, useState } from "react"
 import { useAuth } from "@/contexts/auth-context"
 import { ModulePageShell, ModuleSubpageHeader, ModuleKpiCard } from "@/components/dashboard/module-shell"
 import { MonthlyCashflowChart, CategoryPieChart, ProfitTrendChart } from "@/components/dashboard/cashflow-charts"
-import { fetchTransactions, type Transaction } from "@/lib/supabase"
+import { BusinessComparisonChart } from "@/components/dashboard/business-comparison-chart"
+import { fetchTransactions, fetchBusinessSummaries } from "@/lib/supabase"
 import { displayMoney } from "@/lib/format-money"
 import { SkeletonMetricCards } from "@/components/ui/skeleton-loader"
 import { TrendingUp, TrendingDown, PiggyBank, BarChart3 } from "lucide-react"
 import { toast } from "sonner"
+import type { Transaction, BusinessSummary } from "@/lib/types"
 
 export default function ReportsPage() {
   const { user } = useAuth()
   const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [summaries, setSummaries] = useState<BusinessSummary[]>([])
   const [loading, setLoading] = useState(true)
 
   const loadData = useCallback(async () => {
     if (!user) return
     try {
-      setTransactions(await fetchTransactions(user.id))
+      const [txs, sums] = await Promise.all([
+        fetchTransactions(user.id),
+        fetchBusinessSummaries(user.id),
+      ])
+      setTransactions(txs)
+      setSummaries(sums)
     } catch {
       toast.error("Không tải được báo cáo")
     } finally {
@@ -37,7 +45,7 @@ export default function ReportsPage() {
 
   return (
     <ModulePageShell module="cashflow">
-      <ModuleSubpageHeader module="cashflow" title="Báo cáo tài chính" subtitle="Phân tích thu chi và xu hướng dòng tiền" />
+      <ModuleSubpageHeader module="cashflow" title="Báo cáo tài chính" subtitle="Phân tích thu chi toàn portfolio và từng việc kinh doanh" />
 
       {loading ? (
         <SkeletonMetricCards />
@@ -49,6 +57,8 @@ export default function ReportsPage() {
           <ModuleKpiCard module="cashflow" label="Tỷ suất lợi nhuận" value={`${stats.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="neutral" />
         </div>
       )}
+
+      <BusinessComparisonChart summaries={summaries} />
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <MonthlyCashflowChart transactions={transactions} />
