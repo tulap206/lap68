@@ -72,6 +72,7 @@ export async function fetchBusinessSummaries(userId: string) {
     .from("lap68_business_summary")
     .select("*")
     .eq("user_id", userId)
+    .neq("status", "archived")
   if (error) throw error
   return (data || []) as BusinessSummary[]
 }
