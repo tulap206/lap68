@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { AccentButton } from "./module-shell"
 import { formatMoneyInput, parseMoneyInput } from "@/lib/format-money"
 import { toDateInputValue, toStoredDateValue, todayStoredDate } from "@/lib/format-date"
-import type { Category, Counterparty, Schedule, ScheduleDirection, ScheduleKind } from "@/lib/types"
+import type { Category, Schedule, ScheduleDirection, ScheduleKind } from "@/lib/types"
 
 export type ScheduleFormValues = {
   direction: ScheduleDirection
@@ -49,14 +49,12 @@ export function ScheduleFormDialog({
   open,
   onOpenChange,
   categories,
-  counterparties,
   editing,
   onSave,
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
   categories: Category[]
-  counterparties: Counterparty[]
   editing: Schedule | null
   onSave: (values: ScheduleFormValues) => Promise<void>
 }) {

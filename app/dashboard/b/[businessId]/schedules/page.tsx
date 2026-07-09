@@ -8,13 +8,13 @@ import { useAuth } from "@/contexts/auth-context"
 import { ModulePageShell, ModuleSubpageHeader, ModuleSectionCard, ModuleResponsiveTable, AccentButton, moduleBadgeClass } from "@/components/dashboard/module-shell"
 import { ScheduleFormDialog, scheduleFormToPayload } from "@/components/dashboard/schedule-form-dialog"
 import { SkeletonTable } from "@/components/ui/skeleton-loader"
-import { fetchSchedules, fetchCategories, fetchCounterparties, insertSchedule, updateSchedule, deleteSchedule } from "@/lib/supabase"
+import { fetchSchedules, fetchCategories, insertSchedule, updateSchedule, deleteSchedule } from "@/lib/supabase"
 import { displayMoney } from "@/lib/format-money"
 import { formatDisplayDate } from "@/lib/format-date"
 import { getEffectiveDueDate } from "@/lib/schedule-engine"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import type { Schedule, Category, Counterparty } from "@/lib/types"
+import type { Schedule, Category } from "@/lib/types"
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "Chờ",
@@ -30,7 +30,6 @@ export default function BusinessSchedulesPage() {
   const businessId = params.businessId as string
   const [schedules, setSchedules] = useState<Schedule[]>([])
   const [categories, setCategories] = useState<Category[]>([])
-  const [counterparties, setCounterparties] = useState<Counterparty[]>([])
   const [loading, setLoading] = useState(true)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<Schedule | null>(null)
@@ -38,14 +37,12 @@ export default function BusinessSchedulesPage() {
   const load = useCallback(async () => {
     if (!user) return
     try {
-      const [sch, cats, cps] = await Promise.all([
+      const [sch, cats] = await Promise.all([
         fetchSchedules(user.id, businessId),
         fetchCategories(user.id, businessId),
-        fetchCounterparties(user.id, businessId),
       ])
       setSchedules(sch)
       setCategories(cats)
-      setCounterparties(cps)
     } catch {
       toast.error("Không tải được lịch thu/chi")
     } finally {
@@ -95,7 +92,7 @@ export default function BusinessSchedulesPage() {
         )}
       </ModuleSectionCard>
 
-      <ScheduleFormDialog open={dialogOpen} onOpenChange={setDialogOpen} categories={categories} counterparties={counterparties} editing={editing} onSave={handleSave} />
+      <ScheduleFormDialog open={dialogOpen} onOpenChange={setDialogOpen} categories={categories} editing={editing} onSave={handleSave} />
     </ModulePageShell>
   )
 }

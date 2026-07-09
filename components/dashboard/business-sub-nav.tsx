@@ -9,7 +9,6 @@ const tabs = (businessId: string) => [
   { label: "Giao dịch", href: `/dashboard/b/${businessId}/transactions` },
   { label: "Danh mục", href: `/dashboard/b/${businessId}/categories` },
   { label: "Lịch thu/chi", href: `/dashboard/b/${businessId}/schedules` },
-  { label: "Đối tác", href: `/dashboard/b/${businessId}/counterparties` },
 ]
 
 export function BusinessSubNav({ businessId }: { businessId: string }) {

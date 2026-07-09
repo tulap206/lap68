@@ -17,7 +17,6 @@ import {
   ArrowLeftRight,
   Tags,
   CalendarClock,
-  Users,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -42,7 +41,6 @@ function businessSubItems(businessId: string) {
     { title: "Giao dịch", href: `${base}/transactions`, icon: ArrowLeftRight },
     { title: "Danh mục", href: `${base}/categories`, icon: Tags },
     { title: "Lịch thu/chi", href: `${base}/schedules`, icon: CalendarClock },
-    { title: "Đối tác", href: `${base}/counterparties`, icon: Users },
   ]
 }
 
