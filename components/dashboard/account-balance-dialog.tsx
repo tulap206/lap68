@@ -80,7 +80,11 @@ export function AccountBalanceDialog({
 
     setSaving(true)
     try {
-      await savePortfolioSettings(user.id, { liquid_accounts: accounts, updated_at: new Date().toISOString() })
+      await savePortfolioSettings(user.id, {
+        liquid_accounts: accounts,
+        updated_at: new Date().toISOString(),
+        primary_account_id: settings.primary_account_id || accounts[0]?.id || null,
+      })
       logAction("Cập nhật số dư TK", `${accounts.length} tài khoản · ${displayMoney(totalLiquidBalance({ liquid_accounts: accounts, updated_at: null }))}`)
       toast.success("Đã lưu số dư tài khoản")
       onOpenChange(false)
@@ -101,7 +105,7 @@ export function AccountBalanceDialog({
         <DialogHeader>
           <DialogTitle>Số dư tài khoản</DialogTitle>
           <DialogDescription>
-            Tiền thanh khoản trong ngân hàng / ví — khác với vốn đang bỏ vào việc kinh doanh. Cập nhật khi kiểm tra app ngân hàng.
+            Nhập số dư thực tế từ app ngân hàng để đối soát. Sau đó mỗi giao dịch thu/chi sẽ tự cộng hoặc trừ vào tài khoản tương ứng (tiền mặt → TK tiền mặt, chuyển khoản/thẻ → TK ngân hàng).
           </DialogDescription>
         </DialogHeader>
 

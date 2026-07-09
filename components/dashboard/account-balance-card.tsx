@@ -38,7 +38,7 @@ export function AccountBalanceCard({
             <p className="text-sm font-semibold text-zinc-100">Số dư tài khoản</p>
           </div>
           <p className="text-[11px] text-zinc-500 mt-0.5">
-            Tiền thanh khoản (NH, ví, tiền mặt) — chưa gồm vốn đầu tư nơi khác
+            Tự cập nhật theo giao dịch thu/chi · có thể đối soát thủ công
           </p>
         </div>
         {onClick && <span className="text-[10px] text-sky-400/80 shrink-0">Cập nhật</span>}

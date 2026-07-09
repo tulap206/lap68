@@ -12,6 +12,7 @@ import {
   defaultLiquidAccounts,
   parseUserPortfolioSettings,
   PORTFOLIO_SETTINGS_COUNTERPARTY_NAME,
+  syncPortfolioForTransactionChange,
   type UserPortfolioSettings,
 } from "./account-balance"
 import {
@@ -193,8 +194,12 @@ export async function fetchPortfolioSettings(userId: string): Promise<UserPortfo
 }
 
 export async function savePortfolioSettings(userId: string, portfolio: UserPortfolioSettings) {
+  const withPrimary: UserPortfolioSettings = {
+    ...portfolio,
+    primary_account_id: portfolio.primary_account_id || portfolio.liquid_accounts[0]?.id || null,
+  }
   const ghi_chu = {
-    ...buildPortfolioSettings({}, { ...portfolio, updated_at: new Date().toISOString() }),
+    ...buildPortfolioSettings({}, { ...withPrimary, updated_at: new Date().toISOString() }),
     _lap68_internal: true,
   }
   const { data: existing, error: fetchError } = await supabase
@@ -239,6 +244,23 @@ export async function deleteCounterparty(id: string) {
   if (error) throw error
 }
 
+async function syncPortfolioBalanceFromTransaction(
+  userId: string,
+  before: Pick<Transaction, "type" | "amount" | "payment_method"> | null,
+  after: Pick<Transaction, "type" | "amount" | "payment_method"> | null
+) {
+  if (!before && !after) return
+  const current = await fetchPortfolioSettings(userId)
+  const next = syncPortfolioForTransactionChange(current, before, after)
+  await savePortfolioSettings(userId, next)
+}
+
+async function fetchTransactionById(id: string): Promise<Transaction | null> {
+  const { data, error } = await supabase.from("lap68_transactions").select("*").eq("id", id).maybeSingle()
+  if (error) throw error
+  return data as Transaction | null
+}
+
 // --- Transactions ---
 export async function fetchTransactions(userId: string, businessId?: string) {
   let q = supabase
@@ -260,10 +282,13 @@ export async function insertTransaction(transaction: Omit<Transaction, "id" | "c
     .select("*, category:lap68_categories(*), counterparty:lap68_counterparties(*)")
     .single()
   if (error) throw error
-  return data as Transaction
+  const tx = data as Transaction
+  await syncPortfolioBalanceFromTransaction(tx.user_id, null, tx)
+  return tx
 }
 
 export async function updateTransaction(id: string, updates: Partial<Omit<Transaction, "category" | "counterparty" | "business">>) {
+  const before = await fetchTransactionById(id)
   const payload = sanitizeItem("lap68_transactions", updates)
   const { data, error } = await supabase
     .from("lap68_transactions")
@@ -272,12 +297,20 @@ export async function updateTransaction(id: string, updates: Partial<Omit<Transa
     .select("*, category:lap68_categories(*), counterparty:lap68_counterparties(*)")
     .single()
   if (error) throw error
-  return data as Transaction
+  const after = data as Transaction
+  if (before) {
+    await syncPortfolioBalanceFromTransaction(before.user_id, before, after)
+  }
+  return after
 }
 
 export async function deleteTransaction(id: string) {
+  const before = await fetchTransactionById(id)
   const { error } = await supabase.from("lap68_transactions").delete().eq("id", id)
   if (error) throw error
+  if (before) {
+    await syncPortfolioBalanceFromTransaction(before.user_id, before, null)
+  }
 }
 
 // --- Schedules ---
@@ -515,6 +548,7 @@ export function subscribeLap68Tables(userId: string, onChange: () => void) {
     .on("postgres_changes", { event: "*", schema: "public", table: "lap68_transactions" }, onChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "lap68_schedules" }, onChange)
     .on("postgres_changes", { event: "*", schema: "public", table: "lap68_businesses" }, onChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "lap68_counterparties" }, onChange)
     .subscribe()
   return () => {
     supabase.removeChannel(channel)
