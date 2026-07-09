@@ -63,12 +63,12 @@ export function MonthlyCashflowChart({ transactions }: { transactions: Transacti
       ) : (
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={data} barGap={4}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-            <YAxis tickFormatter={formatChartAxisValue} tick={{ fontSize: 11 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+            <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#71717a" }} axisLine={{ stroke: "#3f3f46" }} />
+            <YAxis tickFormatter={formatChartAxisValue} tick={{ fontSize: 11, fill: "#71717a" }} axisLine={{ stroke: "#3f3f46" }} />
             <Tooltip formatter={(v) => displayMoney(Number(v ?? 0))} />
-            <Bar dataKey="income" name="Thu" fill="#059669" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="expense" name="Chi" fill="#DC2626" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="income" name="Thu" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="expense" name="Chi" fill="#ef4444" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       )}
@@ -124,13 +124,13 @@ export function ProfitTrendChart({ transactions }: { transactions: Transaction[]
       ) : (
         <ResponsiveContainer width="100%" height={240}>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-            <XAxis dataKey="month" tick={{ fontSize: 11 }} />
-            <YAxis tickFormatter={formatChartAxisValue} tick={{ fontSize: 11 }} />
+            <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
+            <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#71717a" }} axisLine={{ stroke: "#3f3f46" }} />
+            <YAxis tickFormatter={formatChartAxisValue} tick={{ fontSize: 11, fill: "#71717a" }} axisLine={{ stroke: "#3f3f46" }} />
             <Tooltip formatter={(v) => displayMoney(Number(v ?? 0))} />
             <Bar dataKey="profit" name="Lợi nhuận" radius={[4, 4, 0, 0]}>
               {data.map((entry, i) => (
-                <Cell key={i} fill={entry.profit >= 0 ? "#059669" : "#DC2626"} />
+                <Cell key={i} fill={entry.profit >= 0 ? "#22c55e" : "#ef4444"} />
               ))}
             </Bar>
           </BarChart>

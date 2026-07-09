@@ -6,7 +6,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Eye, EyeOff, Loader2, Wallet } from "lucide-react"
+import { Eye, EyeOff, Loader2, Wallet, TrendingUp } from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -35,8 +35,8 @@ export default function LoginPage() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <Loader2 className="w-8 h-8 animate-spin text-green-500" />
       </div>
     )
   }
@@ -44,55 +44,64 @@ export default function LoginPage() {
   if (user) return null
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden bg-slate-950">
-      <div className="absolute inset-0 bg-gradient-to-tr from-slate-900/97 via-slate-950/93 to-emerald-950/85" />
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-700/10 rounded-full blur-3xl" />
+    <div className="min-h-screen flex flex-col items-center justify-center p-6 relative overflow-hidden bg-black">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(239,68,68,0.08),transparent_50%),radial-gradient(ellipse_at_bottom_right,rgba(34,197,94,0.1),transparent_50%)]" />
+      <div className="absolute inset-0 opacity-[0.03]" style={{
+        backgroundImage: "linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px)",
+        backgroundSize: "48px 48px",
+      }} />
 
       <div className="relative w-full max-w-md z-10 flex flex-col items-center gap-8">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <div className="w-20 h-20 rounded-2xl bg-emerald-600 flex items-center justify-center shadow-xl shadow-emerald-900/40 ring-2 ring-emerald-500/30">
-            <Wallet className="w-10 h-10 text-white" />
+        <div className="flex flex-col items-center gap-5 text-center">
+          <div className="relative">
+            <div className="w-20 h-20 rounded-2xl bg-zinc-900 flex items-center justify-center border border-zinc-800 glow-green">
+              <Wallet className="w-9 h-9 text-green-400" />
+            </div>
+            <div className="absolute -bottom-1 -right-1 h-7 w-7 rounded-lg bg-red-600 flex items-center justify-center border-2 border-black">
+              <TrendingUp className="h-3.5 w-3.5 text-white" />
+            </div>
           </div>
           <div>
-            <h1 className="text-3xl font-black italic uppercase text-white tracking-tight">
-              LAP<span className="text-emerald-400">68</span>
+            <h1 className="text-4xl font-black italic uppercase text-white tracking-tight">
+              LAP<span className="text-red-500">68</span>
             </h1>
-            <p className="text-slate-400 text-sm mt-2">Quản lý dòng tiền kinh doanh cá nhân</p>
+            <p className="text-zinc-500 text-sm mt-2 max-w-xs">
+              Quản lý dòng tiền kinh doanh cá nhân
+            </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="w-full bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-8 space-y-5">
+        <form onSubmit={handleSubmit} className="w-full glass-panel rounded-2xl p-8 space-y-5 shadow-2xl shadow-black/50">
           {error && (
-            <div className="rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-300">
+            <div className="rounded-xl bg-red-500/10 border border-red-500/25 px-4 py-3 text-sm text-red-300">
               {error}
             </div>
           )}
 
           <div className="space-y-2">
-            <Label className="text-slate-300">Tên đăng nhập</Label>
+            <Label>Tên đăng nhập</Label>
             <Input
               value={formData.username}
               onChange={(e) => setFormData({ ...formData, username: e.target.value })}
               placeholder="admin"
-              className="bg-white/10 border-white/10 text-white placeholder:text-slate-500"
               required
             />
           </div>
 
           <div className="space-y-2">
-            <Label className="text-slate-300">Mật khẩu</Label>
+            <Label>Mật khẩu</Label>
             <div className="relative">
               <Input
                 type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="bg-white/10 border-white/10 text-white pr-10"
+                className="pr-10"
                 required
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
               >
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
@@ -102,10 +111,14 @@ export default function LoginPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl"
+            className="w-full h-11 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl border border-green-500/30 shadow-lg shadow-green-900/30"
           >
             {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Đăng nhập"}
           </Button>
+
+          <p className="text-center text-xs text-zinc-600">
+            Thu <span className="text-green-500">xanh</span> · Chi <span className="text-red-500">đỏ</span> · Dòng tiền rõ ràng
+          </p>
         </form>
       </div>
     </div>

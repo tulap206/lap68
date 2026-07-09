@@ -158,7 +158,7 @@ export default function TransactionsPage() {
         filters={
           <div className="flex flex-wrap gap-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
               <Input className="pl-9 w-48 h-9" placeholder="Tìm kiếm..." value={search} onChange={(e) => setSearch(e.target.value)} />
             </div>
             <Select value={typeFilter} onValueChange={setTypeFilter}>
@@ -182,7 +182,7 @@ export default function TransactionsPage() {
               <TransactionTypeBadge key="type" type={t.type} />,
               t.category?.name || "—",
               t.description || "—",
-              <span key="amt" className={`font-mono font-semibold ${t.type === "income" ? "text-emerald-700" : "text-red-700"}`}>
+              <span key="amt" className={`font-mono font-semibold tabular-nums ${t.type === "income" ? "text-income" : "text-expense"}`}>
                 {t.type === "income" ? "+" : "-"}{displayMoney(t.amount)}
               </span>,
               <PaymentMethodLabel key="pm" method={t.payment_method} />,

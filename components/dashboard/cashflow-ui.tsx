@@ -7,9 +7,7 @@ export function TransactionTypeBadge({ type }: { type: TransactionType }) {
     <span
       className={cn(
         moduleBadgeClass,
-        type === "income"
-          ? "bg-emerald-50 text-emerald-700 border-emerald-100"
-          : "bg-red-50 text-red-700 border-red-100"
+        type === "income" ? "badge-income" : "badge-expense"
       )}
     >
       {type === "income" ? "Thu" : "Chi"}
@@ -24,5 +22,5 @@ export function PaymentMethodLabel({ method }: { method: string }) {
     card: "Thẻ",
     other: "Khác",
   }
-  return <span>{labels[method] || method}</span>
+  return <span className="text-zinc-400">{labels[method] || method}</span>
 }

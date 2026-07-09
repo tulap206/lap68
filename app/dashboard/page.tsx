@@ -136,10 +136,10 @@ export default function DashboardPage() {
         <SkeletonMetricCards />
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(stats.income)} icon={<TrendingUp className="h-5 w-5" />} delay={0} onClick={() => router.push("/dashboard/transactions?type=income")} />
-          <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(stats.expense)} icon={<TrendingDown className="h-5 w-5" />} delay={60} onClick={() => router.push("/dashboard/transactions?type=expense")} />
-          <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(stats.profit)} hint="Thu trừ chi" icon={<PiggyBank className="h-5 w-5" />} delay={120} />
-          <ModuleKpiCard module="cashflow" label="Tháng này" value={displayMoney(stats.monthIncome - stats.monthExpense)} hint={`${stats.count} giao dịch`} icon={<Wallet className="h-5 w-5" />} delay={180} />
+          <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(stats.income)} icon={<TrendingUp className="h-5 w-5" />} delay={0} tone="income" onClick={() => router.push("/dashboard/transactions?type=income")} />
+          <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(stats.expense)} icon={<TrendingDown className="h-5 w-5" />} delay={60} tone="expense" onClick={() => router.push("/dashboard/transactions?type=expense")} />
+          <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(stats.profit)} hint="Thu trừ chi" icon={<PiggyBank className="h-5 w-5" />} delay={120} tone="profit" />
+          <ModuleKpiCard module="cashflow" label="Tháng này" value={displayMoney(stats.monthIncome - stats.monthExpense)} hint={`${stats.count} giao dịch`} icon={<Wallet className="h-5 w-5" />} delay={180} tone="neutral" />
         </div>
       )}
 
@@ -161,7 +161,7 @@ export default function DashboardPage() {
               <TransactionTypeBadge key="type" type={t.type} />,
               t.category?.name || "—",
               t.description || "—",
-              <span key="amt" className={t.type === "income" ? "text-emerald-700 font-semibold font-mono" : "text-red-700 font-semibold font-mono"}>
+              <span key="amt" className={t.type === "income" ? "text-income font-semibold font-mono tabular-nums" : "text-expense font-semibold font-mono tabular-nums"}>
                 {t.type === "income" ? "+" : "-"}{displayMoney(t.amount)}
               </span>,
               <PaymentMethodLabel key="pm" method={t.payment_method} />,
@@ -172,7 +172,7 @@ export default function DashboardPage() {
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-md">
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-t-2xl" />
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-green-500 to-green-700 rounded-t-2xl" />
           <DialogHeader>
             <DialogTitle>Thêm giao dịch mới</DialogTitle>
             <DialogDescription>Ghi nhận thu hoặc chi vào sổ quỹ</DialogDescription>

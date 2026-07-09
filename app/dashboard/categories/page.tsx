@@ -103,7 +103,7 @@ export default function CategoriesPage() {
             headers={["Tên", "Loại", "Màu", ""]}
             rows={categories.map((c) => [
               c.name,
-              <span key="type" className={cn(moduleBadgeClass, c.type === "income" ? "bg-emerald-50 text-emerald-700 border-emerald-100" : "bg-red-50 text-red-700 border-red-100")}>
+              <span key="type" className={cn(moduleBadgeClass, c.type === "income" ? "badge-income" : "badge-expense")}>
                 {c.type === "income" ? "Thu" : "Chi"}
               </span>,
               <span key="color" className="inline-flex items-center gap-2">
@@ -145,7 +145,7 @@ export default function CategoriesPage() {
                     key={color}
                     type="button"
                     onClick={() => setForm({ ...form, color })}
-                    className={cn("h-8 w-8 rounded-full border-2", form.color === color ? "border-slate-900" : "border-transparent")}
+                    className={cn("h-8 w-8 rounded-full border-2", form.color === color ? "border-green-500" : "border-transparent")}
                     style={{ backgroundColor: color }}
                   />
                 ))}

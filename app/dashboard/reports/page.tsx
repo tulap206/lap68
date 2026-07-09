@@ -43,10 +43,10 @@ export default function ReportsPage() {
         <SkeletonMetricCards />
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(stats.income)} icon={<TrendingUp className="h-5 w-5" />} />
-          <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(stats.expense)} icon={<TrendingDown className="h-5 w-5" />} />
-          <ModuleKpiCard module="cashflow" label="Lợi nhuận ròng" value={displayMoney(stats.profit)} icon={<PiggyBank className="h-5 w-5" />} />
-          <ModuleKpiCard module="cashflow" label="Tỷ suất lợi nhuận" value={`${stats.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} />
+          <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(stats.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" />
+          <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(stats.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" />
+          <ModuleKpiCard module="cashflow" label="Lợi nhuận ròng" value={displayMoney(stats.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />
+          <ModuleKpiCard module="cashflow" label="Tỷ suất lợi nhuận" value={`${stats.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="neutral" />
         </div>
       )}
 

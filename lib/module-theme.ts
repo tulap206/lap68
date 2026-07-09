@@ -20,22 +20,23 @@ export const MODULE_THEME: Record<ModuleId, ModuleTheme> = {
 }
 
 export const ACCENT_TITLE_CLASS: Record<ModuleAccent, string> = {
-  emerald: "text-emerald-600",
+  emerald: "text-green-400",
 }
 
 export const ACCENT_BTN_CLASS: Record<ModuleAccent, string> = {
-  emerald: "bg-emerald-600 hover:bg-emerald-700 text-white",
+  emerald:
+    "bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/40 border border-green-500/20",
 }
 
 export const ACCENT_KPI_HOVER_CLASS: Record<ModuleAccent, string> = {
-  emerald: "hover:border-emerald-100",
+  emerald: "hover:border-green-500/30",
 }
 
 export const ACCENT_BADGE_CLASS: Record<ModuleAccent, string> = {
-  emerald: "bg-emerald-50 text-emerald-700 border-emerald-100",
+  emerald: "badge-income",
 }
 
-export const MODULE_CHART_PALETTE = ["#059669", "#DC2626", "#2563EB", "#D97706", "#7C6BA8", "#64748B"]
+export const MODULE_CHART_PALETTE = ["#22c55e", "#ef4444", "#71717a", "#16a34a", "#dc2626", "#52525b"]
 
 export function getModuleTheme(module: ModuleId): ModuleTheme {
   return MODULE_THEME[module]

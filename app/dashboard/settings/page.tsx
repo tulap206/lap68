@@ -109,7 +109,7 @@ export default function SettingsPage() {
       </div>
 
       <ModuleSectionCard title="Thông tin hệ thống">
-        <div className="p-6 text-sm text-slate-600 space-y-2">
+        <div className="p-6 text-sm text-zinc-400 space-y-2">
           <p><strong>Ứng dụng:</strong> LAP68 — Quản lý dòng tiền</p>
           <p><strong>Phiên bản:</strong> 1.0.0</p>
           <p><strong>Tài khoản:</strong> {user?.displayName} ({user?.username})</p>
