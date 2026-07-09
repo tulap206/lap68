@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Plus, TrendingUp, TrendingDown, PiggyBank, CalendarClock, Landmark, SlidersHorizontal } from "lucide-react"
+import { Plus, TrendingUp, TrendingDown, PiggyBank, CalendarClock, Landmark, SlidersHorizontal, BarChart3 } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth-context"
@@ -14,7 +14,7 @@ import {
   ModuleResponsiveTable,
   AccentButton,
 } from "@/components/dashboard/module-shell"
-import { MonthlyCashflowChart, CategoryPieChart } from "@/components/dashboard/cashflow-charts"
+import { MonthlyCashflowChart, CategoryPieChart, ProfitTrendChart } from "@/components/dashboard/cashflow-charts"
 import { TransactionTypeBadge, PaymentMethodLabel } from "@/components/dashboard/cashflow-ui"
 import { ReminderPanel } from "@/components/dashboard/reminder-panel"
 import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog"
@@ -76,7 +76,8 @@ export default function BusinessDashboardPage() {
   const stats = useMemo(() => {
     const income = transactions.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0)
     const expense = transactions.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0)
-    return { income, expense, profit: income - expense, count: transactions.length }
+    const margin = income > 0 ? ((income - expense) / income) * 100 : 0
+    return { income, expense, profit: income - expense, margin, count: transactions.length }
   }, [transactions])
 
   const reminders = useMemo(() => buildReminderItems(schedules), [schedules])
@@ -117,10 +118,11 @@ export default function BusinessDashboardPage() {
       />
 
       {loading ? <SkeletonMetricCards /> : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(stats.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=income`)} />
           <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(stats.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=expense`)} />
           <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(stats.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />
+          <ModuleKpiCard module="cashflow" label="Tỷ suất LN" value={`${stats.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="neutral" />
           <ModuleKpiCard
             module="cashflow"
             label="Vốn hiện tại"
@@ -142,9 +144,14 @@ export default function BusinessDashboardPage() {
         </div>
       )}
 
-      <div className="grid xl:grid-cols-2 gap-4">
-        <MonthlyCashflowChart transactions={transactions} />
-        <CategoryPieChart transactions={transactions} type="expense" />
+      <div>
+        <h3 className="text-sm font-bold text-zinc-300 mb-3">Phân tích dòng tiền</h3>
+        <div className="grid xl:grid-cols-2 gap-4">
+          <MonthlyCashflowChart transactions={transactions} />
+          <ProfitTrendChart transactions={transactions} />
+          <CategoryPieChart transactions={transactions} type="income" />
+          <CategoryPieChart transactions={transactions} type="expense" />
+        </div>
       </div>
 
       <ModuleSectionCard title="Giao dịch gần đây" description={`${stats.count} giao dịch`}>

@@ -7,7 +7,6 @@ import {
   LayoutGrid,
   Bell,
   Calendar,
-  BarChart3,
   History,
   Settings,
   LogOut,
@@ -29,7 +28,6 @@ const globalItems = [
   { title: "Việc KD", href: "/dashboard/businesses", icon: LayoutGrid },
   { title: "Nhắc hẹn", href: "/dashboard/reminders", icon: Bell },
   { title: "Lịch", href: "/dashboard/calendar", icon: Calendar },
-  { title: "Báo cáo", href: "/dashboard/reports", icon: BarChart3 },
   { title: "Lịch sử", href: "/dashboard/history", icon: History },
   { title: "Cài đặt", href: "/dashboard/settings", icon: Settings },
 ]
