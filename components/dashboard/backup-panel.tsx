@@ -145,18 +145,18 @@ export function BackupPanel({
   }
 
   return (
-    <div className="p-4 sm:p-5 space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <AccentButton module="cashflow" onClick={handleCloudBackup} disabled={creating} className="shrink-0">
+    <div className="p-4 sm:p-5 flex flex-col flex-1 min-h-0 h-full gap-4">
+      <div className="space-y-3 shrink-0">
+        <AccentButton module="cashflow" onClick={handleCloudBackup} disabled={creating} className="w-full sm:w-auto">
           <Cloud className="h-4 w-4" />
           {creating ? "Đang lưu..." : "Lưu trực tuyến"}
         </AccentButton>
-        <div className="flex gap-2 flex-1 sm:justify-end">
-          <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting} className="flex-1 sm:flex-none">
+        <div className="grid grid-cols-2 gap-2">
+          <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting} className="w-full">
             <Download className="h-3.5 w-3.5" />
             {exporting ? "Đang xuất..." : "Xuất file"}
           </Button>
-          <label className="flex-1 sm:flex-none">
+          <label className="min-w-0">
             <input type="file" accept=".json" className="hidden" onChange={handleImport} disabled={importing} />
             <Button variant="outline" size="sm" className="w-full cursor-pointer" asChild>
               <span>
@@ -166,23 +166,24 @@ export function BackupPanel({
             </Button>
           </label>
         </div>
+        <p className="text-[11px] text-zinc-600 leading-relaxed">
+          Cloud lưu tối đa 15 bản trên Supabase · File JSON dùng khi chuyển máy · Khôi phục/nhập gộp thêm, không xóa dữ liệu hiện có
+        </p>
       </div>
 
-      <p className="text-[11px] text-zinc-600 leading-relaxed">
-        Cloud lưu tối đa 15 bản trên Supabase · File JSON dùng khi chuyển máy · Khôi phục/nhập gộp thêm, không xóa dữ liệu hiện có
-      </p>
-
-      <div className="border-t border-zinc-800/80 pt-3">
-        <p className="text-xs font-semibold text-zinc-500 mb-2">Bản sao lưu cloud</p>
+      <div className="border-t border-zinc-800/80 pt-3 flex flex-col flex-1 min-h-0">
+        <p className="text-xs font-semibold text-zinc-500 mb-2 shrink-0">Bản sao lưu cloud</p>
         {loading ? (
           <SkeletonTable />
         ) : backups.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-zinc-800 py-6 text-center">
-            <HardDrive className="h-6 w-6 text-zinc-600 mx-auto mb-1.5" />
-            <p className="text-xs text-zinc-500">Chưa có bản cloud — nhấn &quot;Lưu trực tuyến&quot;</p>
+          <div className="flex-1 flex items-center justify-center rounded-lg border border-dashed border-zinc-800 min-h-[200px]">
+            <div className="text-center px-4">
+              <HardDrive className="h-6 w-6 text-zinc-600 mx-auto mb-1.5" />
+              <p className="text-xs text-zinc-500">Chưa có bản cloud — nhấn &quot;Lưu trực tuyến&quot;</p>
+            </div>
           </div>
         ) : (
-          <ul className="divide-y divide-zinc-800/80 rounded-lg border border-zinc-800/80 overflow-hidden">
+          <ul className="divide-y divide-zinc-800/80 rounded-lg border border-zinc-800/80 overflow-hidden overflow-y-auto flex-1 min-h-0 max-h-[340px]">
             {backups.map((b) => (
               <li
                 key={b.id}

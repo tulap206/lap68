@@ -82,22 +82,24 @@ export function ModuleSectionCard({
   description,
   children,
   filters,
+  className,
 }: {
   title: string
   description?: string
   children: React.ReactNode
   filters?: React.ReactNode
+  className?: string
 }) {
   return (
-    <Card className="border-zinc-800/80 bg-card/80 backdrop-blur-sm py-0 overflow-hidden">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-6 py-4 bg-zinc-900/50 border-b border-zinc-800">
+    <Card className={cn("border-zinc-800/80 bg-card/80 backdrop-blur-sm py-0 overflow-hidden flex flex-col", className)}>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-6 py-4 bg-zinc-900/50 border-b border-zinc-800 shrink-0">
         <div>
           <h3 className="text-base font-bold text-zinc-100">{title}</h3>
           {description && <p className="text-xs text-zinc-500 mt-0.5">{description}</p>}
         </div>
         {filters}
       </div>
-      <CardContent className="p-0">{children}</CardContent>
+      <CardContent className="p-0 flex-1 flex flex-col min-h-0">{children}</CardContent>
     </Card>
   )
 }
