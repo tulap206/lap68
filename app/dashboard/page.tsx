@@ -8,8 +8,7 @@ import { useAuth } from "@/contexts/auth-context"
 import { ModulePageShell, ModuleBrandHeader, ModuleKpiCard, AccentButton } from "@/components/dashboard/module-shell"
 import { BusinessHubCard } from "@/components/dashboard/business-hub-card"
 import { ReminderPanel } from "@/components/dashboard/reminder-panel"
-import { BusinessComparisonChart } from "@/components/dashboard/business-comparison-chart"
-import { MonthlyCashflowChart, CategoryPieChart, ProfitTrendChart } from "@/components/dashboard/cashflow-charts"
+import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section"
 import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog"
 import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card"
 import { SkeletonMetricCards } from "@/components/ui/skeleton-loader"
@@ -106,100 +105,107 @@ export default function DashboardHubPage() {
 
   return (
     <ModulePageShell module="cashflow">
-      <ModuleBrandHeader
-        module="cashflow"
-        subtitle="Tổng quan thu chi, vốn và phân tích toàn bộ việc kinh doanh"
-        actions={
-          <div className="flex flex-wrap gap-2">
-            <AccentButton module="cashflow" type="button" onClick={() => setCapitalOpen(true)}>
-              <SlidersHorizontal className="h-4 w-4" /> Tinh chỉnh vốn
-            </AccentButton>
-            <Link href="/dashboard/businesses">
-              <AccentButton module="cashflow" type="button">
-                <LayoutGrid className="h-4 w-4" /> Quản lý việc
+      <div className="space-y-8">
+        <ModuleBrandHeader
+          module="cashflow"
+          subtitle="Tổng quan thu chi, vốn và phân tích toàn bộ việc kinh doanh"
+          actions={
+            <div className="flex flex-wrap gap-2">
+              <AccentButton module="cashflow" type="button" onClick={() => setCapitalOpen(true)}>
+                <SlidersHorizontal className="h-4 w-4" /> Tinh chỉnh vốn
               </AccentButton>
-            </Link>
-          </div>
-        }
-      />
-
-      {loading ? (
-        <SkeletonMetricCards />
-      ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(portfolio.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" />
-          <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(portfolio.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" />
-          <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(portfolio.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />
-          <ModuleKpiCard module="cashflow" label="Tỷ suất LN" value={`${portfolio.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="neutral" />
-          <ModuleKpiCard
-            module="cashflow"
-            label="Vốn hiện tại"
-            value={displayMoney(capitalSnapshot.available_capital)}
-            icon={<Landmark className="h-5 w-5" />}
-            tone="profit"
-            onClick={() => setCapitalOpen(true)}
-          />
-          <ModuleKpiCard module="cashflow" label="Việc KD" value={String(summaries.length)} icon={<LayoutGrid className="h-5 w-5" />} tone="neutral" />
-        </div>
-      )}
-
-      {!loading && summaries.length > 0 && <CapitalOverviewCard snapshot={capitalSnapshot} compact />}
-
-      <section>
-        <SectionTitle>Phân tích dòng tiền</SectionTitle>
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-          <MonthlyCashflowChart transactions={transactions} />
-          <ProfitTrendChart transactions={transactions} />
-          <CategoryPieChart transactions={transactions} type="income" />
-          <CategoryPieChart transactions={transactions} type="expense" />
-        </div>
-        <div className="mt-4">
-          <BusinessComparisonChart summaries={summaries} />
-        </div>
-      </section>
-
-      <section>
-        <SectionTitle
-          action={
-            <Link href="/dashboard/businesses" className="text-xs text-green-400 hover:underline flex items-center gap-1">
-              <Plus className="h-3 w-3" /> Thêm việc
-            </Link>
+              <Link href="/dashboard/businesses">
+                <AccentButton module="cashflow" type="button">
+                  <LayoutGrid className="h-4 w-4" /> Quản lý việc
+                </AccentButton>
+              </Link>
+            </div>
           }
-        >
-          Việc kinh doanh
-        </SectionTitle>
-        {loading ? (
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {[1, 2, 3].map((i) => <div key={i} className="h-40 rounded-xl bg-zinc-800/50 animate-pulse" />)}
-          </div>
-        ) : summaries.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-zinc-700 p-8 text-center">
-            <p className="text-zinc-500 mb-3">Chưa có việc kinh doanh</p>
-            <Link href="/dashboard/businesses"><AccentButton module="cashflow">Tạo việc đầu tiên</AccentButton></Link>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-            {summaries.map((s, i) => (
-              <BusinessHubCard
-                key={s.business_id}
-                summary={s}
-                capital={capitalByBusiness.get(s.business_id)}
-                overdueCount={overdueByBusiness.get(s.business_id) || 0}
-                delay={i * 60}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+        />
 
-      <section>
-        <SectionTitle
-          action={<Link href="/dashboard/reminders" className="text-xs text-zinc-500 hover:text-green-400">Xem tất cả</Link>}
-        >
-          Nhắc hẹn sắp tới
-        </SectionTitle>
-        <ReminderPanel items={reminders.slice(0, 5)} compact />
-      </section>
+        {/* 1. Chỉ số tài chính */}
+        <section>
+          <SectionTitle>Chỉ số tài chính</SectionTitle>
+          {loading ? (
+            <SkeletonMetricCards />
+          ) : (
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+              <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(portfolio.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" />
+              <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(portfolio.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" />
+              <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(portfolio.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />
+              <ModuleKpiCard module="cashflow" label="Tỷ suất LN" value={`${portfolio.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="neutral" />
+              <ModuleKpiCard
+                module="cashflow"
+                label="Vốn hiện tại"
+                value={displayMoney(capitalSnapshot.available_capital)}
+                icon={<Landmark className="h-5 w-5" />}
+                tone="profit"
+                onClick={() => setCapitalOpen(true)}
+              />
+              <ModuleKpiCard module="cashflow" label="Việc KD" value={String(summaries.length)} icon={<LayoutGrid className="h-5 w-5" />} tone="neutral" />
+            </div>
+          )}
+        </section>
+
+        {/* 2. Vốn + nhắc hẹn (ưu tiên hành động) */}
+        {!loading && (
+          <section className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            {summaries.length > 0 && <CapitalOverviewCard snapshot={capitalSnapshot} compact />}
+            <div className={summaries.length === 0 ? "xl:col-span-2" : ""}>
+              <SectionTitle
+                action={<Link href="/dashboard/reminders" className="text-xs text-zinc-500 hover:text-green-400">Xem tất cả</Link>}
+              >
+                Nhắc hẹn sắp tới
+              </SectionTitle>
+              <ReminderPanel items={reminders.slice(0, 5)} compact />
+            </div>
+          </section>
+        )}
+
+        {/* 3. Việc kinh doanh */}
+        <section>
+          <SectionTitle
+            action={
+              <Link href="/dashboard/businesses" className="text-xs text-green-400 hover:underline flex items-center gap-1">
+                <Plus className="h-3 w-3" /> Thêm việc
+              </Link>
+            }
+          >
+            Việc kinh doanh
+          </SectionTitle>
+          {loading ? (
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {[1, 2, 3].map((i) => <div key={i} className="h-40 rounded-xl bg-zinc-800/50 animate-pulse" />)}
+            </div>
+          ) : summaries.length === 0 ? (
+            <div className="rounded-xl border border-dashed border-zinc-700 p-8 text-center">
+              <p className="text-zinc-500 mb-3">Chưa có việc kinh doanh</p>
+              <Link href="/dashboard/businesses"><AccentButton module="cashflow">Tạo việc đầu tiên</AccentButton></Link>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {summaries.map((s, i) => (
+                <BusinessHubCard
+                  key={s.business_id}
+                  summary={s}
+                  capital={capitalByBusiness.get(s.business_id)}
+                  overdueCount={overdueByBusiness.get(s.business_id) || 0}
+                  delay={i * 60}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* 4. Báo cáo & phân tích */}
+        {!loading && transactions.length > 0 && (
+          <section id="bao-cao">
+            <SectionTitle>Báo cáo & phân tích</SectionTitle>
+            <p className="text-xs text-zinc-500 mb-4 -mt-1">Dòng tiền, cơ cấu thu chi và so sánh giữa các việc kinh doanh</p>
+            <CashflowReportsSection transactions={transactions} summaries={summaries} />
+          </section>
+        )}
+      </div>
 
       <CapitalAdjustDialog open={capitalOpen} onOpenChange={setCapitalOpen} businesses={businesses} onSuccess={load} />
     </ModulePageShell>

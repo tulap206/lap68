@@ -14,7 +14,7 @@ import {
   ModuleResponsiveTable,
   AccentButton,
 } from "@/components/dashboard/module-shell"
-import { MonthlyCashflowChart, CategoryPieChart, ProfitTrendChart } from "@/components/dashboard/cashflow-charts"
+import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section"
 import { TransactionTypeBadge, PaymentMethodLabel } from "@/components/dashboard/cashflow-ui"
 import { ReminderPanel } from "@/components/dashboard/reminder-panel"
 import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog"
@@ -98,6 +98,7 @@ export default function BusinessDashboardPage() {
 
   return (
     <ModulePageShell module="cashflow">
+      <div className="space-y-8">
       <ModuleSubpageHeader
         module="cashflow"
         title={business?.name || "..."}
@@ -138,21 +139,11 @@ export default function BusinessDashboardPage() {
       {capitalSnapshot && <CapitalOverviewCard snapshot={capitalSnapshot} compact />}
 
       {reminders.length > 0 && (
-        <div>
+        <section>
           <h3 className="text-sm font-bold text-zinc-300 mb-2">Nhắc hẹn việc này</h3>
           <ReminderPanel items={reminders.slice(0, 3)} compact />
-        </div>
+        </section>
       )}
-
-      <div>
-        <h3 className="text-sm font-bold text-zinc-300 mb-3">Phân tích dòng tiền</h3>
-        <div className="grid xl:grid-cols-2 gap-4">
-          <MonthlyCashflowChart transactions={transactions} />
-          <ProfitTrendChart transactions={transactions} />
-          <CategoryPieChart transactions={transactions} type="income" />
-          <CategoryPieChart transactions={transactions} type="expense" />
-        </div>
-      </div>
 
       <ModuleSectionCard title="Giao dịch gần đây" description={`${stats.count} giao dịch`}>
         <ModuleResponsiveTable
@@ -167,6 +158,14 @@ export default function BusinessDashboardPage() {
           ])}
         />
       </ModuleSectionCard>
+
+      {!loading && transactions.length > 0 && (
+        <section>
+          <h3 className="text-sm font-bold text-zinc-300 mb-1">Báo cáo & phân tích</h3>
+          <p className="text-xs text-zinc-500 mb-4">Thu chi và cơ cấu danh mục của việc này</p>
+          <CashflowReportsSection transactions={transactions} showComparison={false} />
+        </section>
+      )}
 
       {capitalLedger.length > 0 && (
         <ModuleSectionCard title="Điều chỉnh vốn gần đây">
@@ -195,6 +194,7 @@ export default function BusinessDashboardPage() {
         defaultBusinessId={businessId}
         onSuccess={load}
       />
+      </div>
     </ModulePageShell>
   )
 }
