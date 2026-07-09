@@ -123,14 +123,14 @@ export default function BusinessDashboardPage() {
           <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(stats.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=income`)} />
           <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(stats.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=expense`)} />
           <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(stats.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />
-          <ModuleKpiCard module="cashflow" label="Tỷ suất LN" value={`${stats.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="neutral" />
+          <ModuleKpiCard module="cashflow" label="Tỷ suất LN" value={`${stats.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="margin" />
           <ModuleKpiCard
             module="cashflow"
             label="Vốn hiện tại"
             value={capitalSnapshot ? displayMoney(capitalSnapshot.available_capital) : "—"}
             hint={capitalSnapshot ? `Gốc ${displayMoney(capitalSnapshot.base_capital)}` : undefined}
             icon={<Landmark className="h-5 w-5" />}
-            tone="profit"
+            tone="capital"
             onClick={() => setCapitalOpen(true)}
           />
         </div>

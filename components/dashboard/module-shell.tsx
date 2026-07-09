@@ -105,6 +105,13 @@ export function ModuleSectionCard({
   )
 }
 
+type KpiTone = "neutral" | "income" | "expense" | "profit" | "margin" | "balance" | "capital" | "count"
+
+function isNegativeKpiValue(value: string) {
+  const trimmed = value.trim()
+  return trimmed.startsWith("-") && trimmed !== "—"
+}
+
 export function ModuleKpiCard({
   module,
   label,
@@ -122,16 +129,25 @@ export function ModuleKpiCard({
   icon: React.ReactNode
   onClick?: () => void
   delay?: number
-  tone?: "neutral" | "income" | "expense" | "profit"
+  tone?: KpiTone
 }) {
   const theme = getModuleTheme(module)
   const Comp = onClick ? "button" : "div"
+  const signedNegative = (tone === "profit" || tone === "margin") && isNegativeKpiValue(value)
 
-  const toneStyles = {
-    neutral: "border-zinc-800 bg-card/90 [&_.kpi-icon]:text-zinc-400 [&_.kpi-icon]:bg-zinc-800/80 [&_.kpi-icon]:border-zinc-700",
+  const toneStyles: Record<KpiTone, string> = {
+    neutral: "border-zinc-800 bg-card/90 [&_.kpi-value]:text-zinc-300 [&_.kpi-icon]:text-zinc-400 [&_.kpi-icon]:bg-zinc-800/80 [&_.kpi-icon]:border-zinc-700",
     income: "border-green-500/20 bg-card/90 [&_.kpi-value]:text-green-400 [&_.kpi-icon]:text-green-400 [&_.kpi-icon]:bg-green-500/10 [&_.kpi-icon]:border-green-500/20",
     expense: "border-red-500/20 bg-card/90 [&_.kpi-value]:text-red-400 [&_.kpi-icon]:text-red-400 [&_.kpi-icon]:bg-red-500/10 [&_.kpi-icon]:border-red-500/20",
-    profit: "border-zinc-700 bg-card/90 [&_.kpi-value]:text-zinc-100 [&_.kpi-icon]:text-green-400 [&_.kpi-icon]:bg-zinc-800 [&_.kpi-icon]:border-zinc-700",
+    profit: signedNegative
+      ? "border-red-500/20 bg-card/90 [&_.kpi-value]:text-red-400 [&_.kpi-icon]:text-red-400 [&_.kpi-icon]:bg-red-500/10 [&_.kpi-icon]:border-red-500/20"
+      : "border-green-500/20 bg-card/90 [&_.kpi-value]:text-green-400 [&_.kpi-icon]:text-green-400 [&_.kpi-icon]:bg-green-500/10 [&_.kpi-icon]:border-green-500/20",
+    margin: signedNegative
+      ? "border-red-500/20 bg-card/90 [&_.kpi-value]:text-red-400 [&_.kpi-icon]:text-red-400 [&_.kpi-icon]:bg-red-500/10 [&_.kpi-icon]:border-red-500/20"
+      : "border-green-500/20 bg-card/90 [&_.kpi-value]:text-green-400 [&_.kpi-icon]:text-emerald-400 [&_.kpi-icon]:bg-green-500/10 [&_.kpi-icon]:border-green-500/20",
+    balance: "border-sky-500/20 bg-card/90 [&_.kpi-value]:text-sky-400 [&_.kpi-icon]:text-sky-400 [&_.kpi-icon]:bg-sky-500/10 [&_.kpi-icon]:border-sky-500/20",
+    capital: "border-amber-500/20 bg-card/90 [&_.kpi-value]:text-amber-400 [&_.kpi-icon]:text-amber-400 [&_.kpi-icon]:bg-amber-500/10 [&_.kpi-icon]:border-amber-500/20",
+    count: "border-violet-500/20 bg-card/90 [&_.kpi-value]:text-violet-300 [&_.kpi-icon]:text-violet-400 [&_.kpi-icon]:bg-violet-500/10 [&_.kpi-icon]:border-violet-500/20",
   }
 
   return (
@@ -155,15 +171,7 @@ export function ModuleKpiCard({
       </div>
 
       <div className="flex-1 flex items-center min-h-[40px] mt-1.5 py-0.5">
-        <KpiAutoFitValue
-          value={value}
-          className={cn(
-            tone === "income" && "[&_.kpi-value]:text-green-400",
-            tone === "expense" && "[&_.kpi-value]:text-red-400",
-            tone === "profit" && "[&_.kpi-value]:text-zinc-100",
-            tone === "neutral" && "[&_.kpi-value]:text-zinc-100"
-          )}
-        />
+        <KpiAutoFitValue value={value} />
       </div>
 
       <p className="text-[10px] text-zinc-600 mt-1 min-h-[14px] truncate shrink-0">

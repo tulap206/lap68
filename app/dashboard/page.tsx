@@ -147,14 +147,14 @@ export default function DashboardHubPage() {
               <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(portfolio.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" />
               <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(portfolio.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" />
               <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(portfolio.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />
-              <ModuleKpiCard module="cashflow" label="Tỷ suất LN" value={`${portfolio.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="neutral" />
+              <ModuleKpiCard module="cashflow" label="Tỷ suất LN" value={`${portfolio.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="margin" />
               <ModuleKpiCard
                 module="cashflow"
                 label="Số dư TK"
                 value={displayMoney(liquidTotal)}
                 hint={portfolioSettings.liquid_accounts.length > 0 ? `${portfolioSettings.liquid_accounts.length} tài khoản` : "Chưa cập nhật"}
                 icon={<Wallet className="h-5 w-5" />}
-                tone="neutral"
+                tone="balance"
                 onClick={() => setAccountOpen(true)}
               />
               <ModuleKpiCard
@@ -162,10 +162,10 @@ export default function DashboardHubPage() {
                 label="Vốn hiện tại"
                 value={displayMoney(capitalSnapshot.available_capital)}
                 icon={<Landmark className="h-5 w-5" />}
-                tone="profit"
+                tone="capital"
                 onClick={() => setCapitalOpen(true)}
               />
-              <ModuleKpiCard module="cashflow" label="Việc KD" value={String(summaries.length)} icon={<LayoutGrid className="h-5 w-5" />} tone="neutral" />
+              <ModuleKpiCard module="cashflow" label="Việc KD" value={String(summaries.length)} icon={<LayoutGrid className="h-5 w-5" />} tone="count" />
             </div>
           )}
         </section>

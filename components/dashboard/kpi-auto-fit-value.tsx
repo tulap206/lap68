@@ -43,7 +43,7 @@ export function KpiAutoFitValue({
     <div ref={containerRef} className={cn("w-full min-w-0 overflow-hidden", className)}>
       <span
         ref={textRef}
-        className="kpi-value block font-mono font-black tabular-nums text-zinc-100 whitespace-nowrap"
+        className="kpi-value block font-mono font-black tabular-nums whitespace-nowrap"
         style={{ fontSize: `${MAX_PX}px`, lineHeight: 1.15 }}
       >
         {display}
