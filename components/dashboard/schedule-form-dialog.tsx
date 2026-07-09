@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -45,6 +45,29 @@ const defaultForm = (): ScheduleFormValues => ({
   reminderDays: "3,1,0",
 })
 
+function scheduleToForm(editing: Schedule | null): ScheduleFormValues {
+  if (!editing) return defaultForm()
+
+  const dueSource = editing.next_due_date || editing.due_date
+
+  return {
+    direction: editing.direction,
+    title: editing.title,
+    description: editing.description || "",
+    amount: editing.amount != null ? formatMoneyInput(String(editing.amount)) : "",
+    amountIsEstimate: editing.amount_is_estimate,
+    scheduleKind: editing.schedule_kind,
+    dueDate: toDateInputValue(dueSource),
+    frequency: editing.recurrence?.frequency || "monthly",
+    interval: String(editing.recurrence?.interval || 1),
+    dayOfMonth: String(editing.recurrence?.day_of_month || 1),
+    endDate: editing.recurrence?.end_date ? toDateInputValue(editing.recurrence.end_date) : "",
+    categoryId: editing.category_id || "",
+    counterpartyId: editing.counterparty_id || "",
+    reminderDays: (editing.reminder_days || [3, 1, 0]).join(","),
+  }
+}
+
 export function ScheduleFormDialog({
   open,
   onOpenChange,
@@ -61,31 +84,12 @@ export function ScheduleFormDialog({
   const [form, setForm] = useState<ScheduleFormValues>(defaultForm())
   const [saving, setSaving] = useState(false)
 
-  const resetFromEditing = () => {
-    if (!editing) {
-      setForm(defaultForm())
-      return
-    }
-    setForm({
-      direction: editing.direction,
-      title: editing.title,
-      description: editing.description || "",
-      amount: editing.amount ? formatMoneyInput(String(editing.amount)) : "",
-      amountIsEstimate: editing.amount_is_estimate,
-      scheduleKind: editing.schedule_kind,
-      dueDate: toDateInputValue(editing.due_date),
-      frequency: editing.recurrence?.frequency || "monthly",
-      interval: String(editing.recurrence?.interval || 1),
-      dayOfMonth: String(editing.recurrence?.day_of_month || 1),
-      endDate: editing.recurrence?.end_date ? toDateInputValue(editing.recurrence.end_date) : "",
-      categoryId: editing.category_id || "",
-      counterpartyId: editing.counterparty_id || "",
-      reminderDays: (editing.reminder_days || [3, 1, 0]).join(","),
-    })
-  }
+  useEffect(() => {
+    if (open) setForm(scheduleToForm(editing))
+  }, [open, editing])
 
-  const handleOpen = (v: boolean) => {
-    if (v) resetFromEditing()
+  const handleOpenChange = (v: boolean) => {
+    if (!v) setForm(defaultForm())
     onOpenChange(v)
   }
 
@@ -97,7 +101,7 @@ export function ScheduleFormDialog({
     setSaving(true)
     try {
       await onSave(form)
-      onOpenChange(false)
+      handleOpenChange(false)
       setForm(defaultForm())
     } finally {
       setSaving(false)
@@ -105,7 +109,7 @@ export function ScheduleFormDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-green-500 to-green-700 rounded-t-2xl" />
         <DialogHeader>
@@ -191,7 +195,7 @@ export function ScheduleFormDialog({
             <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" className="flex-1" onClick={() => onOpenChange(false)}>Hủy</Button>
+            <Button variant="outline" className="flex-1" onClick={() => handleOpenChange(false)}>Hủy</Button>
             <AccentButton module="cashflow" className="flex-1" onClick={submit} disabled={saving || !form.title.trim()}>
               {saving ? "Đang lưu..." : "Lưu"}
             </AccentButton>

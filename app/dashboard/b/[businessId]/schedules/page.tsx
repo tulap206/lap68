@@ -56,13 +56,20 @@ export default function BusinessSchedulesPage() {
     if (!user) return
     const payload = scheduleFormToPayload(form, user.id, businessId)
     if (editing) {
-      await updateSchedule(editing.id, payload)
+      await updateSchedule(editing.id, {
+        ...payload,
+        status: editing.status,
+        linked_transaction_id: editing.linked_transaction_id,
+        completed_at: editing.completed_at,
+      })
       logAction("Sửa lịch", form.title)
     } else {
       await insertSchedule(payload)
       logAction("Thêm lịch", form.title)
     }
     toast.success("Đã lưu")
+    setEditing(null)
+    setDialogOpen(false)
     load()
   }
 
@@ -92,7 +99,16 @@ export default function BusinessSchedulesPage() {
         )}
       </ModuleSectionCard>
 
-      <ScheduleFormDialog open={dialogOpen} onOpenChange={setDialogOpen} categories={categories} editing={editing} onSave={handleSave} />
+      <ScheduleFormDialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open)
+          if (!open) setEditing(null)
+        }}
+        categories={categories}
+        editing={editing}
+        onSave={handleSave}
+      />
     </ModulePageShell>
   )
 }
