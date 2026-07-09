@@ -62,12 +62,16 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
 
   const NavContent = ({ labeled }: { labeled: boolean }) => (
     <>
+      {!labeled && (
+        <div className="hidden lg:block w-full h-5 mb-5 shrink-0" aria-hidden />
+      )}
+
       <Link
         href="/dashboard"
         onClick={() => setMobileOpen(false)}
         className={cn(
-          "relative flex items-center rounded-2xl bg-zinc-900 text-white border border-zinc-800 mb-6 glow-green shrink-0",
-          labeled ? "h-12 w-full gap-3 px-4" : "h-12 w-12 justify-center"
+          "relative flex items-center rounded-2xl bg-zinc-900 text-white border border-zinc-800 glow-green shrink-0",
+          labeled ? "h-12 w-full gap-3 px-4 mb-6" : "h-12 w-12 justify-center mb-6 lg:mb-8"
         )}
         title="LAP68"
       >
@@ -90,7 +94,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         </Link>
       )}
 
-      <nav className={cn("flex flex-col gap-1.5 flex-1 w-full", !labeled && "items-center gap-2")}>
+      <nav className={cn("flex flex-col gap-1.5 flex-1 w-full", !labeled && "items-center gap-2 lg:mt-1")}>
         {menuItems.map((item) => {
           const active = pathname === item.href || (item.href !== `/dashboard/b/${businessId}` && pathname.startsWith(item.href + "/"))
           const isExactBusinessHome = item.href === `/dashboard/b/${businessId}` && pathname === item.href
@@ -127,7 +131,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         onClick={handleLogout}
         className={cn(
           "flex items-center rounded-2xl text-zinc-500 border border-transparent hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 transition-all shrink-0",
-          labeled ? "h-11 w-full gap-3 px-4 mt-2" : "h-12 w-12 justify-center"
+          labeled ? "h-11 w-full gap-3 px-4 mt-2" : "h-12 w-12 justify-center lg:mt-3"
         )}
         title="Đăng xuất"
       >
@@ -167,7 +171,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
           "fixed top-0 left-0 z-40 h-dvh bg-black border-r border-zinc-800/80 flex flex-col transition-transform duration-200 ease-out",
           "w-[min(280px,85vw)] px-4 py-6 safe-top safe-bottom",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:w-[72px] lg:items-center lg:px-0 lg:py-6"
+          "lg:translate-x-0 lg:w-[72px] lg:items-center lg:px-0 lg:pt-8 lg:pb-8"
         )}
       >
         <div className="lg:hidden flex flex-col flex-1 min-h-0 w-full">
