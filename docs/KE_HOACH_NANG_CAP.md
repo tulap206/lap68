@@ -1,9 +1,26 @@
 # Kế hoạch nâng cấp LAP68 — Quản lý đa dòng tiền & nhắc hẹn thu chi
 
-> **Phiên bản tài liệu:** 1.0  
+> **Phiên bản tài liệu:** 1.1  
 > **Ngày:** 09/07/2026  
 > **Mục đích:** Đề xuất giải pháp hoàn thiện LAP68 cho cá nhân kinh doanh nhiều lĩnh vực, nhiều dòng tiền, có nhắc hẹn thu/chi theo lịch từng việc.  
-> **Supabase:** Dùng chung project **3lmoto** (`fpiupgmknsydqrihqdbo`) với 79moto / 3lmotohue — **bắt buộc prefix `lap68_*`**.
+> **Supabase:** Có thể dùng chung **instance** project `fpiupgmknsydqrihqdbo` — **chỉ** bảng prefix `lap68_*`. LAP68 **không** đọc/ghi/sửa dữ liệu hay code của 79moto / 3lmoto.
+
+---
+
+## 0. Nguyên tắc độc lập (bắt buộc)
+
+**LAP68 là dự án độc lập.** Mọi phát triển tuân thủ:
+
+| Quy tắc | Chi tiết |
+|---------|----------|
+| **Không sửa code** | Không commit, refactor hay deploy thay đổi trong repo `79moto`, `3lmoto` / `3lmotohue` |
+| **Không đụng bảng DB khác** | Không `SELECT/INSERT/UPDATE/DELETE` vào `customers`, `vehicles`, `rentals`, `transactions`, `auth_users`, `pawn_*`, `sales_*`, `loan_*`, … |
+| **Chỉ schema LAP68** | Mọi migration chỉ tạo/sửa bảng `lap68_*`, view `lap68_*`, bucket `lap68-*` |
+| **Tham chiếu UI** | 79moto chỉ là **nguồn cảm hứng giao diện** đã fork sẵn trong repo `lap68` — không phụ thuộc runtime |
+| **Không tích hợp dữ liệu** | Không import/sync dữ liệu từ app khác; mỗi giao dịch nhập trực tiếp trên LAP68 |
+| **Repo & deploy riêng** | GitHub `tulap206/lap68`, Vercel `lap68.vercel.app` — tách biệt hoàn toàn |
+
+> Dùng chung Supabase **project** (hạ tầng) ≠ gộp dữ liệu. Cách tách an toàn: prefix `lap68_*` + không query bảng ngoài prefix.
 
 ---
 
@@ -16,7 +33,7 @@ LAP68 hiện là **sổ quỹ đơn luồng**: một user, một danh sách giao
 - **Nhắc hẹn** trước hạn (3 ngày, 1 ngày, đúng ngày)
 - Báo cáo theo việc và tổng hợp toàn portfolio
 
-Giải pháp đề xuất: nâng cấp theo **4 phase**, giữ stack hiện tại (Next.js 16 + Supabase + dark UI), mở rộng schema `lap68_*`, UI theo mô hình **hub chọn việc** (tương tự `/dashboard/selection` của 79moto).
+Giải pháp đề xuất: nâng cấp theo **3 phase**, giữ stack hiện tại (Next.js 16 + Supabase + dark UI), mở rộng schema `lap68_*`, UI hub chọn việc (pattern đã có trong LAP68, lấy cảm hứng layout admin).
 
 ---
 
@@ -36,18 +53,18 @@ Giải pháp đề xuất: nâng cấp theo **4 phase**, giữ stack hiện tạ
 | Đối tác theo việc | **Chưa có** |
 | Realtime | **Chưa có** |
 
-### 2.2 Supabase dùng chung (project 3lmoto)
+### 2.2 Supabase — instance dùng chung, dữ liệu tách biệt
 
-**URL:** `https://fpiupgmknsydqrihqdbo.supabase.co`
+**URL hiện tại:** `https://fpiupgmknsydqrihqdbo.supabase.co` (cùng instance với 79moto/3lmotohue vì giới hạn project free).
 
-| Nhóm bảng | App | Prefix | Ghi chú |
-|-----------|-----|--------|---------|
-| `customers`, `vehicles`, `rentals`, `transactions` | 79moto / 3lmotohue | Không prefix | **KHÔNG dùng cho LAP68** |
-| `auth_users`, `access_logs` | 79moto | Không prefix | Khác schema LAP68 |
-| `pawn_*`, `sales_*`, `loan_*` | 79moto | Module prefix | Mẫu cách tách app |
-| `lap68_*` | LAP68 | `lap68_` | **Đúng hướng — tiếp tục mở rộng** |
+| Nhóm bảng | Thuộc app khác | LAP68 |
+|-----------|----------------|-------|
+| `customers`, `vehicles`, `rentals`, `transactions`, … | 79moto / 3lmotohue | **Cấm truy cập** |
+| `lap68_*` | LAP68 | **Duy nhất được phép** |
 
-**Bảng LAP68 đã có trên production:**
+**Khuyến nghị dài hạn:** Khi tạo được Supabase project riêng tên `lap68`, migrate chỉ bảng `lap68_*` sang project mới → tách hạ tầng hoàn toàn, không còn chung instance.
+
+**Bảng LAP68 đã có:**
 
 - `lap68_auth_users`
 - `lap68_categories`
@@ -56,15 +73,16 @@ Giải pháp đề xuất: nâng cấp theo **4 phase**, giữ stack hiện tạ
 
 **Script SQL v2 (chưa chạy):** [`migrations/lap68_v2_multi_business.sql`](../migrations/lap68_v2_multi_business.sql)
 
-### 2.3 Tham chiếu codebase anh em
+### 2.3 Tham chiếu (chỉ đọc — không chỉnh sửa)
 
-| Dự án | Đường dẫn | Học được gì |
-|-------|-----------|-------------|
-| 79moto | `~/Desktop/Code/79moto` | Hub module, `module-shell`, multi-tab dashboard, `sales_*` isolation |
-| 3lmotohue | `~/Desktop/Code/3lmotohue` | Rental dashboard, backup cron, format tiền/ngày VN |
-| LAP68 | `~/Desktop/Code/lap68` | Dark UI, `lap68_*` schema, cashflow charts |
+Các dự án sau **không được sửa** khi phát triển LAP68. Chỉ tham khảo ý tưởng UI/UX nếu cần:
 
-> **Lưu ý:** Thư mục `Code\3lmoto` trên máy thực tế là **`3lmotohue`** — cùng Supabase project.
+| Dự án | Vai trò với LAP68 |
+|-------|-------------------|
+| `~/Desktop/Code/79moto` | Cảm hứng layout admin (đã áp dụng sẵn trong lap68) |
+| `~/Desktop/Code/3lmotohue` | Không liên kết code hay dữ liệu |
+
+Toàn bộ code triển khai nằm trong **`~/Desktop/Code/lap68`**.
 
 ---
 
@@ -177,13 +195,11 @@ Ví dụ `ghi_chu` trên `lap68_schedules`:
 
 **Các bước:**
 
-1. Mở [Supabase Dashboard](https://supabase.com/dashboard) → project **3lmoto**
+1. Mở Supabase Dashboard → project đang chứa bảng `lap68_*`
 2. **SQL Editor** → New query
-3. Dán toàn bộ nội dung file migration
-4. **Run** → kiểm tra không lỗi
-5. **Table Editor** → xác nhận bảng `lap68_businesses`, `lap68_schedules`, …
-
-**Không chạy** script tạo `transactions`, `customers` của 79moto — tránh xung đột.
+3. Dán toàn bộ [`migrations/lap68_v2_multi_business.sql`](../migrations/lap68_v2_multi_business.sql)
+4. **Run** — script chỉ `CREATE/ALTER` bảng `lap68_*`
+5. Xác nhận **không** có câu lệnh đụng bảng không prefix `lap68_`
 
 ---
 
@@ -222,12 +238,7 @@ Cập nhật `lib/supabase.ts`: thêm filter `business_id` vào fetch transactio
 
 ### 5.3 Realtime (phase 2)
 
-Subscribe `postgres_changes` trên:
-
-- `lap68_transactions`
-- `lap68_schedules`
-
-Pattern giống `79moto/app/dashboard/page.tsx`.
+Subscribe `postgres_changes` chỉ trên bảng `lap68_*`.
 
 ### 5.4 Cron nhắc hẹn (phase 3)
 
@@ -235,7 +246,7 @@ Pattern giống `79moto/app/dashboard/page.tsx`.
 |------|-------|
 | **A — Vercel Cron** | `app/api/cron/reminders/route.ts` chạy 07:00 hàng ngày |
 | **B — Client** | Khi mở app, quét lịch hôm nay (đủ cho MVP) |
-| **C — Telegram** | Học `3lmotohue/app/api/telegram/route.ts` |
+| **C — Telegram** | Tùy chọn sau — triển khai trong repo `lap68` only (`app/api/...`) |
 
 **MVP khuyến nghị:** B + panel in-app; thêm A khi ổn định.
 
@@ -249,7 +260,7 @@ Pattern giống `79moto/app/dashboard/page.tsx`.
 
 | Màn hình | Thiết kế |
 |----------|----------|
-| **Hub việc** | Grid card (kiểu 79moto selection): mỗi việc 1 card — tên, màu accent, KPI mini, badge số khoản quá hạn |
+| **Hub việc** | Grid card: mỗi việc 1 card — tên, màu accent, KPI mini, badge số khoản quá hạn |
 | **Sidebar** | Giữ 72px; thêm nút "Tất cả việc" + context việc đang chọn (màu viền theo `business.color`) |
 | **Header việc** | `ModuleBrandHeader` + suffix tên việc thay vì chỉ "LAP68" |
 | **Panel nhắc** | Sticky top hoặc tab "Nhắc" — đỏ quá hạn, vàng 1–3 ngày, xanh đã xong |
@@ -319,17 +330,15 @@ Pattern giống `79moto/app/dashboard/page.tsx`.
 |----------|----------|
 | Đối tác | CRUD `lap68_counterparties`, gắn lịch & giao dịch |
 | Calendar view | Lịch tháng tổng hợp |
-| Realtime | Supabase subscription |
-| Backup v2 | Export/import đủ bảng mới; bucket `lap68-backups` |
-| Cron Vercel | `/api/cron/reminders` 07:00 |
-| Telegram (tùy chọn) | Gửi nhắc quá hạn |
-| Bảo mật | Bật RLS `lap68_*`; hash mật khẩu hoặc Supabase Auth |
+| Realtime | Supabase subscription trên `lap68_*` |
+| Backup v2 | Export/import đủ bảng mới; bucket `lap68-backups` riêng |
+| Cron Vercel | `/api/cron/reminders` 07:00 (trong repo lap68) |
+| Telegram (tùy chọn) | API route riêng LAP68 |
+| Bảo mật | RLS `lap68_*`; hash mật khẩu hoặc Supabase Auth |
 | Mobile PWA | Add to home screen, notification permission |
+| **Tách Supabase** | Migrate `lap68_*` sang project Supabase riêng khi có slot free |
 
-### Phase 4 — Tích hợp mở rộng (tùy chọn)
-
-- Import giao dịch từ `transactions` (79moto rental) **chỉ đọc**, gắn việc "Cho thuê xe" — không ghi đè bảng rental
-- API đồng bộ một chiều nếu cần dashboard tài chính tổng hợp cả 79moto + LAP68
+~~Phase 4 — Tích hợp 79moto/3lmoto~~ **Đã loại bỏ** — LAP68 độc lập, không đồng bộ dữ liệu app khác.
 
 ---
 
@@ -337,9 +346,9 @@ Pattern giống `79moto/app/dashboard/page.tsx`.
 
 ### 8.1 Trước khi chạy migration
 
-- [ ] Xác nhận đúng project: **3lmoto** (`fpiupgmknsydqrihqdbo`)
-- [ ] Backup: export JSON từ Settings hoặc `pg_dump` bảng `lap68_*`
-- [ ] Không rename/xóa bảng 79moto
+- [ ] Xác nhận migration **chỉ** chạm bảng `lap68_*`
+- [ ] Backup bảng `lap68_*` trước khi migrate
+- [ ] **Không** rename/xóa/sửa bảng thuộc app khác trên cùng instance
 
 ### 8.2 Sau khi chạy migration
 
@@ -350,7 +359,7 @@ Pattern giống `79moto/app/dashboard/page.tsx`.
 
 ### 8.3 Storage (phase 3)
 
-Tạo bucket **`lap68-backups`** (private), policy chỉ service role — tương tự bucket `backups` của 79moto.
+Tạo bucket **`lap68-backups`** (private) — riêng LAP68, không dùng bucket `backups` của app khác.
 
 ### 8.4 RLS (khuyến nghị trước production)
 
@@ -372,14 +381,14 @@ Hiện app dùng `lap68_auth_users` custom — RLS nên gắn sau khi migrate au
 | R2 | Plaintext password | Phase 3: bcrypt hoặc Supabase Auth |
 | R3 | Không có RLS | Chỉ dùng cá nhân; bật RLS trước khi mở rộng user |
 | R4 | Nhắc hẹn chỉ khi mở app | Thêm Vercel Cron + Telegram |
-| R5 | Ngày DD/MM/YYYY vs timezone | Giữ chuẩn 79moto; engine tính theo `Asia/Ho_Chi_Minh` |
+| R5 | Ngày DD/MM/YYYY vs timezone | Engine tính theo `Asia/Ho_Chi_Minh`, format DD/MM/YYYY |
 | R6 | Quá nhiều việc → UI rối | Hub + switcher; archive việc cũ |
 
 ### Quyết định cần bạn chốt
 
-1. **Tên hiển thị việc mẫu** — Cho thuê xe / Mua bán / Dịch vụ có khớp thực tế không?
+1. **Tên việc mẫu** trong seed SQL — Cho thuê xe / Mua bán / Dịch vụ có phù hợp không?
 2. **Nhắc qua kênh nào trước** — Chỉ in-app hay thêm Telegram?
-3. **Có cần đọc dữ liệu thuê xe từ 79moto** vào LAP68 không (phase 4)?
+3. **Tách Supabase project riêng** — Có pause project cũ để tạo `lap68` DB riêng không?
 4. **Multi-user** — Chỉ 1 admin hay thêm staff theo việc?
 
 ---
@@ -390,8 +399,7 @@ Hiện app dùng `lap68_auth_users` custom — RLS nên gắn sau khi migrate au
 |-------|----------------|---------|
 | Phase 1 | 2–3 tuần | Cao — đúng nhu cầu đa dòng tiền |
 | Phase 2 | 2–3 tuần | Cao — nhắc hẹn là điểm khác biệt |
-| Phase 3 | 2–4 tuần | Trung bình — vận hành ổn định |
-| Phase 4 | Tùy chọn | Thấp–trung — tích hợp 79moto |
+| Phase 3 | 2–4 tuần | Trung bình — vận hành ổn định, tách hạ tầng tùy chọn |
 
 ---
 

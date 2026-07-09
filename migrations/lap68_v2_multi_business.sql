@@ -1,8 +1,8 @@
 -- =============================================================================
 -- LAP68 v2 — Multi-business cash flow + reminders
--- Supabase project: 3lmoto / 79moto (fpiupgmknsydqrihqdbo)
--- Chạy trong Supabase SQL Editor. KHÔNG đụng bảng rental: transactions, customers, vehicles...
--- Prefix bắt buộc: lap68_*
+-- DỰ ÁN ĐỘC LẬP: chỉ tạo/sửa bảng lap68_*
+-- KHÔNG đụng bảng 79moto / 3lmoto (customers, vehicles, rentals, transactions, ...)
+-- Chạy trong Supabase SQL Editor
 -- =============================================================================
 
 -- -----------------------------------------------------------------------------
@@ -247,5 +247,5 @@ WHERE c.user_id = fb.user_id
 -- -----------------------------------------------------------------------------
 -- LƯU Ý BẢO MẬT (đọc trước khi production)
 -- Hiện tại lap68_* chưa bật RLS. Khi bật RLS, thêm policy theo user_id.
--- KHÔNG dùng chung bảng transactions / auth_users của 79moto/3lmoto.
+-- KHÔNG dùng chung bảng với app khác. Chỉ lap68_*.
 -- =============================================================================

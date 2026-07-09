@@ -1,5 +1,6 @@
 -- LAP68 Cash Flow Management Schema
--- Run on Supabase project
+-- Dự án độc lập — chỉ bảng prefix lap68_*
+-- Run on Supabase SQL Editor (project chứa bảng lap68_*)
 
 CREATE TABLE IF NOT EXISTS lap68_auth_users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
