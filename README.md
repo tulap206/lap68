@@ -31,7 +31,7 @@ Mở http://localhost:3000 — đăng nhập mặc định: `admin` / `Lap68@123
 
 ## Supabase
 
-Schema trong `setup.sql`. Bảng dùng prefix `lap68_` trên project Supabase.
+Schema trong `setup.sql`. Bảng dùng prefix `lap68_` trên project Supabase. Kế hoạch nâng cấp v2: [`docs/KE_HOACH_NANG_CAP.md`](docs/KE_HOACH_NANG_CAP.md).
 
 ## Triển khai Vercel
 
