@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Plus, TrendingUp, TrendingDown, Wallet, PiggyBank, CalendarClock } from "lucide-react"
+import { Plus, TrendingUp, TrendingDown, PiggyBank, CalendarClock, Landmark, SlidersHorizontal } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth-context"
@@ -17,15 +17,19 @@ import {
 import { MonthlyCashflowChart, CategoryPieChart } from "@/components/dashboard/cashflow-charts"
 import { TransactionTypeBadge, PaymentMethodLabel } from "@/components/dashboard/cashflow-ui"
 import { ReminderPanel } from "@/components/dashboard/reminder-panel"
+import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog"
+import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card"
 import { SkeletonMetricCards } from "@/components/ui/skeleton-loader"
 import {
   fetchBusiness,
+  fetchBusinesses,
   fetchTransactions,
   fetchSchedules,
   subscribeLap68Tables,
   syncScheduleStatuses,
 } from "@/lib/supabase"
 import { buildReminderItems } from "@/lib/schedule-engine"
+import { computeCapitalSnapshot, parseBusinessCapital, capitalAdjustLabel } from "@/lib/capital"
 import { displayMoney } from "@/lib/format-money"
 import { formatDisplayDate } from "@/lib/format-date"
 import type { Business, Schedule, Transaction } from "@/lib/types"
@@ -38,20 +42,24 @@ export default function BusinessDashboardPage() {
   const [business, setBusiness] = useState<Business | null>(null)
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [schedules, setSchedules] = useState<Schedule[]>([])
+  const [allBusinesses, setAllBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
+  const [capitalOpen, setCapitalOpen] = useState(false)
 
   const load = useCallback(async () => {
     if (!user) return
     try {
       await syncScheduleStatuses(user.id)
-      const [b, txs, sch] = await Promise.all([
+      const [b, txs, sch, biz] = await Promise.all([
         fetchBusiness(businessId),
         fetchTransactions(user.id, businessId),
         fetchSchedules(user.id, businessId),
+        fetchBusinesses(user.id),
       ])
       setBusiness(b)
       setTransactions(txs)
       setSchedules(sch)
+      setAllBusinesses(biz)
     } catch {
       toast.error("Không tải được dữ liệu")
     } finally {
@@ -74,6 +82,17 @@ export default function BusinessDashboardPage() {
   const reminders = useMemo(() => buildReminderItems(schedules), [schedules])
   const recent = transactions.slice(0, 6)
 
+  const capitalSnapshot = useMemo(() => {
+    if (!business) return null
+    const meta = parseBusinessCapital(business.ghi_chu)
+    return computeCapitalSnapshot(meta, stats.profit)
+  }, [business, stats.profit])
+
+  const capitalLedger = useMemo(() => {
+    if (!business) return []
+    return [...parseBusinessCapital(business.ghi_chu).capital_ledger].reverse().slice(0, 5)
+  }, [business])
+
   if (!business && !loading) return null
 
   return (
@@ -84,6 +103,9 @@ export default function BusinessDashboardPage() {
         subtitle={business?.description || "Tổng quan dòng tiền việc kinh doanh"}
         actions={
           <div className="flex flex-wrap gap-2">
+            <AccentButton module="cashflow" type="button" onClick={() => setCapitalOpen(true)}>
+              <SlidersHorizontal className="h-4 w-4" /> Tinh chỉnh vốn
+            </AccentButton>
             <Link href={`/dashboard/b/${businessId}/schedules`}>
               <AccentButton module="cashflow" type="button"><CalendarClock className="h-4 w-4" /> Lịch thu/chi</AccentButton>
             </Link>
@@ -99,9 +121,19 @@ export default function BusinessDashboardPage() {
           <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(stats.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=income`)} />
           <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(stats.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=expense`)} />
           <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(stats.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />
-          <ModuleKpiCard module="cashflow" label="Giao dịch" value={String(stats.count)} icon={<Wallet className="h-5 w-5" />} tone="neutral" />
+          <ModuleKpiCard
+            module="cashflow"
+            label="Vốn hiện tại"
+            value={capitalSnapshot ? displayMoney(capitalSnapshot.available_capital) : "—"}
+            hint={capitalSnapshot ? `Gốc ${displayMoney(capitalSnapshot.base_capital)}` : undefined}
+            icon={<Landmark className="h-5 w-5" />}
+            tone="profit"
+            onClick={() => setCapitalOpen(true)}
+          />
         </div>
       )}
+
+      {capitalSnapshot && <CapitalOverviewCard snapshot={capitalSnapshot} compact />}
 
       {reminders.length > 0 && (
         <div>
@@ -115,7 +147,7 @@ export default function BusinessDashboardPage() {
         <CategoryPieChart transactions={transactions} type="expense" />
       </div>
 
-      <ModuleSectionCard title="Giao dịch gần đây">
+      <ModuleSectionCard title="Giao dịch gần đây" description={`${stats.count} giao dịch`}>
         <ModuleResponsiveTable
           headers={["Ngày", "Loại", "Mô tả", "Số tiền"]}
           rows={recent.map((t) => [
@@ -128,6 +160,34 @@ export default function BusinessDashboardPage() {
           ])}
         />
       </ModuleSectionCard>
+
+      {capitalLedger.length > 0 && (
+        <ModuleSectionCard title="Điều chỉnh vốn gần đây">
+          <div className="divide-y divide-zinc-800">
+            {capitalLedger.map((entry) => (
+              <div key={entry.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
+                <div className="min-w-0">
+                  <p className={entry.type === "deposit" ? "text-green-400 font-medium" : "text-red-400 font-medium"}>
+                    {capitalAdjustLabel(entry.type)}
+                  </p>
+                  <p className="text-xs text-zinc-500 truncate">{entry.note || "—"}</p>
+                </div>
+                <span className="font-mono font-semibold text-zinc-200 tabular-nums shrink-0">
+                  {entry.type === "deposit" ? "+" : "-"}{displayMoney(entry.amount)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </ModuleSectionCard>
+      )}
+
+      <CapitalAdjustDialog
+        open={capitalOpen}
+        onOpenChange={setCapitalOpen}
+        businesses={allBusinesses}
+        defaultBusinessId={businessId}
+        onSuccess={load}
+      />
     </ModulePageShell>
   )
 }

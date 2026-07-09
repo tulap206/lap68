@@ -2,39 +2,47 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { Plus, LayoutGrid } from "lucide-react"
+import { Plus, LayoutGrid, Landmark, SlidersHorizontal } from "lucide-react"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth-context"
 import { ModulePageShell, ModuleBrandHeader, AccentButton } from "@/components/dashboard/module-shell"
 import { BusinessHubCard } from "@/components/dashboard/business-hub-card"
 import { ReminderPanel } from "@/components/dashboard/reminder-panel"
 import { BusinessComparisonChart } from "@/components/dashboard/business-comparison-chart"
+import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog"
+import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card"
 import { SkeletonMetricCards } from "@/components/ui/skeleton-loader"
 import {
   fetchBusinessSummaries,
+  fetchBusinesses,
   fetchSchedules,
   subscribeLap68Tables,
   syncScheduleStatuses,
 } from "@/lib/supabase"
 import { buildReminderItems } from "@/lib/schedule-engine"
-import type { BusinessSummary, Schedule } from "@/lib/types"
+import { computeCapitalSnapshot, computePortfolioCapital, parseBusinessCapital } from "@/lib/capital"
+import type { Business, BusinessSummary, Schedule } from "@/lib/types"
 import { displayMoney } from "@/lib/format-money"
 
 export default function DashboardHubPage() {
   const { user } = useAuth()
   const [summaries, setSummaries] = useState<BusinessSummary[]>([])
+  const [businesses, setBusinesses] = useState<Business[]>([])
   const [schedules, setSchedules] = useState<Schedule[]>([])
   const [loading, setLoading] = useState(true)
+  const [capitalOpen, setCapitalOpen] = useState(false)
 
   const load = useCallback(async () => {
     if (!user) return
     try {
       await syncScheduleStatuses(user.id)
-      const [s, sch] = await Promise.all([
+      const [s, biz, sch] = await Promise.all([
         fetchBusinessSummaries(user.id),
+        fetchBusinesses(user.id),
         fetchSchedules(user.id),
       ])
       setSummaries(s)
+      setBusinesses(biz)
       setSchedules(sch)
     } catch {
       toast.error("Không tải được dữ liệu")
@@ -69,13 +77,31 @@ export default function DashboardHubPage() {
     return { income, expense, profit: income - expense }
   }, [summaries])
 
+  const capitalSnapshot = useMemo(
+    () => computePortfolioCapital(businesses, summaries),
+    [businesses, summaries]
+  )
+
+  const capitalByBusiness = useMemo(() => {
+    const map = new Map<string, ReturnType<typeof computeCapitalSnapshot>>()
+    for (const s of summaries) {
+      const b = businesses.find((x) => x.id === s.business_id)
+      if (!b) continue
+      map.set(s.business_id, computeCapitalSnapshot(parseBusinessCapital(b.ghi_chu), Number(s.net_profit)))
+    }
+    return map
+  }, [summaries, businesses])
+
   return (
     <ModulePageShell module="cashflow">
       <ModuleBrandHeader
         module="cashflow"
         subtitle="Quản lý đa dòng tiền — chọn việc kinh doanh để vào chi tiết"
         actions={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <AccentButton module="cashflow" type="button" onClick={() => setCapitalOpen(true)}>
+              <SlidersHorizontal className="h-4 w-4" /> Tinh chỉnh vốn
+            </AccentButton>
             <Link href="/dashboard/businesses">
               <AccentButton module="cashflow" type="button">
                 <LayoutGrid className="h-4 w-4" /> Quản lý việc
@@ -88,7 +114,7 @@ export default function DashboardHubPage() {
       {loading ? (
         <SkeletonMetricCards />
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="rounded-xl border border-zinc-800 bg-card/90 p-4">
             <p className="text-xs uppercase text-zinc-500">Tổng thu</p>
             <p className="text-xl font-black font-mono text-income">{displayMoney(portfolio.income)}</p>
@@ -101,11 +127,21 @@ export default function DashboardHubPage() {
             <p className="text-xs uppercase text-zinc-500">Lợi nhuận</p>
             <p className="text-xl font-black font-mono text-zinc-100">{displayMoney(portfolio.profit)}</p>
           </div>
-          <div className="rounded-xl border border-zinc-800 bg-card/90 p-4">
+          <div className="rounded-xl border border-green-500/20 bg-card/90 p-4 col-span-2 lg:col-span-1">
+            <p className="text-xs uppercase text-zinc-500 flex items-center gap-1">
+              <Landmark className="h-3 w-3" /> Vốn hiện tại
+            </p>
+            <p className="text-xl font-black font-mono text-green-400">{displayMoney(capitalSnapshot.available_capital)}</p>
+          </div>
+          <div className="rounded-xl border border-zinc-800 bg-card/90 p-4 col-span-2 lg:col-span-1">
             <p className="text-xs uppercase text-zinc-500">Việc KD</p>
             <p className="text-xl font-black text-zinc-100">{summaries.length}</p>
           </div>
         </div>
+      )}
+
+      {!loading && summaries.length > 0 && (
+        <CapitalOverviewCard snapshot={capitalSnapshot} />
       )}
 
       <div>
@@ -127,7 +163,13 @@ export default function DashboardHubPage() {
         ) : (
           <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
             {summaries.map((s, i) => (
-              <BusinessHubCard key={s.business_id} summary={s} overdueCount={overdueByBusiness.get(s.business_id) || 0} delay={i * 60} />
+              <BusinessHubCard
+                key={s.business_id}
+                summary={s}
+                capital={capitalByBusiness.get(s.business_id)}
+                overdueCount={overdueByBusiness.get(s.business_id) || 0}
+                delay={i * 60}
+              />
             ))}
           </div>
         )}
@@ -143,6 +185,13 @@ export default function DashboardHubPage() {
         </div>
         <BusinessComparisonChart summaries={summaries} />
       </div>
+
+      <CapitalAdjustDialog
+        open={capitalOpen}
+        onOpenChange={setCapitalOpen}
+        businesses={businesses}
+        onSuccess={load}
+      />
     </ModulePageShell>
   )
 }

@@ -4,14 +4,17 @@ import Link from "next/link"
 import { ArrowRight, AlertTriangle } from "lucide-react"
 import { displayMoney } from "@/lib/format-money"
 import type { BusinessSummary } from "@/lib/types"
+import type { CapitalSnapshot } from "@/lib/capital"
 import { cn } from "@/lib/utils"
 
 export function BusinessHubCard({
   summary,
+  capital,
   overdueCount = 0,
   delay = 0,
 }: {
   summary: BusinessSummary
+  capital?: CapitalSnapshot
   overdueCount?: number
   delay?: number
 }) {
@@ -36,7 +39,7 @@ export function BusinessHubCard({
         )}
       </div>
 
-      <div className="grid grid-cols-3 gap-3 mt-4">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4">
         <div>
           <p className="text-[10px] uppercase tracking-wider text-zinc-500">Thu</p>
           <p className="text-sm font-mono font-semibold text-income tabular-nums">{displayMoney(Number(summary.total_income))}</p>
@@ -48,6 +51,12 @@ export function BusinessHubCard({
         <div>
           <p className="text-[10px] uppercase tracking-wider text-zinc-500">Lãi</p>
           <p className="text-sm font-mono font-semibold text-zinc-100 tabular-nums">{displayMoney(Number(summary.net_profit))}</p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-zinc-500">Vốn</p>
+          <p className="text-sm font-mono font-semibold text-green-400 tabular-nums">
+            {capital ? displayMoney(capital.available_capital) : "—"}
+          </p>
         </div>
       </div>
 

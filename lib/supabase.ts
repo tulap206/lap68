@@ -7,6 +7,12 @@ import {
   scheduleToTransactionType,
 } from "./schedule-engine"
 import { toStoredDateValue } from "./format-date"
+import {
+  buildCapitalGhiChu,
+  parseBusinessCapital,
+  type CapitalAdjustType,
+  type CapitalLedgerEntry,
+} from "./capital"
 import type {
   AccessLog,
   AuthUser,
@@ -88,6 +94,34 @@ export async function updateBusiness(id: string, updates: Partial<Business>) {
   const { data, error } = await supabase.from("lap68_businesses").update(payload).eq("id", id).select().single()
   if (error) throw error
   return data as Business
+}
+
+export async function setBusinessOpeningCapital(business: Business, openingCapital: number) {
+  const meta = parseBusinessCapital(business.ghi_chu)
+  const ghi_chu = buildCapitalGhiChu(business.ghi_chu, { ...meta, opening_capital: openingCapital })
+  return updateBusiness(business.id, { ghi_chu })
+}
+
+export async function adjustBusinessCapital(
+  business: Business,
+  type: CapitalAdjustType,
+  amount: number,
+  note?: string
+) {
+  if (amount <= 0) throw new Error("Số tiền phải lớn hơn 0")
+  const meta = parseBusinessCapital(business.ghi_chu)
+  const entry: CapitalLedgerEntry = {
+    id: crypto.randomUUID(),
+    type,
+    amount,
+    note: note?.trim() || null,
+    created_at: new Date().toISOString(),
+  }
+  const ghi_chu = buildCapitalGhiChu(business.ghi_chu, {
+    ...meta,
+    capital_ledger: [...meta.capital_ledger, entry],
+  })
+  return updateBusiness(business.id, { ghi_chu })
 }
 
 // --- Categories ---
