@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
-import { Plus, LayoutGrid, Landmark, SlidersHorizontal, TrendingUp, TrendingDown, PiggyBank, BarChart3, Wallet } from "lucide-react"
+import { Plus, LayoutGrid, Landmark, SlidersHorizontal, TrendingUp, TrendingDown, PiggyBank, BarChart3, Wallet, FileText } from "lucide-react"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth-context"
 import { ModulePageShell, ModuleBrandHeader, ModuleKpiCard, AccentButton } from "@/components/dashboard/module-shell"
@@ -10,6 +10,7 @@ import { BusinessHubCard } from "@/components/dashboard/business-hub-card"
 import { ReminderPanel } from "@/components/dashboard/reminder-panel"
 import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section"
 import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog"
+import { ReportDialog } from "@/components/dashboard/report-dialog"
 import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card"
 import { AccountBalanceDialog } from "@/components/dashboard/account-balance-dialog"
 import { AccountBalanceCard } from "@/components/dashboard/account-balance-card"
@@ -48,6 +49,7 @@ export default function DashboardHubPage() {
   const [loading, setLoading] = useState(true)
   const [capitalOpen, setCapitalOpen] = useState(false)
   const [accountOpen, setAccountOpen] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
   const [portfolioSettings, setPortfolioSettings] = useState<UserPortfolioSettings>({ liquid_accounts: [], updated_at: null })
 
   const load = useCallback(async () => {
@@ -127,6 +129,9 @@ export default function DashboardHubPage() {
               </AccentButton>
               <AccentButton module="cashflow" type="button" onClick={() => setCapitalOpen(true)}>
                 <SlidersHorizontal className="h-4 w-4" /> Tinh chỉnh vốn
+              </AccentButton>
+              <AccentButton module="cashflow" type="button" onClick={() => setReportOpen(true)}>
+                <FileText className="h-4 w-4" /> Báo cáo
               </AccentButton>
               <Link href="/dashboard/businesses">
                 <AccentButton module="cashflow" type="button">
@@ -235,6 +240,7 @@ export default function DashboardHubPage() {
 
       <CapitalAdjustDialog open={capitalOpen} onOpenChange={setCapitalOpen} businesses={businesses} onSuccess={load} />
       <AccountBalanceDialog open={accountOpen} onOpenChange={setAccountOpen} settings={portfolioSettings} onSuccess={load} />
+      <ReportDialog open={reportOpen} onOpenChange={setReportOpen} businesses={businesses} transactions={transactions} defaultBusinessId="all" />
     </ModulePageShell>
   )
 }

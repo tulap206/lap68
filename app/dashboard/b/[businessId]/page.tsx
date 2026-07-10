@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { Plus, TrendingUp, TrendingDown, PiggyBank, CalendarClock, Landmark, SlidersHorizontal, BarChart3 } from "lucide-react"
+import { Plus, TrendingUp, TrendingDown, PiggyBank, CalendarClock, Landmark, SlidersHorizontal, BarChart3, FileText } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { useAuth } from "@/contexts/auth-context"
@@ -18,6 +18,7 @@ import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-
 import { TransactionTypeBadge, PaymentMethodLabel } from "@/components/dashboard/cashflow-ui"
 import { ReminderPanel } from "@/components/dashboard/reminder-panel"
 import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog"
+import { ReportDialog } from "@/components/dashboard/report-dialog"
 import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card"
 import { SkeletonMetricCards } from "@/components/ui/skeleton-loader"
 import {
@@ -45,6 +46,7 @@ export default function BusinessDashboardPage() {
   const [allBusinesses, setAllBusinesses] = useState<Business[]>([])
   const [loading, setLoading] = useState(true)
   const [capitalOpen, setCapitalOpen] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
 
   const load = useCallback(async () => {
     if (!user) return
@@ -107,6 +109,9 @@ export default function BusinessDashboardPage() {
           <div className="flex flex-wrap gap-2">
             <AccentButton module="cashflow" type="button" onClick={() => setCapitalOpen(true)}>
               <SlidersHorizontal className="h-4 w-4" /> Tinh chỉnh vốn
+            </AccentButton>
+            <AccentButton module="cashflow" type="button" onClick={() => setReportOpen(true)}>
+              <FileText className="h-4 w-4" /> Báo cáo
             </AccentButton>
             <Link href={`/dashboard/b/${businessId}/schedules`}>
               <AccentButton module="cashflow" type="button"><CalendarClock className="h-4 w-4" /> Lịch thu/chi</AccentButton>
@@ -193,6 +198,13 @@ export default function BusinessDashboardPage() {
         businesses={allBusinesses}
         defaultBusinessId={businessId}
         onSuccess={load}
+      />
+      <ReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        businesses={allBusinesses}
+        transactions={transactions}
+        defaultBusinessId={businessId}
       />
       </div>
     </ModulePageShell>
