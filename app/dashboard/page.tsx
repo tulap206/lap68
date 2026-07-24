@@ -164,8 +164,9 @@ export default function DashboardHubPage() {
               />
               <ModuleKpiCard
                 module="cashflow"
-                label="Vốn hiện tại"
-                value={displayMoney(capitalSnapshot.available_capital)}
+                label="Vốn"
+                value={displayMoney(capitalSnapshot.base_capital)}
+                hint={`Ròng ${displayMoney(capitalSnapshot.available_capital)}`}
                 icon={<Landmark className="h-5 w-5" />}
                 tone="capital"
                 onClick={() => setCapitalOpen(true)}

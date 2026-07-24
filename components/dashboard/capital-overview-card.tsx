@@ -14,9 +14,9 @@ export function CapitalOverviewCard({
   className?: string
 }) {
   const items = [
-    { label: "Vốn gốc", value: snapshot.base_capital, hint: "Ban đầu + nạp/rút" },
+    { label: "Vốn", value: snapshot.base_capital, hint: "Cố định — chỉ đổi khi nạp/rút", highlight: true },
     { label: "Lợi nhuận KD", value: snapshot.net_profit, hint: "Thu − chi" },
-    { label: "Vốn hiện tại", value: snapshot.available_capital, hint: "Gốc + lãi", highlight: true },
+    { label: "Giá trị ròng", value: snapshot.available_capital, hint: "Vốn + lãi/lỗ" },
   ]
 
   return (
@@ -28,7 +28,7 @@ export function CapitalOverviewCard({
     >
       <div className="px-4 py-3 border-b border-zinc-800/80">
         <p className="text-sm font-semibold text-zinc-100">Vốn & số dư</p>
-        <p className="text-[11px] text-zinc-500 mt-0.5">Vốn gốc + lợi nhuận tích lũy từ thu chi</p>
+        <p className="text-[11px] text-zinc-500 mt-0.5">Vốn cố định; lãi/lỗ không làm hao vốn</p>
       </div>
       <div className={cn("grid gap-px bg-zinc-800/50", compact ? "grid-cols-1 min-[420px]:grid-cols-3" : "grid-cols-1 sm:grid-cols-3")}>
         {items.map((item) => (

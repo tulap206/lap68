@@ -55,7 +55,7 @@ export function BusinessHubCard({
         <div>
           <p className="text-[10px] uppercase tracking-wider text-zinc-500">Vốn</p>
           <p className="text-sm font-mono font-semibold text-green-400 tabular-nums">
-            {capital ? displayMoney(capital.available_capital) : "—"}
+            {capital ? displayMoney(capital.base_capital) : "—"}
           </p>
         </div>
       </div>

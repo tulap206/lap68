@@ -131,9 +131,9 @@ export default function BusinessDashboardPage() {
           <ModuleKpiCard module="cashflow" label="Tỷ suất LN" value={`${stats.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="margin" />
           <ModuleKpiCard
             module="cashflow"
-            label="Vốn hiện tại"
-            value={capitalSnapshot ? displayMoney(capitalSnapshot.available_capital) : "—"}
-            hint={capitalSnapshot ? `Gốc ${displayMoney(capitalSnapshot.base_capital)}` : undefined}
+            label="Vốn"
+            value={capitalSnapshot ? displayMoney(capitalSnapshot.base_capital) : "—"}
+            hint={capitalSnapshot ? `Ròng ${displayMoney(capitalSnapshot.available_capital)}` : undefined}
             icon={<Landmark className="h-5 w-5" />}
             tone="capital"
             onClick={() => setCapitalOpen(true)}

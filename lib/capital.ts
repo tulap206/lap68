@@ -15,6 +15,9 @@ export interface BusinessCapitalMeta {
   capital_ledger: CapitalLedgerEntry[]
 }
 
+/** Snapshot vốn theo việc KD.
+ * - base_capital: vốn cố định (ban đầu + nạp − rút) — không bị lãi/lỗ làm hao
+ * - available_capital: giá trị ròng = vốn + lợi nhuận KD (chỉ để tham chiếu) */
 export interface CapitalSnapshot {
   opening_capital: number
   adjustments_net: number
