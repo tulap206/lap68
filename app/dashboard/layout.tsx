@@ -1,28 +1,32 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/contexts/auth-context"
-import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { Loader2 } from "lucide-react"
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/auth-context";
+import { DashboardSidebar } from "@/components/dashboard-sidebar";
+import { Loader2 } from "lucide-react";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { user, isLoading } = useAuth()
-  const router = useRouter()
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const { user, isLoading } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && !user) router.push("/login")
-  }, [user, isLoading, router])
+    if (!isLoading && !user) router.push("/login");
+  }, [user, isLoading, router]);
 
   if (isLoading) {
     return (
       <div className="min-h-dvh flex items-center justify-center gradient-bg">
-        <Loader2 className="w-8 h-8 animate-spin text-green-500" />
+        <Loader2 className="w-7 h-7 animate-spin text-muted-foreground" />
       </div>
-    )
+    );
   }
 
-  if (!user) return null
+  if (!user) return null;
 
-  return <DashboardSidebar>{children}</DashboardSidebar>
+  return <DashboardSidebar>{children}</DashboardSidebar>;
 }

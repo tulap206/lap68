@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   Bar,
@@ -8,7 +8,7 @@ import {
   Tooltip,
   XAxis,
   YAxis,
-} from "recharts"
+} from "recharts";
 import {
   AXIS_TICK,
   CHART_COLORS,
@@ -19,25 +19,28 @@ import {
   ChartTooltipContent,
   GRID_HORIZONTAL,
   formatChartAxisValue,
-} from "./chart-primitives"
-import type { BusinessSummary } from "@/lib/types"
+} from "./chart-primitives";
+import type { BusinessSummary } from "@/lib/types";
 
-const CHART_HEIGHT = 200
+const CHART_HEIGHT = 200;
 
 export function BusinessComparisonChart({
   summaries,
   className,
 }: {
-  summaries: BusinessSummary[]
-  className?: string
+  summaries: BusinessSummary[];
+  className?: string;
 }) {
   const data = summaries.map((s) => ({
-    name: s.business_name.length > 14 ? `${s.business_name.slice(0, 14)}…` : s.business_name,
+    name:
+      s.business_name.length > 14
+        ? `${s.business_name.slice(0, 14)}…`
+        : s.business_name,
     fullName: s.business_name,
     color: s.color,
     thu: Number(s.total_income),
     chi: Number(s.total_expense),
-  }))
+  }));
 
   return (
     <ChartShell
@@ -60,7 +63,13 @@ export function BusinessComparisonChart({
         <ChartEmpty label="Chưa có dữ liệu" />
       ) : (
         <ResponsiveContainer width="100%" height={CHART_HEIGHT}>
-          <BarChart data={data} layout="vertical" margin={{ ...CHART_MARGIN, left: 4 }} barCategoryGap="18%" barGap={3}>
+          <BarChart
+            data={data}
+            layout="vertical"
+            margin={{ ...CHART_MARGIN, left: 4 }}
+            barCategoryGap="18%"
+            barGap={3}
+          >
             <defs>
               <linearGradient id="lap68BizIncome" x1="0" y1="0" x2="1" y2="0">
                 <stop offset="0%" stopColor="#16a34a" stopOpacity={0.7} />
@@ -71,7 +80,13 @@ export function BusinessComparisonChart({
                 <stop offset="100%" stopColor="#f87171" stopOpacity={0.95} />
               </linearGradient>
             </defs>
-            <CartesianGrid {...GRID_HORIZONTAL} horizontal={false} vertical stroke={CHART_COLORS.grid} strokeDasharray="4 6" />
+            <CartesianGrid
+              {...GRID_HORIZONTAL}
+              horizontal={false}
+              vertical
+              stroke={CHART_COLORS.grid}
+              strokeDasharray="4 6"
+            />
             <XAxis
               type="number"
               tickFormatter={formatChartAxisValue}
@@ -91,11 +106,23 @@ export function BusinessComparisonChart({
               content={<ChartTooltipContent />}
               cursor={{ fill: "rgba(39, 39, 42, 0.3)", radius: 4 }}
             />
-            <Bar dataKey="thu" name="Thu" fill="url(#lap68BizIncome)" radius={[0, 4, 4, 0]} maxBarSize={14} />
-            <Bar dataKey="chi" name="Chi" fill="url(#lap68BizExpense)" radius={[0, 4, 4, 0]} maxBarSize={14} />
+            <Bar
+              dataKey="thu"
+              name="Thu"
+              fill="url(#lap68BizIncome)"
+              radius={[0, 4, 4, 0]}
+              maxBarSize={14}
+            />
+            <Bar
+              dataKey="chi"
+              name="Chi"
+              fill="url(#lap68BizExpense)"
+              radius={[0, 4, 4, 0]}
+              maxBarSize={14}
+            />
           </BarChart>
         </ResponsiveContainer>
       )}
     </ChartShell>
-  )
+  );
 }

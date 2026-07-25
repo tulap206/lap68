@@ -1,43 +1,50 @@
-export type ModuleId = "cashflow"
-export type ModuleAccent = "emerald"
+export type ModuleId = "cashflow";
+export type ModuleAccent = "neutral";
 
 export type ModuleTheme = {
-  id: ModuleId
-  accent: ModuleAccent
-  titleSuffix: string
-  adminClass: string
-  label: string
-}
+  id: ModuleId;
+  accent: ModuleAccent;
+  titleSuffix: string;
+  adminClass: string;
+  label: string;
+};
 
 export const MODULE_THEME: Record<ModuleId, ModuleTheme> = {
   cashflow: {
     id: "cashflow",
-    accent: "emerald",
-    titleSuffix: "DÒNG TIỀN LAP68",
+    accent: "neutral",
+    titleSuffix: "Dòng tiền",
     adminClass: "cashflow-admin",
     label: "Quản lý dòng tiền",
   },
-}
+};
 
 export const ACCENT_TITLE_CLASS: Record<ModuleAccent, string> = {
-  emerald: "text-green-400",
-}
+  neutral: "text-foreground",
+};
 
 export const ACCENT_BTN_CLASS: Record<ModuleAccent, string> = {
-  emerald:
-    "bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-900/40 border border-green-500/20",
-}
+  neutral:
+    "bg-primary text-primary-foreground hover:bg-foreground/90 border border-transparent",
+};
 
 export const ACCENT_KPI_HOVER_CLASS: Record<ModuleAccent, string> = {
-  emerald: "hover:border-green-500/30",
-}
+  neutral: "hover:border-foreground/15",
+};
 
 export const ACCENT_BADGE_CLASS: Record<ModuleAccent, string> = {
-  emerald: "badge-income",
-}
+  neutral: "badge-income",
+};
 
-export const MODULE_CHART_PALETTE = ["#22c55e", "#ef4444", "#71717a", "#16a34a", "#dc2626", "#52525b"]
+export const MODULE_CHART_PALETTE = [
+  "#346538",
+  "#9f2f2d",
+  "#787774",
+  "#1f6c9f",
+  "#956400",
+  "#52524e",
+];
 
 export function getModuleTheme(module: ModuleId): ModuleTheme {
-  return MODULE_THEME[module]
+  return MODULE_THEME[module];
 }

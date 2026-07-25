@@ -1,20 +1,36 @@
-"use client"
+"use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react"
-import Link from "next/link"
-import { Plus, LayoutGrid, Landmark, SlidersHorizontal, TrendingUp, TrendingDown, PiggyBank, BarChart3, Wallet, FileText } from "lucide-react"
-import { toast } from "sonner"
-import { useAuth } from "@/contexts/auth-context"
-import { ModulePageShell, ModuleBrandHeader, ModuleKpiCard, AccentButton } from "@/components/dashboard/module-shell"
-import { BusinessHubCard } from "@/components/dashboard/business-hub-card"
-import { ReminderPanel } from "@/components/dashboard/reminder-panel"
-import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section"
-import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog"
-import { ReportDialog } from "@/components/dashboard/report-dialog"
-import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card"
-import { AccountBalanceDialog } from "@/components/dashboard/account-balance-dialog"
-import { AccountBalanceCard } from "@/components/dashboard/account-balance-card"
-import { SkeletonMetricCards } from "@/components/ui/skeleton-loader"
+import { useCallback, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
+import {
+  Plus,
+  LayoutGrid,
+  Landmark,
+  SlidersHorizontal,
+  TrendingUp,
+  TrendingDown,
+  PiggyBank,
+  BarChart3,
+  Wallet,
+  FileText,
+} from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/auth-context";
+import {
+  ModulePageShell,
+  ModuleBrandHeader,
+  ModuleKpiCard,
+  AccentButton,
+} from "@/components/dashboard/module-shell";
+import { BusinessHubCard } from "@/components/dashboard/business-hub-card";
+import { ReminderPanel } from "@/components/dashboard/reminder-panel";
+import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section";
+import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog";
+import { ReportDialog } from "@/components/dashboard/report-dialog";
+import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card";
+import { AccountBalanceDialog } from "@/components/dashboard/account-balance-dialog";
+import { AccountBalanceCard } from "@/components/dashboard/account-balance-card";
+import { SkeletonMetricCards } from "@/components/ui/skeleton-loader";
 import {
   fetchBusinessSummaries,
   fetchBusinesses,
@@ -23,98 +39,134 @@ import {
   fetchTransactions,
   subscribeLap68Tables,
   syncScheduleStatuses,
-} from "@/lib/supabase"
-import { buildReminderItems } from "@/lib/schedule-engine"
-import { computeCapitalSnapshot, computePortfolioCapital, parseBusinessCapital } from "@/lib/capital"
-import { totalLiquidBalance } from "@/lib/account-balance"
-import type { UserPortfolioSettings } from "@/lib/account-balance"
-import type { Business, BusinessSummary, Schedule, Transaction } from "@/lib/types"
-import { displayMoney } from "@/lib/format-money"
+} from "@/lib/supabase";
+import { buildReminderItems } from "@/lib/schedule-engine";
+import {
+  computeCapitalSnapshot,
+  computePortfolioCapital,
+  parseBusinessCapital,
+} from "@/lib/capital";
+import { totalLiquidBalance } from "@/lib/account-balance";
+import type { UserPortfolioSettings } from "@/lib/account-balance";
+import type {
+  Business,
+  BusinessSummary,
+  Schedule,
+  Transaction,
+} from "@/lib/types";
+import { displayMoney } from "@/lib/format-money";
 
-function SectionTitle({ children, action }: { children: React.ReactNode; action?: React.ReactNode }) {
+function SectionTitle({
+  children,
+  action,
+}: {
+  children: React.ReactNode;
+  action?: React.ReactNode;
+}) {
   return (
     <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
-      <h2 className="text-base sm:text-lg font-bold text-zinc-100">{children}</h2>
+      <h2 className="text-base sm:text-lg font-bold text-foreground">
+        {children}
+      </h2>
       {action}
     </div>
-  )
+  );
 }
 
 export default function DashboardHubPage() {
-  const { user } = useAuth()
-  const [summaries, setSummaries] = useState<BusinessSummary[]>([])
-  const [businesses, setBusinesses] = useState<Business[]>([])
-  const [transactions, setTransactions] = useState<Transaction[]>([])
-  const [schedules, setSchedules] = useState<Schedule[]>([])
-  const [loading, setLoading] = useState(true)
-  const [capitalOpen, setCapitalOpen] = useState(false)
-  const [accountOpen, setAccountOpen] = useState(false)
-  const [reportOpen, setReportOpen] = useState(false)
-  const [portfolioSettings, setPortfolioSettings] = useState<UserPortfolioSettings>({ liquid_accounts: [], updated_at: null })
+  const { user } = useAuth();
+  const [summaries, setSummaries] = useState<BusinessSummary[]>([]);
+  const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [capitalOpen, setCapitalOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [portfolioSettings, setPortfolioSettings] =
+    useState<UserPortfolioSettings>({ liquid_accounts: [], updated_at: null });
 
   const load = useCallback(async () => {
-    if (!user) return
+    if (!user) return;
     try {
-      await syncScheduleStatuses(user.id)
+      await syncScheduleStatuses(user.id);
       const [s, biz, txs, sch, portfolio] = await Promise.all([
         fetchBusinessSummaries(user.id),
         fetchBusinesses(user.id),
         fetchTransactions(user.id),
         fetchSchedules(user.id),
         fetchPortfolioSettings(user.id),
-      ])
-      setSummaries(s)
-      setBusinesses(biz)
-      setTransactions(txs)
-      setSchedules(sch)
-      setPortfolioSettings(portfolio)
+      ]);
+      setSummaries(s);
+      setBusinesses(biz);
+      setTransactions(txs);
+      setSchedules(sch);
+      setPortfolioSettings(portfolio);
     } catch {
-      toast.error("Không tải được dữ liệu")
+      toast.error("Không tải được dữ liệu");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [user])
+  }, [user]);
 
-  useEffect(() => { load() }, [load])
   useEffect(() => {
-    if (!user) return
-    return subscribeLap68Tables(user.id, load)
-  }, [user, load])
+    load();
+  }, [load]);
+  useEffect(() => {
+    if (!user) return;
+    return subscribeLap68Tables(user.id, load);
+  }, [user, load]);
 
-  const reminders = useMemo(() => buildReminderItems(schedules), [schedules])
+  const reminders = useMemo(() => buildReminderItems(schedules), [schedules]);
   const overdueByBusiness = useMemo(() => {
-    const map = new Map<string, number>()
+    const map = new Map<string, number>();
     for (const s of schedules) {
-      if (s.status === "overdue" || buildReminderItems([s])[0]?.urgency === "overdue") {
-        map.set(s.business_id, (map.get(s.business_id) || 0) + 1)
+      if (
+        s.status === "overdue" ||
+        buildReminderItems([s])[0]?.urgency === "overdue"
+      ) {
+        map.set(s.business_id, (map.get(s.business_id) || 0) + 1);
       }
     }
-    return map
-  }, [schedules])
+    return map;
+  }, [schedules]);
 
   const portfolio = useMemo(() => {
-    const income = transactions.filter((t) => t.type === "income").reduce((a, t) => a + t.amount, 0)
-    const expense = transactions.filter((t) => t.type === "expense").reduce((a, t) => a + t.amount, 0)
-    const margin = income > 0 ? ((income - expense) / income) * 100 : 0
-    return { income, expense, profit: income - expense, margin }
-  }, [transactions])
+    const income = transactions
+      .filter((t) => t.type === "income")
+      .reduce((a, t) => a + t.amount, 0);
+    const expense = transactions
+      .filter((t) => t.type === "expense")
+      .reduce((a, t) => a + t.amount, 0);
+    const margin = income > 0 ? ((income - expense) / income) * 100 : 0;
+    return { income, expense, profit: income - expense, margin };
+  }, [transactions]);
 
   const capitalSnapshot = useMemo(
     () => computePortfolioCapital(businesses, summaries),
-    [businesses, summaries]
-  )
+    [businesses, summaries],
+  );
 
-  const liquidTotal = useMemo(() => totalLiquidBalance(portfolioSettings), [portfolioSettings])
+  const liquidTotal = useMemo(
+    () => totalLiquidBalance(portfolioSettings),
+    [portfolioSettings],
+  );
 
   const capitalByBusiness = useMemo(() => {
-    const map = new Map<string, ReturnType<typeof computeCapitalSnapshot>>()
+    const map = new Map<string, ReturnType<typeof computeCapitalSnapshot>>();
     for (const s of summaries) {
-      const b = businesses.find((x) => x.id === s.business_id)
-      if (!b) continue
-      map.set(s.business_id, computeCapitalSnapshot(parseBusinessCapital(b.ghi_chu), Number(s.net_profit)))
+      const b = businesses.find((x) => x.id === s.business_id);
+      if (!b) continue;
+      map.set(
+        s.business_id,
+        computeCapitalSnapshot(
+          parseBusinessCapital(b.ghi_chu),
+          Number(s.net_profit),
+        ),
+      );
     }
-    return map
-  }, [summaries, businesses])
+    return map;
+  }, [summaries, businesses]);
 
   return (
     <ModulePageShell module="cashflow">
@@ -124,13 +176,25 @@ export default function DashboardHubPage() {
           subtitle="Tổng quan thu chi, vốn và phân tích toàn bộ việc kinh doanh"
           actions={
             <div className="flex flex-wrap gap-2 w-full md:w-auto">
-              <AccentButton module="cashflow" type="button" onClick={() => setAccountOpen(true)}>
+              <AccentButton
+                module="cashflow"
+                type="button"
+                onClick={() => setAccountOpen(true)}
+              >
                 <Wallet className="h-4 w-4" /> Số dư TK
               </AccentButton>
-              <AccentButton module="cashflow" type="button" onClick={() => setCapitalOpen(true)}>
+              <AccentButton
+                module="cashflow"
+                type="button"
+                onClick={() => setCapitalOpen(true)}
+              >
                 <SlidersHorizontal className="h-4 w-4" /> Tinh chỉnh vốn
               </AccentButton>
-              <AccentButton module="cashflow" type="button" onClick={() => setReportOpen(true)}>
+              <AccentButton
+                module="cashflow"
+                type="button"
+                onClick={() => setReportOpen(true)}
+              >
                 <FileText className="h-4 w-4" /> Báo cáo
               </AccentButton>
               <Link href="/dashboard/businesses">
@@ -149,15 +213,43 @@ export default function DashboardHubPage() {
             <SkeletonMetricCards />
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 auto-rows-fr items-stretch">
-              <ModuleKpiCard module="cashflow" label="Tổng thu" value={displayMoney(portfolio.income)} icon={<TrendingUp className="h-5 w-5" />} tone="income" />
-              <ModuleKpiCard module="cashflow" label="Tổng chi" value={displayMoney(portfolio.expense)} icon={<TrendingDown className="h-5 w-5" />} tone="expense" />
-              <ModuleKpiCard module="cashflow" label="Lợi nhuận" value={displayMoney(portfolio.profit)} icon={<PiggyBank className="h-5 w-5" />} tone="profit" />
-              <ModuleKpiCard module="cashflow" label="Tỷ suất LN" value={`${portfolio.margin.toFixed(1)}%`} icon={<BarChart3 className="h-5 w-5" />} tone="margin" />
+              <ModuleKpiCard
+                module="cashflow"
+                label="Tổng thu"
+                value={displayMoney(portfolio.income)}
+                icon={<TrendingUp className="h-5 w-5" />}
+                tone="income"
+              />
+              <ModuleKpiCard
+                module="cashflow"
+                label="Tổng chi"
+                value={displayMoney(portfolio.expense)}
+                icon={<TrendingDown className="h-5 w-5" />}
+                tone="expense"
+              />
+              <ModuleKpiCard
+                module="cashflow"
+                label="Lợi nhuận"
+                value={displayMoney(portfolio.profit)}
+                icon={<PiggyBank className="h-5 w-5" />}
+                tone="profit"
+              />
+              <ModuleKpiCard
+                module="cashflow"
+                label="Tỷ suất LN"
+                value={`${portfolio.margin.toFixed(1)}%`}
+                icon={<BarChart3 className="h-5 w-5" />}
+                tone="margin"
+              />
               <ModuleKpiCard
                 module="cashflow"
                 label="Số dư TK"
                 value={displayMoney(liquidTotal)}
-                hint={portfolioSettings.liquid_accounts.length > 0 ? `${portfolioSettings.liquid_accounts.length} tài khoản` : "Chưa cập nhật"}
+                hint={
+                  portfolioSettings.liquid_accounts.length > 0
+                    ? `${portfolioSettings.liquid_accounts.length} tài khoản`
+                    : "Chưa cập nhật"
+                }
                 icon={<Wallet className="h-5 w-5" />}
                 tone="balance"
                 onClick={() => setAccountOpen(true)}
@@ -171,7 +263,13 @@ export default function DashboardHubPage() {
                 tone="capital"
                 onClick={() => setCapitalOpen(true)}
               />
-              <ModuleKpiCard module="cashflow" label="Việc KD" value={String(summaries.length)} icon={<LayoutGrid className="h-5 w-5" />} tone="count" />
+              <ModuleKpiCard
+                module="cashflow"
+                label="Việc KD"
+                value={String(summaries.length)}
+                icon={<LayoutGrid className="h-5 w-5" />}
+                tone="count"
+              />
             </div>
           )}
         </section>
@@ -180,12 +278,25 @@ export default function DashboardHubPage() {
         {!loading && (
           <section className="space-y-4">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-              <AccountBalanceCard settings={portfolioSettings} compact onClick={() => setAccountOpen(true)} />
-              {summaries.length > 0 && <CapitalOverviewCard snapshot={capitalSnapshot} compact />}
+              <AccountBalanceCard
+                settings={portfolioSettings}
+                compact
+                onClick={() => setAccountOpen(true)}
+              />
+              {summaries.length > 0 && (
+                <CapitalOverviewCard snapshot={capitalSnapshot} compact />
+              )}
             </div>
             <div>
               <SectionTitle
-                action={<Link href="/dashboard/reminders" className="text-xs text-zinc-500 hover:text-green-400">Xem tất cả</Link>}
+                action={
+                  <Link
+                    href="/dashboard/reminders"
+                    className="text-xs text-muted-foreground hover:text-income"
+                  >
+                    Xem tất cả
+                  </Link>
+                }
               >
                 Nhắc hẹn sắp tới
               </SectionTitle>
@@ -198,7 +309,10 @@ export default function DashboardHubPage() {
         <section>
           <SectionTitle
             action={
-              <Link href="/dashboard/businesses" className="text-xs text-green-400 hover:underline flex items-center gap-1">
+              <Link
+                href="/dashboard/businesses"
+                className="text-xs text-income hover:underline flex items-center gap-1"
+              >
                 <Plus className="h-3 w-3" /> Thêm việc
               </Link>
             }
@@ -207,12 +321,21 @@ export default function DashboardHubPage() {
           </SectionTitle>
           {loading ? (
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {[1, 2, 3].map((i) => <div key={i} className="h-40 rounded-xl bg-zinc-800/50 animate-pulse" />)}
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-40 rounded-xl bg-muted/50 animate-pulse"
+                />
+              ))}
             </div>
           ) : summaries.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-zinc-700 p-8 text-center">
-              <p className="text-zinc-500 mb-3">Chưa có việc kinh doanh</p>
-              <Link href="/dashboard/businesses"><AccentButton module="cashflow">Tạo việc đầu tiên</AccentButton></Link>
+            <div className="rounded-xl border border-dashed border-border p-8 text-center">
+              <p className="text-muted-foreground mb-3">
+                Chưa có việc kinh doanh
+              </p>
+              <Link href="/dashboard/businesses">
+                <AccentButton module="cashflow">Tạo việc đầu tiên</AccentButton>
+              </Link>
             </div>
           ) : (
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -233,15 +356,36 @@ export default function DashboardHubPage() {
         {!loading && transactions.length > 0 && (
           <section id="bao-cao">
             <SectionTitle>Báo cáo & phân tích</SectionTitle>
-            <p className="text-xs text-zinc-500 mb-4 -mt-1">Dòng tiền, cơ cấu thu chi và so sánh giữa các việc kinh doanh</p>
-            <CashflowReportsSection transactions={transactions} summaries={summaries} />
+            <p className="text-xs text-muted-foreground mb-4 -mt-1">
+              Dòng tiền, cơ cấu thu chi và so sánh giữa các việc kinh doanh
+            </p>
+            <CashflowReportsSection
+              transactions={transactions}
+              summaries={summaries}
+            />
           </section>
         )}
       </div>
 
-      <CapitalAdjustDialog open={capitalOpen} onOpenChange={setCapitalOpen} businesses={businesses} onSuccess={load} />
-      <AccountBalanceDialog open={accountOpen} onOpenChange={setAccountOpen} settings={portfolioSettings} onSuccess={load} />
-      <ReportDialog open={reportOpen} onOpenChange={setReportOpen} businesses={businesses} transactions={transactions} defaultBusinessId="all" />
+      <CapitalAdjustDialog
+        open={capitalOpen}
+        onOpenChange={setCapitalOpen}
+        businesses={businesses}
+        onSuccess={load}
+      />
+      <AccountBalanceDialog
+        open={accountOpen}
+        onOpenChange={setAccountOpen}
+        settings={portfolioSettings}
+        onSuccess={load}
+      />
+      <ReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        businesses={businesses}
+        transactions={transactions}
+        defaultBusinessId="all"
+      />
     </ModulePageShell>
-  )
+  );
 }

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation"
+import { redirect } from "next/navigation";
 
 export default function HistoryRedirectPage() {
-  redirect("/dashboard/settings")
+  redirect("/dashboard/settings");
 }

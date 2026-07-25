@@ -1,8 +1,8 @@
-import type { Metadata } from "next"
-import { Analytics } from "@vercel/analytics/next"
-import { Toaster } from "sonner"
-import { AuthProvider } from "@/contexts/auth-context"
-import "./globals.css"
+import type { Metadata, Viewport } from "next";
+import { Analytics } from "@vercel/analytics/next";
+import { Toaster } from "sonner";
+import { AuthProvider } from "@/contexts/auth-context";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "LAP68 — Quản lý dòng tiền",
@@ -17,20 +17,34 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "LAP68",
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
   },
-}
+};
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export const viewport: Viewport = {
+  themeColor: "#f7f6f3",
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="vi" className="dark">
-      <body className="dark-grain min-h-screen">
+    <html lang="vi">
+      <body className="min-h-dvh font-sans">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
+        >
+          Bỏ qua đến nội dung
+        </a>
         <AuthProvider>
           {children}
-          <Toaster position="top-right" richColors theme="dark" />
+          <Toaster position="top-right" richColors theme="light" />
         </AuthProvider>
         <Analytics />
       </body>
     </html>
-  )
+  );
 }

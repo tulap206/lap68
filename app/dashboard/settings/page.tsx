@@ -1,14 +1,18 @@
-"use client"
+"use client";
 
-import { useAuth } from "@/contexts/auth-context"
-import { ModulePageShell, ModuleSubpageHeader, ModuleSectionCard } from "@/components/dashboard/module-shell"
-import { BackupPanel } from "@/components/dashboard/backup-panel"
-import { ActivityLogPanel } from "@/components/dashboard/activity-log-panel"
+import { useAuth } from "@/contexts/auth-context";
+import {
+  ModulePageShell,
+  ModuleSubpageHeader,
+  ModuleSectionCard,
+} from "@/components/dashboard/module-shell";
+import { BackupPanel } from "@/components/dashboard/backup-panel";
+import { ActivityLogPanel } from "@/components/dashboard/activity-log-panel";
 
 export default function SettingsPage() {
-  const { user, logAction } = useAuth()
+  const { user, logAction } = useAuth();
 
-  if (!user) return null
+  if (!user) return null;
 
   return (
     <ModulePageShell module="cashflow">
@@ -38,5 +42,5 @@ export default function SettingsPage() {
         </div>
       </div>
     </ModulePageShell>
-  )
+  );
 }

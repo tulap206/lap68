@@ -1,0 +1,34 @@
+---
+description: LAP68 UI — Toss-style quiet fintech + warm minimalist product design
+globs: ["**/*.tsx", "**/*.css", "lib/module-theme.ts"]
+alwaysApply: false
+---
+
+# LAP68 UI Design
+
+Derived from awesome-cursorrules Toss-style + project redesign brief.
+
+## Direction
+
+- Quiet, high-trust cashflow product UI. Clear hierarchy, generous spacing, minimal ornament.
+- One primary accent (charcoal / near-black). Semantic soft green/red only for thu/chi status.
+- No decorative gradients, neon glow, glassmorphism, or competing accent rainbows.
+- Prefer semantic tokens (`bg-background`, `text-muted-foreground`, `border-border`) over raw zinc/slate utilities.
+
+## Surfaces
+
+- Canvas: warm bone off-white. Cards: white with `1px` border, radius 8–12px.
+- Shadows ultra-diffuse or none. Never heavy `shadow-xl` on cards.
+- No nested cards. No glow rings on active nav.
+
+## Typography
+
+- Sans geometric with character (Outfit). Metrics use `tabular-nums` / mono.
+- Page titles: semibold sentence case — not italic uppercase shout.
+- Never pure `#000` text; use off-black foreground.
+
+## Interaction
+
+- Hover: subtle border/bg shift. Active: `scale(0.98)`.
+- Focus rings visible. Respect `prefers-reduced-motion`.
+- Loading: skeleton shapes matching layout, not only spinners.
