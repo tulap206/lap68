@@ -122,13 +122,15 @@ export async function deliverTelegramReminders(
         .eq("channel", "telegram")
       result.sent++
     } else {
+      // Xóa claim thất bại để cron lần sau còn retry trong ngày
       await supabase
         .from("lap68_reminder_logs")
-        .update({ status: "failed", message: `${message}\n\n[error] ${send.error}` })
+        .delete()
         .eq("schedule_id", item.schedule.id)
         .eq("remind_on_date", remindOnDate)
         .eq("days_before", daysBefore)
         .eq("channel", "telegram")
+        .eq("status", "failed")
       result.failed++
     }
   }

@@ -37,14 +37,27 @@ export async function GET(req: NextRequest) {
     const items = buildReminderItems((schedules || []) as Schedule[], today)
     const telegram = await deliverTelegramReminders(supabase, items, today)
 
+    // toISOString() là UTC — trả thêm ngày VN đúng calendar
+    const todayVn = `${String(today.getDate()).padStart(2, "0")}/${String(today.getMonth() + 1).padStart(2, "0")}/${today.getFullYear()}`
+
     return NextResponse.json({
       ok: true,
       schedules: (schedules || []).length,
       statusUpdates,
       reminders: items.length,
+      reminderTitles: items.map((i) => ({
+        title: i.schedule.title,
+        daysUntil: i.daysUntil,
+        urgency: i.urgency,
+      })),
       telegram,
       at: new Date().toISOString(),
-      todayVn: today.toISOString().slice(0, 10),
+      todayVn,
+      hint: !telegram.configured
+        ? "Thiếu TELEGRAM_BOT_TOKEN hoặc TELEGRAM_CHAT_ID trên Vercel"
+        : items.length === 0
+          ? "Không có lịch trong cửa sổ nhắc (mặc định 3/1/0 ngày hoặc quá hạn)"
+          : undefined,
     })
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error"
