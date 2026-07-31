@@ -21,6 +21,8 @@ export function KpiAutoFitValue({
     const text = textRef.current;
     if (!container || !text) return;
 
+    let lastWidth = container.clientWidth;
+
     const fit = () => {
       let size = MAX_PX;
       text.style.fontSize = `${size}px`;
@@ -32,7 +34,16 @@ export function KpiAutoFitValue({
     };
 
     fit();
-    const ro = new ResizeObserver(fit);
+
+    const ro = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = entry.contentRect.width;
+        if (Math.abs(width - lastWidth) > 1) {
+          lastWidth = width;
+          requestAnimationFrame(fit);
+        }
+      }
+    });
     ro.observe(container);
     return () => ro.disconnect();
   }, [value]);
