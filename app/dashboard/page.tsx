@@ -55,6 +55,7 @@ import type {
   Transaction,
 } from "@/lib/types";
 import { displayMoney } from "@/lib/format-money";
+import { parseDisplayDate } from "@/lib/format-date";
 
 function SectionTitle({
   children,
@@ -142,6 +143,26 @@ export default function DashboardHubPage() {
     return { income, expense, profit: income - expense, margin };
   }, [transactions]);
 
+  const portfolioMonthly = useMemo(() => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-indexed
+
+    const monthlyTxs = transactions.filter((t) => {
+      const d = parseDisplayDate(t.transaction_date);
+      if (!d) return false;
+      return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+    });
+
+    const income = monthlyTxs
+      .filter((t) => t.type === "income")
+      .reduce((a, t) => a + t.amount, 0);
+    const expense = monthlyTxs
+      .filter((t) => t.type === "expense")
+      .reduce((a, t) => a + t.amount, 0);
+    return { income, expense, profit: income - expense };
+  }, [transactions]);
+
   const capitalSnapshot = useMemo(
     () => computePortfolioCapital(businesses, summaries),
     [businesses, summaries],
@@ -212,11 +233,19 @@ export default function DashboardHubPage() {
           {loading ? (
             <SkeletonMetricCards />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 auto-rows-fr items-stretch">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 auto-rows-fr items-stretch">
               <ModuleKpiCard
                 module="cashflow"
                 label="Tổng thu"
                 value={displayMoney(portfolio.income)}
+                icon={<TrendingUp className="h-5 w-5" />}
+                tone="income"
+              />
+              <ModuleKpiCard
+                module="cashflow"
+                label={`Thu tháng ${new Date().getMonth() + 1}`}
+                value={displayMoney(portfolioMonthly.income)}
+                hint="Tháng hiện tại"
                 icon={<TrendingUp className="h-5 w-5" />}
                 tone="income"
               />
@@ -229,8 +258,24 @@ export default function DashboardHubPage() {
               />
               <ModuleKpiCard
                 module="cashflow"
+                label={`Chi tháng ${new Date().getMonth() + 1}`}
+                value={displayMoney(portfolioMonthly.expense)}
+                hint="Tháng hiện tại"
+                icon={<TrendingDown className="h-5 w-5" />}
+                tone="expense"
+              />
+              <ModuleKpiCard
+                module="cashflow"
                 label="Lợi nhuận"
                 value={displayMoney(portfolio.profit)}
+                icon={<PiggyBank className="h-5 w-5" />}
+                tone="profit"
+              />
+              <ModuleKpiCard
+                module="cashflow"
+                label={`LN tháng ${new Date().getMonth() + 1}`}
+                value={displayMoney(portfolioMonthly.profit)}
+                hint="Tháng hiện tại"
                 icon={<PiggyBank className="h-5 w-5" />}
                 tone="profit"
               />
