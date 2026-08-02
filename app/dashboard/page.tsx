@@ -137,7 +137,7 @@ export default function DashboardHubPage() {
       .filter((t) => t.type === "income")
       .reduce((a, t) => a + t.amount, 0);
     const expense = transactions
-      .filter((t) => t.type === "expense")
+      .filter((t) => t.type === "expense" && t.category?.name?.trim().toLowerCase() !== "chi tiêu cá nhân")
       .reduce((a, t) => a + t.amount, 0);
     const margin = income > 0 ? ((income - expense) / income) * 100 : 0;
     return { income, expense, profit: income - expense, margin };
@@ -158,9 +158,30 @@ export default function DashboardHubPage() {
       .filter((t) => t.type === "income")
       .reduce((a, t) => a + t.amount, 0);
     const expense = monthlyTxs
-      .filter((t) => t.type === "expense")
+      .filter((t) => t.type === "expense" && t.category?.name?.trim().toLowerCase() !== "chi tiêu cá nhân")
       .reduce((a, t) => a + t.amount, 0);
     return { income, expense, profit: income - expense };
+  }, [transactions]);
+
+  const personalSpending = useMemo(() => {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth(); // 0-indexed
+
+    const total = transactions
+      .filter((t) => t.type === "expense" && t.category?.name?.trim().toLowerCase() === "chi tiêu cá nhân")
+      .reduce((a, t) => a + t.amount, 0);
+
+    const monthly = transactions
+      .filter((t) => {
+        if (t.type !== "expense" || t.category?.name?.trim().toLowerCase() !== "chi tiêu cá nhân") return false;
+        const d = parseDisplayDate(t.transaction_date);
+        if (!d) return false;
+        return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+      })
+      .reduce((a, t) => a + t.amount, 0);
+
+    return { total, monthly };
   }, [transactions]);
 
   const capitalSnapshot = useMemo(
@@ -233,7 +254,7 @@ export default function DashboardHubPage() {
           {loading ? (
             <SkeletonMetricCards />
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 auto-rows-fr items-stretch">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 auto-rows-fr items-stretch">
               <ModuleKpiCard
                 module="cashflow"
                 label="Tổng thu"
@@ -307,6 +328,14 @@ export default function DashboardHubPage() {
                 icon={<Landmark className="h-5 w-5" />}
                 tone="capital"
                 onClick={() => setCapitalOpen(true)}
+              />
+              <ModuleKpiCard
+                module="cashflow"
+                label="Chi tiêu cá nhân"
+                value={displayMoney(personalSpending.total)}
+                hint={`Tháng này: ${displayMoney(personalSpending.monthly)}`}
+                icon={<Wallet className="h-5 w-5" />}
+                tone="neutral"
               />
               <ModuleKpiCard
                 module="cashflow"
