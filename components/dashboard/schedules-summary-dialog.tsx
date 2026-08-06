@@ -13,7 +13,7 @@ import {
 } from "@/components/dashboard/module-shell";
 import { TablePagination } from "@/components/dashboard/table-pagination";
 import { displayMoney } from "@/lib/format-money";
-import { formatDisplayDate } from "@/lib/format-date";
+import { formatDisplayDate, parseDisplayDate } from "@/lib/format-date";
 import type { Schedule } from "@/lib/types";
 
 function ScheduleStatusBadge({ status }: { status: Schedule["status"] }) {
@@ -54,7 +54,9 @@ export function SchedulesSummaryDialog({
 
   // Sort schedules by due_date ascending (from earliest to latest date)
   const sortedSchedules = [...schedules].sort((a, b) => {
-    return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+    const dateA = parseDisplayDate(a.due_date)?.getTime() || 0;
+    const dateB = parseDisplayDate(b.due_date)?.getTime() || 0;
+    return dateA - dateB;
   });
 
   const totalItems = sortedSchedules.length;

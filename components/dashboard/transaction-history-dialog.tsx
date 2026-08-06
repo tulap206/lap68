@@ -19,7 +19,7 @@ import { TablePagination } from "@/components/dashboard/table-pagination";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { displayMoney } from "@/lib/format-money";
-import { formatDisplayDate } from "@/lib/format-date";
+import { formatDisplayDate, parseDisplayDate } from "@/lib/format-date";
 import type { Transaction } from "@/lib/types";
 
 export function TransactionHistoryDialog({
@@ -38,17 +38,29 @@ export function TransactionHistoryDialog({
   
   // Sort transactions to ensure the newest ones are on top (by transaction_date, then by created_at)
   const sortedTransactions = [...transactions].sort((a, b) => {
-    const dateA = new Date(a.transaction_date).getTime();
-    const dateB = new Date(b.transaction_date).getTime();
+    const dateA = parseDisplayDate(a.transaction_date)?.getTime() || 0;
+    const dateB = parseDisplayDate(b.transaction_date)?.getTime() || 0;
     if (dateB !== dateA) return dateB - dateA;
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
   // Filter transactions by date range
   const filteredTransactions = sortedTransactions.filter((t) => {
-    const txDate = t.transaction_date.split("T")[0];
-    if (startDate && txDate < startDate) return false;
-    if (endDate && txDate > endDate) return false;
+    const txDate = parseDisplayDate(t.transaction_date);
+    if (!txDate) return true;
+
+    txDate.setHours(0, 0, 0, 0);
+
+    if (startDate) {
+      const start = new Date(startDate);
+      start.setHours(0, 0, 0, 0);
+      if (txDate < start) return false;
+    }
+    if (endDate) {
+      const end = new Date(endDate);
+      end.setHours(0, 0, 0, 0);
+      if (txDate > end) return false;
+    }
     return true;
   });
 
