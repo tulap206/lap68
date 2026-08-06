@@ -13,6 +13,8 @@ import {
   BarChart3,
   Wallet,
   FileText,
+  History,
+  Calendar,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
@@ -30,6 +32,8 @@ import { ReportDialog } from "@/components/dashboard/report-dialog";
 import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card";
 import { AccountBalanceDialog } from "@/components/dashboard/account-balance-dialog";
 import { AccountBalanceCard } from "@/components/dashboard/account-balance-card";
+import { TransactionHistoryDialog } from "@/components/dashboard/transaction-history-dialog";
+import { SchedulesSummaryDialog } from "@/components/dashboard/schedules-summary-dialog";
 import { SkeletonMetricCards } from "@/components/ui/skeleton-loader";
 import {
   fetchBusinessSummaries,
@@ -84,6 +88,8 @@ export default function DashboardHubPage() {
   const [capitalOpen, setCapitalOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [schedulesOpen, setSchedulesOpen] = useState(false);
   const [portfolioSettings, setPortfolioSettings] =
     useState<UserPortfolioSettings>({ liquid_accounts: [], updated_at: null });
 
@@ -224,6 +230,20 @@ export default function DashboardHubPage() {
                 onClick={() => setAccountOpen(true)}
               >
                 <Wallet className="h-4 w-4" /> Số dư TK
+              </AccentButton>
+              <AccentButton
+                module="cashflow"
+                type="button"
+                onClick={() => setHistoryOpen(true)}
+              >
+                <History className="h-4 w-4" /> Lịch sử giao dịch
+              </AccentButton>
+              <AccentButton
+                module="cashflow"
+                type="button"
+                onClick={() => setSchedulesOpen(true)}
+              >
+                <Calendar className="h-4 w-4" /> Lịch thu chi
               </AccentButton>
               <AccentButton
                 module="cashflow"
@@ -459,6 +479,16 @@ export default function DashboardHubPage() {
         businesses={businesses}
         transactions={transactions}
         defaultBusinessId="all"
+      />
+      <TransactionHistoryDialog
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+        transactions={transactions}
+      />
+      <SchedulesSummaryDialog
+        open={schedulesOpen}
+        onOpenChange={setSchedulesOpen}
+        schedules={schedules}
       />
     </ModulePageShell>
   );
