@@ -32,12 +32,20 @@ export function TransactionHistoryDialog({
   const [page, setPage] = useState(1);
   const pageSize = 10;
   
-  const totalItems = transactions.length;
+  // Sort transactions to ensure the newest ones are on top (by transaction_date, then by created_at)
+  const sortedTransactions = [...transactions].sort((a, b) => {
+    const dateA = new Date(a.transaction_date).getTime();
+    const dateB = new Date(b.transaction_date).getTime();
+    if (dateB !== dateA) return dateB - dateA;
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+
+  const totalItems = sortedTransactions.length;
   const totalPages = Math.ceil(totalItems / pageSize);
   
   // Slice transactions for the current page
   const startIdx = (page - 1) * pageSize;
-  const paginatedTransactions = transactions.slice(startIdx, startIdx + pageSize);
+  const paginatedTransactions = sortedTransactions.slice(startIdx, startIdx + pageSize);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
