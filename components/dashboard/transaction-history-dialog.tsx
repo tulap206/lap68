@@ -16,6 +16,8 @@ import {
   PaymentMethodLabel,
 } from "@/components/dashboard/cashflow-ui";
 import { TablePagination } from "@/components/dashboard/table-pagination";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { displayMoney } from "@/lib/format-money";
 import { formatDisplayDate } from "@/lib/format-date";
 import type { Transaction } from "@/lib/types";
@@ -30,6 +32,8 @@ export function TransactionHistoryDialog({
   transactions: Transaction[];
 }) {
   const [page, setPage] = useState(1);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const pageSize = 10;
   
   // Sort transactions to ensure the newest ones are on top (by transaction_date, then by created_at)
@@ -40,12 +44,20 @@ export function TransactionHistoryDialog({
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
 
-  const totalItems = sortedTransactions.length;
+  // Filter transactions by date range
+  const filteredTransactions = sortedTransactions.filter((t) => {
+    const txDate = t.transaction_date.split("T")[0];
+    if (startDate && txDate < startDate) return false;
+    if (endDate && txDate > endDate) return false;
+    return true;
+  });
+
+  const totalItems = filteredTransactions.length;
   const totalPages = Math.ceil(totalItems / pageSize);
   
   // Slice transactions for the current page
   const startIdx = (page - 1) * pageSize;
-  const paginatedTransactions = sortedTransactions.slice(startIdx, startIdx + pageSize);
+  const paginatedTransactions = filteredTransactions.slice(startIdx, startIdx + pageSize);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -54,7 +66,11 @@ export function TransactionHistoryDialog({
   return (
     <Dialog open={open} onOpenChange={(v) => {
       onOpenChange(v);
-      if (v) setPage(1); // Reset page on open
+      if (v) {
+        setPage(1); // Reset page on open
+        setStartDate("");
+        setEndDate("");
+      }
     }}>
       <DialogContent className="max-w-4xl w-[95vw] md:w-full">
         <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-foreground/60 to-foreground/20 rounded-t-2xl" />
@@ -65,7 +81,48 @@ export function TransactionHistoryDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="mt-4 border border-border rounded-xl overflow-hidden bg-card">
+        {/* Date Filter Panel */}
+        <div className="flex flex-wrap items-end gap-3 mt-4 mb-2">
+          <div className="flex flex-col gap-1 w-full sm:w-auto">
+            <span className="text-xs font-semibold text-muted-foreground">Từ ngày</span>
+            <Input
+              type="date"
+              className="h-9 w-full sm:w-40 font-medium"
+              value={startDate}
+              onChange={(e) => {
+                setStartDate(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+          <div className="flex flex-col gap-1 w-full sm:w-auto">
+            <span className="text-xs font-semibold text-muted-foreground">Đến ngày</span>
+            <Input
+              type="date"
+              className="h-9 w-full sm:w-40 font-medium"
+              value={endDate}
+              onChange={(e) => {
+                setEndDate(e.target.value);
+                setPage(1);
+              }}
+            />
+          </div>
+          {(startDate || endDate) && (
+            <Button
+              variant="ghost"
+              className="h-9 text-xs px-3 font-semibold text-expense hover:text-expense hover:bg-rose-50 dark:hover:bg-rose-950/20"
+              onClick={() => {
+                setStartDate("");
+                setEndDate("");
+                setPage(1);
+              }}
+            >
+              Xóa bộ lọc
+            </Button>
+          )}
+        </div>
+
+        <div className="border border-border rounded-xl overflow-hidden bg-card mt-2">
           <ModuleResponsiveTable
             headers={["Ngày", "Công việc", "Loại", "Mô tả", "Số tiền", "Thanh toán"]}
             rows={paginatedTransactions.map((t) => [
