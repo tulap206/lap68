@@ -52,11 +52,16 @@ export function SchedulesSummaryDialog({
   const [page, setPage] = useState(1);
   const pageSize = 10;
 
-  const totalItems = schedules.length;
+  // Sort schedules by due_date ascending (from earliest to latest date)
+  const sortedSchedules = [...schedules].sort((a, b) => {
+    return new Date(a.due_date).getTime() - new Date(b.due_date).getTime();
+  });
+
+  const totalItems = sortedSchedules.length;
   const totalPages = Math.ceil(totalItems / pageSize);
 
   const startIdx = (page - 1) * pageSize;
-  const paginatedSchedules = schedules.slice(startIdx, startIdx + pageSize);
+  const paginatedSchedules = sortedSchedules.slice(startIdx, startIdx + pageSize);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
