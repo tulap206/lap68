@@ -147,17 +147,17 @@ export function AccountBalanceDialog({
                 <Label className="text-xs text-muted-foreground">
                   Tài khoản
                 </Label>
-                <Button
+                <button
                   type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-muted-foreground hover:text-expense"
+                  className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors p-1 disabled:opacity-30 disabled:hover:text-zinc-400"
                   onClick={() => removeRow(row.id)}
                   disabled={rows.length <= 1}
                   aria-label="Xóa tài khoản"
+                  title="Xóa tài khoản"
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                </Button>
+                  <Trash2 className="h-4 w-4" />
+                </button>
+
               </div>
               <Input
                 value={row.name}

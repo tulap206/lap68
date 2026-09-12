@@ -193,26 +193,27 @@ export default function BusinessesPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
                       <button
                         type="button"
                         onClick={(e) => openEdit(b, e)}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                        className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors p-1"
                         title="Chỉnh sửa"
                         aria-label="Chỉnh sửa"
                       >
-                        <Edit2 className="h-3.5 w-3.5" />
+                        <Edit2 className="h-4 w-4" />
                       </button>
                       <button
                         type="button"
                         onClick={(e) => archive(b, e)}
-                        className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                        className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors p-1"
                         title="Lưu trữ"
                         aria-label="Lưu trữ"
                       >
-                        <Archive className="h-3.5 w-3.5" />
+                        <Archive className="h-4 w-4" />
                       </button>
                     </div>
+
                   </div>
 
                   <p className="text-xs text-zinc-500 mt-3 line-clamp-2 min-h-[32px]">

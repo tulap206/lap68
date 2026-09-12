@@ -246,40 +246,40 @@ export function BackupPanel({
                     {formatBytes(b.file_size)}
                   </p>
                 </div>
-                <div className="flex gap-0.5 shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
+                <div className="flex items-center gap-1.5 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors p-1"
                     title="Khôi phục"
-                    disabled={restoringId === b.id}
+                    aria-label="Khôi phục"
                     onClick={() => handleRestore(b)}
+                    disabled={restoringId === b.id}
                   >
                     <RotateCcw
                       className={cn(
-                        "h-3.5 w-3.5",
+                        "h-4 w-4",
                         restoringId === b.id && "animate-spin",
                       )}
                     />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8"
+                  </button>
+                  <button
+                    type="button"
+                    className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors p-1"
                     title="Tải JSON"
+                    aria-label="Tải JSON"
                     onClick={() => handleDownloadCloud(b)}
                   >
-                    <Download className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 text-expense/80 hover:text-expense"
+                    <Download className="h-4 w-4" />
+                  </button>
+                  <button
+                    type="button"
+                    className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors p-1"
                     title="Xóa"
+                    aria-label="Xóa"
                     onClick={() => handleDelete(b)}
                   >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               </li>
             ))}
