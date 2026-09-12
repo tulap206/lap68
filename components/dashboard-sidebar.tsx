@@ -220,7 +220,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
 
       <main
         id="main-content"
-        className="lg:pl-[72px] pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0 min-h-dvh px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 safe-bottom relative z-10"
+        className="lg:pl-[72px] pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0 min-h-dvh px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-8 safe-bottom relative z-10"
       >
         {user && (
           <div className="mb-4 sm:mb-5 hidden lg:flex justify-end items-center gap-2">
@@ -235,6 +235,52 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         )}
         {children}
       </main>
+
+      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      <nav
+        aria-label="Thanh điều hướng di động"
+        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-lg border-t border-border/80 px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-4px_16px_rgba(0,0,0,0.04)]"
+      >
+        {menuItems.map((item) => {
+          const active =
+            pathname === item.href ||
+            (item.href !== `/dashboard/b/${businessId}` &&
+              pathname.startsWith(item.href + "/"));
+          const isExactBusinessHome =
+            item.href === `/dashboard/b/${businessId}` &&
+            pathname === item.href;
+          const isActive =
+            businessId && item.href === `/dashboard/b/${businessId}`
+              ? isExactBusinessHome
+              : active;
+          const Icon = item.icon;
+
+          return (
+            <Link
+              key={`mobile-bottom-${item.href}`}
+              href={item.href}
+              className={cn(
+                "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-150 min-w-[56px] min-h-[44px]",
+                isActive
+                  ? "text-income font-bold"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <div
+                className={cn(
+                  "p-1 rounded-lg transition-colors",
+                  isActive && "bg-income/10",
+                )}
+              >
+                <Icon className="h-4.5 w-4.5" />
+              </div>
+              <span className="text-[10px] leading-none tracking-tight">
+                {item.title}
+              </span>
+            </Link>
+          );
+        })}
+      </nav>
     </div>
   );
 }
