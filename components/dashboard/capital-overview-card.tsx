@@ -38,52 +38,52 @@ export function CapitalOverviewCard({
       onClick={onClick}
       onKeyDown={(e) => onClick && e.key === "Enter" && onClick()}
       className={cn(
-        "rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] overflow-hidden text-left transition-all duration-200",
-        onClick && "cursor-pointer hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] active:scale-[0.99]",
+        "rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card shadow-xs overflow-hidden text-left transition-all duration-150",
+        onClick && "cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 active:scale-[0.99]",
         className,
       )}
     >
-      <div className="px-5 py-3.5 border-b border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between">
+      <div className="px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#34c759]/12 text-[#34c759]">
+          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40">
             <Coins className="h-4 w-4" />
           </div>
           <div>
-            <p className="text-sm font-semibold text-foreground tracking-tight">Vốn & Giá trị ròng</p>
-            <p className="text-[11px] text-muted-foreground">
+            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">Vốn & Giá trị ròng</p>
+            <p className="text-[11px] text-zinc-500">
               Vốn cố định độc lập với biến động chi phí
             </p>
           </div>
         </div>
         {onClick && (
-          <ChevronRight className="h-4 w-4 text-muted-foreground/60" />
+          <ChevronRight className="h-4 w-4 text-zinc-400" />
         )}
       </div>
 
       <div
         className={cn(
-          "grid gap-px bg-black/[0.04] dark:bg-white/[0.06]",
+          "grid gap-px bg-zinc-100 dark:bg-zinc-800",
           compact
             ? "grid-cols-1 min-[420px]:grid-cols-3"
             : "grid-cols-1 sm:grid-cols-3",
         )}
       >
         {items.map((item) => (
-          <div key={item.label} className="bg-card/90 dark:bg-card/95 px-4.5 py-3.5">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div key={item.label} className="bg-card px-4.5 py-3.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
               {item.label}
             </p>
             <p
               className={cn(
                 "font-mono font-bold tabular-nums mt-1",
                 compact ? "text-sm" : "text-base sm:text-lg",
-                item.highlight ? "text-[#34c759]" : "text-foreground",
+                item.highlight ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-800 dark:text-zinc-200",
               )}
             >
               {displayMoney(item.value)}
             </p>
             {!compact && (
-              <p className="text-[10px] text-muted-foreground/80 mt-0.5 font-medium">
+              <p className="text-[10px] text-zinc-400 mt-0.5 font-medium">
                 {item.hint}
               </p>
             )}

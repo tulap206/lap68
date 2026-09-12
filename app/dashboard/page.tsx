@@ -333,23 +333,23 @@ export default function DashboardHubPage() {
           </div>
         )}
 
-        {/* 1. HERO FINANCIAL OVERVIEW (4 KEY APPLE BENTO CARDS) */}
+        {/* 1. HERO FINANCIAL OVERVIEW (4 KEY APPLE PRO BENTO CARDS) */}
         {loading ? (
           <SkeletonMetricCards />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             {/* CARD 1: NET PROFIT (HERO CARD) */}
-            <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all flex flex-col justify-between">
+            <div className="relative overflow-hidden rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                   Lợi nhuận ròng
                 </span>
                 <span
                   className={cn(
-                    "inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full",
+                    "inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-0.5 rounded-full border",
                     activeStats.profit >= 0
-                      ? "bg-[#34c759]/12 text-[#34c759] border border-[#34c759]/20"
-                      : "bg-[#ff3b30]/12 text-[#ff3b30] border border-[#ff3b30]/20",
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800/60"
+                      : "bg-rose-50 text-rose-700 border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-400 dark:border-rose-800/60",
                   )}
                 >
                   {activeStats.profit >= 0 ? "+" : ""}
@@ -358,76 +358,71 @@ export default function DashboardHubPage() {
               </div>
 
               <div className="my-3.5">
-                <div
-                  className={cn(
-                    "text-2xl sm:text-3xl font-mono font-bold tracking-tight tabular-nums",
-                    activeStats.profit >= 0 ? "text-[#34c759]" : "text-[#ff3b30]",
-                  )}
-                >
+                <div className="text-2xl sm:text-3xl font-mono font-bold tracking-tight text-zinc-900 dark:text-zinc-100 tabular-nums">
                   {displayMoney(activeStats.profit)}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Kỳ xem: <strong className="text-foreground/85">{timeframeLabel}</strong>
+                <p className="text-xs text-zinc-500 mt-1">
+                  Kỳ xem: <strong className="text-zinc-800 dark:text-zinc-200 font-medium">{timeframeLabel}</strong>
                 </p>
               </div>
 
-              <div className="pt-2.5 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs text-muted-foreground">
+              <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500">
                 <span>{activeStats.txCount} giao dịch</span>
-                <span className="text-[11px] font-medium">
-                  {activeStats.profit >= 0 ? "🟢 Dòng tiền dương" : "🔴 Dòng tiền âm"}
+                <span className="text-[11px] font-medium text-zinc-600 dark:text-zinc-400">
+                  {activeStats.profit >= 0 ? "Dòng tiền dương" : "Dòng tiền âm"}
                 </span>
               </div>
             </div>
 
             {/* CARD 2: TOTAL INCOME */}
-            <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all flex flex-col justify-between">
+            <div className="relative overflow-hidden rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                   Dòng tiền thu
                 </span>
-                <span className="p-2 rounded-xl bg-[#34c759]/12 text-[#34c759]">
+                <span className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40">
                   <TrendingUp className="h-4 w-4" />
                 </span>
               </div>
 
               <div className="my-3.5">
-                <div className="text-2xl sm:text-3xl font-mono font-bold text-[#34c759] tracking-tight tabular-nums">
+                <div className="text-2xl sm:text-3xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums">
                   {displayMoney(activeStats.income)}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-zinc-500 mt-1">
                   Tổng thu trong {timeframeLabel.toLowerCase()}
                 </p>
               </div>
 
-              <div className="pt-2.5 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs text-muted-foreground">
+              <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500">
                 <span>{activeStats.incomeCount} khoản thu</span>
-                <span className="font-mono text-xs text-[#34c759] font-semibold">100% doanh số</span>
+                <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">100% doanh số</span>
               </div>
             </div>
 
             {/* CARD 3: TOTAL EXPENSE */}
-            <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all flex flex-col justify-between">
+            <div className="relative overflow-hidden rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                   Dòng tiền chi
                 </span>
-                <span className="p-2 rounded-xl bg-[#ff3b30]/12 text-[#ff3b30]">
+                <span className="p-2 rounded-xl bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-900/40">
                   <TrendingDown className="h-4 w-4" />
                 </span>
               </div>
 
               <div className="my-3.5">
-                <div className="text-2xl sm:text-3xl font-mono font-bold text-[#ff3b30] tracking-tight tabular-nums">
+                <div className="text-2xl sm:text-3xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums">
                   {displayMoney(activeStats.expense)}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1">
+                <p className="text-xs text-zinc-500 mt-1">
                   Tổng chi trong {timeframeLabel.toLowerCase()}
                 </p>
               </div>
 
-              <div className="pt-2.5 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs text-muted-foreground">
+              <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500">
                 <span>{activeStats.expenseCount} khoản chi</span>
-                <span className="font-mono text-xs text-muted-foreground font-medium">
+                <span className="text-xs text-zinc-500 font-medium">
                   Tỷ lệ chi: {activeStats.income > 0 ? ((activeStats.expense / activeStats.income) * 100).toFixed(0) : 0}%
                 </span>
               </div>
@@ -439,36 +434,36 @@ export default function DashboardHubPage() {
               tabIndex={0}
               onClick={() => setAccountOpen(true)}
               onKeyDown={(e) => e.key === "Enter" && setAccountOpen(true)}
-              className="relative overflow-hidden rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] cursor-pointer active:scale-[0.98] transition-all flex flex-col justify-between group text-left"
+              className="relative overflow-hidden rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 cursor-pointer active:scale-[0.98] transition-all flex flex-col justify-between group text-left"
             >
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <span className="text-xs font-semibold uppercase tracking-wider text-zinc-500 flex items-center gap-1.5">
                   Số dư tài khoản
                 </span>
-                <span className="p-2 rounded-xl bg-[#007aff]/12 text-[#007aff] group-hover:scale-105 transition-transform">
+                <span className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40 group-hover:scale-105 transition-transform">
                   <Wallet className="h-4 w-4" />
                 </span>
               </div>
 
               <div className="my-3.5">
-                <div className="text-2xl sm:text-3xl font-mono font-bold text-[#007aff] dark:text-[#0a84ff] tracking-tight tabular-nums">
+                <div className="text-2xl sm:text-3xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums">
                   {displayMoney(liquidTotal)}
                 </div>
-                <p className="text-xs text-muted-foreground mt-1 flex items-center justify-between">
+                <p className="text-xs text-zinc-500 mt-1 flex items-center justify-between">
                   <span>Vốn khả dụng:</span>
-                  <strong className="font-mono text-foreground font-semibold">
+                  <strong className="font-mono text-zinc-800 dark:text-zinc-200 font-semibold">
                     {displayMoney(capitalSnapshot.available_capital)}
                   </strong>
                 </p>
               </div>
 
-              <div className="pt-2.5 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs text-[#007aff] font-semibold">
+              <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-700 dark:text-zinc-300 font-medium">
                 <span>
                   {portfolioSettings.liquid_accounts.length > 0
                     ? `${portfolioSettings.liquid_accounts.length} tài khoản thanh toán`
                     : "Cập nhật số dư"}
                 </span>
-                <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                <ArrowUpRight className="h-3.5 w-3.5 text-zinc-400 group-hover:text-zinc-900 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
               </div>
             </div>
           </div>

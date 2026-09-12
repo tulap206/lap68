@@ -5,89 +5,89 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Apple System Colors (Light Mode) */
-  --background: #f2f2f7;
-  --foreground: #1c1c1e;
+  /* Apple Pro Clean Neutral Palette (Light Mode) */
+  --background: #f8f9fa;
+  --foreground: #18181b;
   --card: #ffffff;
-  --card-foreground: #1c1c1e;
+  --card-foreground: #18181b;
   --popover: #ffffff;
-  --popover-foreground: #1c1c1e;
-  --primary: #007aff;
+  --popover-foreground: #18181b;
+  --primary: #18181b;
   --primary-foreground: #ffffff;
-  --secondary: #e5e5ea;
-  --secondary-foreground: #1c1c1e;
-  --muted: #e5e5ea;
-  --muted-foreground: #8e8e93;
-  --accent: #f2f2f7;
-  --accent-foreground: #007aff;
-  --destructive: #ff3b30;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --destructive: #dc2626;
   --destructive-foreground: #ffffff;
-  --border: rgba(60, 60, 67, 0.12);
+  --border: rgba(24, 24, 27, 0.08);
   --input: #ffffff;
-  --ring: #007aff;
+  --ring: #18181b;
   
-  /* Apple Functional Palette */
-  --chart-1: #007aff;
-  --chart-2: #34c759;
-  --chart-3: #ff9500;
-  --chart-4: #ff3b30;
-  --chart-5: #af52de;
+  /* Apple Calm Financial Tones */
+  --chart-1: #2563eb;
+  --chart-2: #16a34a;
+  --chart-3: #d97706;
+  --chart-4: #dc2626;
+  --chart-5: #7c3aed;
   --radius: 1rem; /* 16px Apple Squircle */
   
-  --success: #34c759;
-  --warning: #ff9500;
-  --income: #34c759;
-  --expense: #ff3b30;
+  --success: #16a34a;
+  --warning: #d97706;
+  --income: #16a34a;
+  --expense: #dc2626;
   --surface-elevated: #ffffff;
-  --sidebar: rgba(255, 255, 255, 0.82);
-  --sidebar-border: rgba(60, 60, 67, 0.08);
+  --sidebar: #ffffff;
+  --sidebar-border: rgba(24, 24, 27, 0.07);
   
-  --pale-green: #e8f8ed;
-  --pale-red: #ffedec;
-  --pale-blue: #e5f2ff;
-  --pale-amber: #fff4e5;
+  --pale-green: #f0fdf4;
+  --pale-red: #fef2f2;
+  --pale-blue: #eff6ff;
+  --pale-amber: #fffbeb;
 }
 
 .dark {
-  /* Apple System Colors (Dark Mode) */
-  --background: #000000;
-  --foreground: #f5f5f7;
-  --card: #1c1c1e;
-  --card-foreground: #f5f5f7;
-  --popover: #1c1c1e;
-  --popover-foreground: #f5f5f7;
-  --primary: #0a84ff;
-  --primary-foreground: #ffffff;
-  --secondary: #2c2c2e;
-  --secondary-foreground: #f5f5f7;
-  --muted: #2c2c2e;
-  --muted-foreground: #8e8e93;
-  --accent: #2c2c2e;
-  --accent-foreground: #0a84ff;
-  --destructive: #ff453a;
+  /* Apple Pro Clean Neutral Palette (Dark Mode) */
+  --background: #09090b;
+  --foreground: #f4f4f5;
+  --card: #141416;
+  --card-foreground: #f4f4f5;
+  --popover: #141416;
+  --popover-foreground: #f4f4f5;
+  --primary: #f4f4f5;
+  --primary-foreground: #09090b;
+  --secondary: #27272a;
+  --secondary-foreground: #f4f4f5;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  --accent: #27272a;
+  --accent-foreground: #f4f4f5;
+  --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: rgba(255, 255, 255, 0.12);
-  --input: #1c1c1e;
-  --ring: #0a84ff;
+  --border: rgba(255, 255, 255, 0.08);
+  --input: #18181b;
+  --ring: #f4f4f5;
   
-  --chart-1: #0a84ff;
-  --chart-2: #30d158;
-  --chart-3: #ff9f0a;
-  --chart-4: #ff453a;
-  --chart-5: #bf5af2;
+  --chart-1: #3b82f6;
+  --chart-2: #22c55e;
+  --chart-3: #f59e0b;
+  --chart-4: #ef4444;
+  --chart-5: #8b5cf6;
   
-  --success: #30d158;
-  --warning: #ff9f0a;
-  --income: #30d158;
-  --expense: #ff453a;
-  --surface-elevated: #2c2c2e;
-  --sidebar: rgba(28, 28, 30, 0.82);
-  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --income: #22c55e;
+  --expense: #ef4444;
+  --surface-elevated: #1f1f23;
+  --sidebar: #141416;
+  --sidebar-border: rgba(255, 255, 255, 0.07);
   
-  --pale-green: rgba(48, 209, 88, 0.15);
-  --pale-red: rgba(255, 69, 58, 0.15);
-  --pale-blue: rgba(10, 132, 255, 0.15);
-  --pale-amber: rgba(255, 159, 10, 0.15);
+  --pale-green: rgba(34, 197, 94, 0.12);
+  --pale-red: rgba(239, 68, 68, 0.12);
+  --pale-blue: rgba(59, 130, 246, 0.12);
+  --pale-amber: rgba(245, 158, 11, 0.12);
 }
 
 @theme inline {

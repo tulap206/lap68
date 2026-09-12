@@ -72,17 +72,17 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         href="/dashboard"
         onClick={() => setMobileOpen(false)}
         className={cn(
-          "relative flex items-center rounded-2xl bg-gradient-to-br from-[#007aff] to-[#0055b3] text-white shrink-0 shadow-[0_4px_12px_rgba(0,122,255,0.3)] transition-transform active:scale-[0.95]",
+          "relative flex items-center rounded-xl bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shrink-0 shadow-xs transition-transform active:scale-[0.96]",
           labeled
-            ? "h-11 w-full gap-3 px-3.5 mb-6"
-            : "h-11 w-11 justify-center mb-6 lg:mb-8",
+            ? "h-10.5 w-full gap-3 px-3.5 mb-6"
+            : "h-10.5 w-10.5 justify-center mb-6 lg:mb-8",
         )}
         title="LAP68"
       >
         <Wallet className="h-5 w-5 shrink-0" />
         {labeled && (
           <span className="text-sm font-bold tracking-tight">
-            LAP<span className="opacity-80">68</span>
+            LAP<span className="opacity-70">68</span>
           </span>
         )}
       </Link>
@@ -92,8 +92,8 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
           href="/dashboard"
           onClick={() => setMobileOpen(false)}
           className={cn(
-            "mb-3 flex items-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-black/[0.04] dark:hover:bg-white/[0.06] text-xs font-medium shrink-0 transition-colors",
-            labeled ? "h-9 w-full gap-2 px-3" : "h-8 w-11 justify-center",
+            "mb-3 flex items-center rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium shrink-0 transition-colors",
+            labeled ? "h-8.5 w-full gap-2 px-3" : "h-8 w-10.5 justify-center",
           )}
           title="Về hub"
         >
@@ -103,8 +103,8 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
 
       <nav
         className={cn(
-          "flex flex-col gap-1.5 flex-1 w-full",
-          !labeled && "items-center gap-2 lg:mt-1",
+          "flex flex-col gap-1 flex-1 w-full",
+          !labeled && "items-center gap-1.5 lg:mt-1",
         )}
       >
         {menuItems.map((item) => {
@@ -126,26 +126,26 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "group relative flex items-center rounded-xl transition-all duration-200 active:scale-[0.97]",
-                labeled ? "h-10 w-full gap-3 px-3.5" : "h-11 w-11 justify-center",
+                "group relative flex items-center rounded-xl transition-all duration-150 active:scale-[0.97]",
+                labeled ? "h-9.5 w-full gap-3 px-3" : "h-10.5 w-10.5 justify-center",
                 isActive
-                  ? "bg-[#007aff]/10 text-[#007aff] font-semibold dark:bg-[#0a84ff]/20 dark:text-[#0a84ff]"
-                  : "text-muted-foreground hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:text-foreground",
+                  ? "bg-zinc-900 text-white font-medium shadow-xs dark:bg-white dark:text-zinc-950"
+                  : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100",
               )}
               title={item.title}
             >
               <Icon
                 className={cn(
-                  "h-4.5 w-4.5 shrink-0 transition-transform duration-200 group-hover:scale-105",
-                  isActive && "text-[#007aff] dark:text-[#0a84ff]",
+                  "h-4.5 w-4.5 shrink-0",
+                  isActive ? "text-white dark:text-zinc-950" : "text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-zinc-100",
                 )}
               />
               {labeled ? (
-                <span className="text-sm tracking-tight truncate">
+                <span className="text-sm font-medium tracking-tight truncate">
                   {item.title}
                 </span>
               ) : (
-                <span className="absolute left-full ml-3 hidden group-hover:block whitespace-nowrap rounded-xl border border-black/[0.08] dark:border-white/[0.1] bg-card/95 backdrop-blur-xl px-3 py-1.5 text-xs font-semibold text-foreground z-50 shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                <span className="absolute left-full ml-3 hidden group-hover:block whitespace-nowrap rounded-lg border border-zinc-200 dark:border-zinc-800 bg-card px-2.5 py-1 text-xs font-medium text-foreground z-50 shadow-md">
                   {item.title}
                 </span>
               )}
@@ -157,10 +157,10 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       <button
         onClick={handleLogout}
         className={cn(
-          "flex items-center rounded-xl text-muted-foreground hover:bg-[#ff3b30]/10 hover:text-[#ff3b30] transition-all shrink-0 active:scale-[0.96]",
+          "flex items-center rounded-xl text-zinc-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 transition-all shrink-0 active:scale-[0.96]",
           labeled
-            ? "h-10 w-full gap-3 px-3.5 mt-2"
-            : "h-11 w-11 justify-center lg:mt-3",
+            ? "h-9.5 w-full gap-3 px-3 mt-2"
+            : "h-10.5 w-10.5 justify-center lg:mt-3",
         )}
         title="Đăng xuất"
       >
@@ -173,9 +173,9 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-background">
       {/* MOBILE TOP BAR */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 safe-top bg-card/85 backdrop-blur-2xl border-b border-black/[0.06] dark:border-white/[0.08]">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 safe-top bg-card/90 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#007aff] to-[#0055b3] text-white shadow-sm">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-xs">
             <Wallet className="h-4 w-4" />
           </div>
           <div className="min-w-0">
@@ -202,7 +202,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
 
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-30 bg-black/30 backdrop-blur-sm transition-opacity"
+          className="lg:hidden fixed inset-0 z-30 bg-black/20 backdrop-blur-[2px] transition-opacity"
           onClick={() => setMobileOpen(false)}
           aria-hidden
         />
@@ -211,10 +211,10 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       {/* MACOS TRANSLUCENT SIDEBAR */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 h-dvh bg-sidebar/85 backdrop-blur-2xl border-r border-black/[0.06] dark:border-white/[0.08] flex flex-col transition-transform duration-300 ease-out",
-          "w-[min(280px,85vw)] px-3.5 py-6 safe-top safe-bottom",
+          "fixed top-0 left-0 z-40 h-dvh bg-card/90 backdrop-blur-xl border-r border-zinc-200/80 dark:border-zinc-800 flex flex-col transition-transform duration-200 ease-out",
+          "w-[min(280px,85vw)] px-3.5 py-5 safe-top safe-bottom",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:w-[76px] lg:items-center lg:px-0 lg:pt-7 lg:pb-7",
+          "lg:translate-x-0 lg:w-[72px] lg:items-center lg:px-0 lg:pt-6 lg:pb-6",
         )}
       >
         <div className="lg:hidden flex flex-col flex-1 min-h-0 w-full">
@@ -228,14 +228,14 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       {/* MAIN VIEWPORT */}
       <main
         id="main-content"
-        className="lg:pl-[76px] pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0 min-h-dvh px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-8 safe-bottom relative z-10"
+        className="lg:pl-[72px] pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0 min-h-dvh px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-8 safe-bottom relative z-10"
       >
         {user && (
           <div className="mb-4 sm:mb-6 hidden lg:flex justify-end items-center gap-2">
-            <span className="inline-flex h-2 w-2 rounded-full bg-[#34c759] shadow-[0_0_8px_rgba(52,199,89,0.5)]" />
-            <span className="text-xs text-muted-foreground font-medium">
+            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
+            <span className="text-xs text-zinc-500 font-medium">
               Xin chào,{" "}
-              <strong className="text-foreground font-semibold">
+              <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">
                 {user.displayName}
               </strong>
             </span>
@@ -247,7 +247,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       {/* MOBILE FLOATING TAB BAR (iOS Dock) */}
       <nav
         aria-label="Thanh điều hướng di động"
-        className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 z-40 bg-card/90 dark:bg-[#1c1c1e]/90 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.1] rounded-2xl px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
+        className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 z-40 bg-card/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
       >
         {menuItems.map((item) => {
           const active =
@@ -268,16 +268,16 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
               key={`mobile-bottom-${item.href}`}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-200 min-w-[56px] min-h-[44px] active:scale-95",
+                "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-150 min-w-[56px] min-h-[44px] active:scale-95",
                 isActive
-                  ? "text-[#007aff] dark:text-[#0a84ff] font-bold"
-                  : "text-muted-foreground hover:text-foreground",
+                  ? "text-zinc-900 dark:text-zinc-100 font-bold"
+                  : "text-zinc-500 hover:text-zinc-900",
               )}
             >
               <div
                 className={cn(
-                  "p-1.5 rounded-xl transition-all duration-200",
-                  isActive && "bg-[#007aff]/12 dark:bg-[#0a84ff]/20 shadow-xs",
+                  "p-1.5 rounded-xl transition-all duration-150",
+                  isActive && "bg-zinc-100 dark:bg-zinc-800",
                 )}
               >
                 <Icon className="h-4.5 w-4.5" />

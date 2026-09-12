@@ -37,7 +37,7 @@ export function BusinessHubCard({
     <Link
       href={`/dashboard/b/${summary.business_id}`}
       className={cn(
-        "metric-card card-animate group relative block rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_28px_rgba(0,0,0,0.08)] active:scale-[0.98] transition-all duration-200",
+        "metric-card card-animate group relative block rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 active:scale-[0.98] transition-all duration-150",
       )}
       style={{
         animationDelay: `${delay}ms`,
@@ -47,19 +47,19 @@ export function BusinessHubCard({
         <div className="min-w-0">
           <div className="flex items-center gap-2.5">
             <span
-              className="w-3 h-3 rounded-full shrink-0 shadow-xs"
-              style={{ backgroundColor: summary.color || "#007aff" }}
+              className="w-2.5 h-2.5 rounded-full shrink-0"
+              style={{ backgroundColor: summary.color || "#18181b" }}
             />
-            <h3 className="text-base font-bold text-foreground tracking-tight truncate group-hover:text-[#007aff] transition-colors">
+            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight truncate group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
               {summary.business_name}
             </h3>
           </div>
-          <p className="text-[11px] font-medium text-muted-foreground mt-0.5 ml-5.5">
+          <p className="text-[11px] font-medium text-zinc-500 mt-0.5 ml-5">
             {statusLabel}
           </p>
         </div>
         {overdueCount > 0 && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#ff3b30]/10 border border-[#ff3b30]/20 px-2.5 py-0.5 text-xs font-semibold text-[#ff3b30] shrink-0">
+          <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-800/60 px-2.5 py-0.5 text-xs font-semibold text-rose-700 dark:text-rose-400 shrink-0">
             <AlertTriangle className="h-3 w-3" />
             {overdueCount} quá hạn
           </span>
@@ -67,58 +67,59 @@ export function BusinessHubCard({
       </div>
 
       {/* Main Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 p-3 rounded-xl bg-black/[0.02] dark:bg-white/[0.04] border border-black/[0.04] dark:border-white/[0.06]">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800/80">
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
             Thu
           </p>
-          <p className="text-xs sm:text-sm font-mono font-semibold text-[#34c759] tabular-nums mt-0.5">
+          <p className="text-xs sm:text-sm font-mono font-bold text-zinc-900 dark:text-zinc-100 tabular-nums mt-0.5">
             {displayMoney(income)}
           </p>
         </div>
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
             Chi
           </p>
-          <p className="text-xs sm:text-sm font-mono font-semibold text-[#ff3b30] tabular-nums mt-0.5">
+          <p className="text-xs sm:text-sm font-mono font-bold text-zinc-900 dark:text-zinc-100 tabular-nums mt-0.5">
             {displayMoney(expense)}
           </p>
         </div>
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-            Lãi {isProfit ? <TrendingUp className="h-2.5 w-2.5 text-[#34c759]" /> : <TrendingDown className="h-2.5 w-2.5 text-[#ff3b30]" />}
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 flex items-center gap-1">
+            Lãi {isProfit ? <TrendingUp className="h-2.5 w-2.5 text-emerald-600" /> : <TrendingDown className="h-2.5 w-2.5 text-rose-600" />}
           </p>
           <p
             className={cn(
-              "text-xs sm:text-sm font-mono font-semibold tabular-nums mt-0.5",
-              isProfit ? "text-[#34c759]" : "text-[#ff3b30]",
+              "text-xs sm:text-sm font-mono font-bold tabular-nums mt-0.5",
+              isProfit ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400",
             )}
           >
             {displayMoney(profit)}
           </p>
         </div>
         <div>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-zinc-500">
             Vốn
           </p>
-          <p className="text-xs sm:text-sm font-mono font-semibold text-foreground/90 tabular-nums mt-0.5">
+          <p className="text-xs sm:text-sm font-mono font-bold text-zinc-700 dark:text-zinc-300 tabular-nums mt-0.5">
             {capital ? displayMoney(capital.base_capital) : "—"}
           </p>
         </div>
       </div>
 
       {/* Footer Info */}
-      <div className="flex items-center justify-between mt-3.5 pt-2.5 border-t border-black/[0.04] dark:border-white/[0.06] text-xs">
-        <div className="flex items-center gap-2 text-muted-foreground text-[11px]">
+      <div className="flex items-center justify-between mt-3.5 pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 text-xs">
+        <div className="flex items-center gap-2 text-zinc-500 text-[11px]">
           <span>{summary.transaction_count} giao dịch</span>
           <span>•</span>
-          <span>Tỷ suất: <strong className={isProfit ? "text-[#34c759]" : "text-[#ff3b30]"}>{margin.toFixed(1)}%</strong></span>
+          <span>Tỷ suất: <strong className={isProfit ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}>{margin.toFixed(1)}%</strong></span>
         </div>
-        <span className="text-xs font-semibold text-[#007aff] flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
-          Chi tiết <ArrowRight className="h-3 w-3" />
+        <span className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1 group-hover:translate-x-0.5 transition-transform">
+          Chi tiết <ArrowRight className="h-3 w-3 text-zinc-500 group-hover:text-zinc-900" />
         </span>
       </div>
     </Link>
   );
 }
+
 
