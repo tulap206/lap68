@@ -12,12 +12,12 @@ import {
 } from "@/lib/module-theme";
 
 export const moduleTableHeadClass =
-  "py-3 px-4 text-xs font-medium text-muted-foreground uppercase tracking-wider";
+  "py-3.5 px-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider";
 
-export const moduleTableBodyClass = "text-sm text-foreground/85";
+export const moduleTableBodyClass = "text-sm text-foreground/90";
 
 export const moduleBadgeClass =
-  "inline-flex items-center justify-center text-xs font-medium px-2.5 py-0.5 rounded-full border whitespace-nowrap";
+  "inline-flex items-center justify-center text-xs font-semibold px-2.5 py-0.5 rounded-full border whitespace-nowrap";
 
 export function ModulePageShell({
   module,
@@ -53,9 +53,9 @@ export function ModuleBrandHeader({
 }) {
   const theme = getModuleTheme(module);
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-border pb-5">
+    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-black/[0.06] dark:border-white/[0.08] pb-5">
       <div className="min-w-0">
-        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-foreground text-balance">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground text-balance">
           Quản trị{" "}
           <span className={ACCENT_TITLE_CLASS[theme.accent]}>
             {theme.titleSuffix}
@@ -85,11 +85,11 @@ export function ModuleSubpageHeader({
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
       <div className="min-w-0">
-        <h2 className="text-lg sm:text-xl font-semibold tracking-tight text-foreground">
+        <h2 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">
           {title}
         </h2>
         {subtitle && (
-          <p className="text-muted-foreground text-sm mt-0.5">{subtitle}</p>
+          <p className="text-muted-foreground text-xs sm:text-sm mt-0.5">{subtitle}</p>
         )}
       </div>
       {actions && (
@@ -117,13 +117,13 @@ export function ModuleSectionCard({
   return (
     <Card
       className={cn(
-        "border-border bg-card py-0 overflow-hidden flex flex-col",
+        "border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl p-0 overflow-hidden flex flex-col rounded-2xl shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.25)]",
         className,
       )}
     >
-      <div className="flex flex-col gap-3 px-4 sm:px-6 py-4 bg-muted/40 border-b border-border shrink-0 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 px-5 py-4 bg-black/[0.02] dark:bg-white/[0.03] border-b border-black/[0.04] dark:border-white/[0.06] shrink-0 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <h3 className="text-base font-semibold text-foreground">{title}</h3>
+          <h3 className="text-base font-bold text-foreground tracking-tight">{title}</h3>
           {description && (
             <p className="text-xs text-muted-foreground mt-0.5">
               {description}
@@ -180,30 +180,30 @@ export function ModuleKpiCard({
 
   const toneStyles: Record<KpiTone, string> = {
     neutral:
-      "border-border bg-card [&_.kpi-value]:text-foreground [&_.kpi-icon]:text-muted-foreground [&_.kpi-icon]:bg-muted [&_.kpi-icon]:border-border",
+      "border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 [&_.kpi-value]:text-foreground [&_.kpi-icon]:text-muted-foreground [&_.kpi-icon]:bg-black/[0.05] dark:[&_.kpi-icon]:bg-white/[0.08]",
     income:
-      "border-border bg-card [&_.kpi-value]:text-income [&_.kpi-icon]:text-income [&_.kpi-icon]:bg-[var(--pale-green)] [&_.kpi-icon]:border-transparent",
+      "border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 [&_.kpi-value]:text-[#34c759] [&_.kpi-icon]:text-[#34c759] [&_.kpi-icon]:bg-[#34c759]/12",
     expense:
-      "border-border bg-card [&_.kpi-value]:text-expense [&_.kpi-icon]:text-expense [&_.kpi-icon]:bg-[var(--pale-red)] [&_.kpi-icon]:border-transparent",
+      "border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 [&_.kpi-value]:text-[#ff3b30] [&_.kpi-icon]:text-[#ff3b30] [&_.kpi-icon]:bg-[#ff3b30]/12",
     profit: signedNegative
-      ? "border-border bg-card [&_.kpi-value]:text-expense [&_.kpi-icon]:text-expense [&_.kpi-icon]:bg-[var(--pale-red)] [&_.kpi-icon]:border-transparent"
-      : "border-border bg-card [&_.kpi-value]:text-income [&_.kpi-icon]:text-income [&_.kpi-icon]:bg-[var(--pale-green)] [&_.kpi-icon]:border-transparent",
+      ? "border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 [&_.kpi-value]:text-[#ff3b30] [&_.kpi-icon]:text-[#ff3b30] [&_.kpi-icon]:bg-[#ff3b30]/12"
+      : "border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 [&_.kpi-value]:text-[#34c759] [&_.kpi-icon]:text-[#34c759] [&_.kpi-icon]:bg-[#34c759]/12",
     margin: signedNegative
-      ? "border-border bg-card [&_.kpi-value]:text-expense [&_.kpi-icon]:text-expense [&_.kpi-icon]:bg-[var(--pale-red)] [&_.kpi-icon]:border-transparent"
-      : "border-border bg-card [&_.kpi-value]:text-income [&_.kpi-icon]:text-income [&_.kpi-icon]:bg-[var(--pale-green)] [&_.kpi-icon]:border-transparent",
+      ? "border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 [&_.kpi-value]:text-[#ff3b30] [&_.kpi-icon]:text-[#ff3b30] [&_.kpi-icon]:bg-[#ff3b30]/12"
+      : "border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 [&_.kpi-value]:text-[#34c759] [&_.kpi-icon]:text-[#34c759] [&_.kpi-icon]:bg-[#34c759]/12",
     balance:
-      "border-border bg-card [&_.kpi-value]:text-foreground [&_.kpi-icon]:text-[#1f6c9f] [&_.kpi-icon]:bg-[var(--pale-blue)] [&_.kpi-icon]:border-transparent",
+      "border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 [&_.kpi-value]:text-[#007aff] dark:[&_.kpi-value]:text-[#0a84ff] [&_.kpi-icon]:text-[#007aff] [&_.kpi-icon]:bg-[#007aff]/12",
     capital:
-      "border-border bg-card [&_.kpi-value]:text-foreground [&_.kpi-icon]:text-[#956400] [&_.kpi-icon]:bg-[var(--pale-amber)] [&_.kpi-icon]:border-transparent",
+      "border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 [&_.kpi-value]:text-foreground [&_.kpi-icon]:text-[#ff9500] [&_.kpi-icon]:bg-[#ff9500]/12",
     count:
-      "border-border bg-card [&_.kpi-value]:text-foreground [&_.kpi-icon]:text-muted-foreground [&_.kpi-icon]:bg-muted [&_.kpi-icon]:border-border",
+      "border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 [&_.kpi-value]:text-foreground [&_.kpi-icon]:text-muted-foreground [&_.kpi-icon]:bg-black/[0.05] dark:[&_.kpi-icon]:bg-white/[0.08]",
   };
 
   return (
     <Comp
       onClick={onClick}
       className={cn(
-        "metric-card card-animate text-left w-full h-full rounded-xl border p-3.5 min-w-0 flex flex-col",
+        "metric-card card-animate text-left w-full h-full rounded-2xl border p-4 min-w-0 flex flex-col backdrop-blur-xl shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] active:scale-[0.98]",
         toneStyles[tone],
         ACCENT_KPI_HOVER_CLASS[theme.accent],
         onClick && "cursor-pointer",
@@ -211,10 +211,10 @@ export function ModuleKpiCard({
       style={{ animationDelay: `${delay}ms` }}
     >
       <div className="flex items-start justify-between gap-2 shrink-0">
-        <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground leading-tight line-clamp-2 min-h-[26px] pr-1 flex-1">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground leading-tight line-clamp-2 min-h-[26px] pr-1 flex-1">
           {label}
         </p>
-        <div className="kpi-icon flex h-9 w-9 items-center justify-center rounded-lg border shrink-0 [&_svg]:h-[18px] [&_svg]:w-[18px]">
+        <div className="kpi-icon flex h-8.5 w-8.5 items-center justify-center rounded-xl shrink-0 [&_svg]:h-4.5 [&_svg]:w-4.5">
           {icon}
         </div>
       </div>
@@ -223,7 +223,7 @@ export function ModuleKpiCard({
         <KpiAutoFitValue value={value} />
       </div>
 
-      <p className="text-[10px] text-muted-foreground/70 mt-1 min-h-[14px] truncate shrink-0">
+      <p className="text-[10px] text-muted-foreground/80 mt-1 min-h-[14px] truncate shrink-0 font-medium">
         {hint || "\u00A0"}
       </p>
     </Comp>
@@ -252,7 +252,7 @@ export function ModuleResponsiveTable({
       <div className="hidden md:block overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-muted/50 border-b border-border">
+            <tr className="bg-black/[0.02] dark:bg-white/[0.03] border-b border-black/[0.04] dark:border-white/[0.06]">
               {headers.map((h) => (
                 <th key={h} className={cn(moduleTableHeadClass, "text-left")}>
                   {h}
@@ -265,10 +265,10 @@ export function ModuleResponsiveTable({
               <tr
                 key={i}
                 data-table-row
-                className="border-b border-border/70 transition-colors"
+                className="border-b border-black/[0.04] dark:border-white/[0.06] hover:bg-black/[0.02] dark:hover:bg-white/[0.03] transition-colors"
               >
                 {cells.map((cell, j) => (
-                  <td key={j} className={cn("py-3 px-4", moduleTableBodyClass)}>
+                  <td key={j} className={cn("py-3.5 px-4", moduleTableBodyClass)}>
                     {cell}
                   </td>
                 ))}
@@ -277,7 +277,7 @@ export function ModuleResponsiveTable({
           </tbody>
         </table>
       </div>
-      <div className="md:hidden divide-y divide-border">
+      <div className="md:hidden divide-y divide-black/[0.04] dark:divide-white/[0.06]">
         {rows.map((cells, i) => (
           <div key={i} className="p-4 space-y-2.5">
             {headers.map((h, j) => (
@@ -285,10 +285,10 @@ export function ModuleResponsiveTable({
                 key={h}
                 className="flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-3 text-sm min-w-0"
               >
-                <span className="text-muted-foreground text-[10px] uppercase tracking-wider shrink-0">
+                <span className="text-muted-foreground text-[10px] font-semibold uppercase tracking-wider shrink-0">
                   {h}
                 </span>
-                <span className="text-foreground/85 min-w-0 break-words sm:text-right">
+                <span className="text-foreground/90 min-w-0 break-words sm:text-right">
                   {cells[j]}
                 </span>
               </div>
@@ -310,7 +310,7 @@ export function AccentButton({
   return (
     <button
       className={cn(
-        "inline-flex items-center justify-center gap-2 h-9 px-4 rounded-lg text-sm font-medium transition-all active:scale-[0.98]",
+        "inline-flex items-center justify-center gap-2 h-9 px-4 rounded-xl text-sm font-semibold transition-all active:scale-[0.97]",
         ACCENT_BTN_CLASS[theme.accent],
         className,
       )}
@@ -320,3 +320,4 @@ export function AccentButton({
     </button>
   );
 }
+

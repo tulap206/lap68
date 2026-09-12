@@ -212,14 +212,14 @@ export default function DashboardHubPage() {
   return (
     <ModulePageShell module="cashflow">
       <div className="space-y-6">
-        {/* TOP BAR: Title, Timeframe selector & Action Buttons */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-border">
+        {/* TOP BAR: Title, Apple Segmented Switcher & Pill Action Buttons */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
           <div className="space-y-1">
             <div className="flex items-center gap-2.5">
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
                 Tổng quan dòng tiền & kinh doanh
               </h1>
-              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium bg-income/10 text-income border border-income/20 px-2.5 py-0.5 rounded-full">
+              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold bg-[#007aff]/10 text-[#007aff] px-2.5 py-0.5 rounded-full">
                 <Sparkles className="h-3 w-3" /> Trực quan & Tự động
               </span>
             </div>
@@ -228,17 +228,15 @@ export default function DashboardHubPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Timeframe Switcher Tabs */}
-            <div className="flex items-center p-1 bg-muted/60 border border-border/80 rounded-xl">
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Apple Segmented Control */}
+            <div className="apple-segmented">
               <button
                 type="button"
                 onClick={() => setTimeframe("month")}
                 className={cn(
-                  "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all",
-                  timeframe === "month"
-                    ? "bg-card text-foreground shadow-sm font-bold"
-                    : "text-muted-foreground hover:text-foreground",
+                  "apple-segmented-item",
+                  timeframe === "month" && "active",
                 )}
               >
                 Tháng này
@@ -247,10 +245,8 @@ export default function DashboardHubPage() {
                 type="button"
                 onClick={() => setTimeframe("last_month")}
                 className={cn(
-                  "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all",
-                  timeframe === "last_month"
-                    ? "bg-card text-foreground shadow-sm font-bold"
-                    : "text-muted-foreground hover:text-foreground",
+                  "apple-segmented-item",
+                  timeframe === "last_month" && "active",
                 )}
               >
                 Tháng trước
@@ -259,50 +255,52 @@ export default function DashboardHubPage() {
                 type="button"
                 onClick={() => setTimeframe("all")}
                 className={cn(
-                  "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all",
-                  timeframe === "all"
-                    ? "bg-card text-foreground shadow-sm font-bold"
-                    : "text-muted-foreground hover:text-foreground",
+                  "apple-segmented-item",
+                  timeframe === "all" && "active",
                 )}
               >
                 Toàn bộ
               </button>
             </div>
 
-            {/* Quick Actions */}
+            {/* Apple Pill Quick Actions */}
             <div className="flex items-center gap-1.5">
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
-                className="h-9 text-xs gap-1.5 border-border"
+                className="rounded-full text-xs gap-1.5 h-8.5 px-3.5"
                 onClick={() => setReportOpen(true)}
               >
-                <FileText className="h-3.5 w-3.5" />
+                <FileText className="h-3.5 w-3.5 text-muted-foreground" />
                 Báo cáo
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
-                className="h-9 text-xs gap-1.5 border-border"
+                className="rounded-full text-xs gap-1.5 h-8.5 px-3.5"
                 onClick={() => setHistoryOpen(true)}
               >
-                <History className="h-3.5 w-3.5" />
+                <History className="h-3.5 w-3.5 text-muted-foreground" />
                 Lịch sử
               </Button>
               <Button
-                variant="outline"
+                variant="secondary"
                 size="sm"
-                className="h-9 text-xs gap-1.5 border-border"
+                className="rounded-full text-xs gap-1.5 h-8.5 px-3.5"
                 onClick={() => setSchedulesOpen(true)}
               >
-                <Calendar className="h-3.5 w-3.5" />
+                <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                 Lịch thu chi
               </Button>
               <Link href="/dashboard/businesses">
-                <AccentButton module="cashflow" className="h-9 text-xs gap-1.5">
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="rounded-full text-xs gap-1.5 h-8.5 px-4 font-semibold"
+                >
                   <LayoutGrid className="h-3.5 w-3.5" />
                   Quản lý việc
-                </AccentButton>
+                </Button>
               </Link>
             </div>
           </div>
@@ -310,16 +308,16 @@ export default function DashboardHubPage() {
 
         {/* SMART ALERT: Overdue or due soon items */}
         {overdueCount > 0 && (
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-rose-500/25 bg-rose-500/10 text-expense">
-            <div className="flex items-center gap-2.5">
-              <span className="p-1.5 rounded-lg bg-rose-500/20 text-rose-500">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl border border-[#ff3b30]/20 bg-[#ff3b30]/8 text-[#ff3b30] backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <span className="p-2 rounded-xl bg-[#ff3b30]/15 text-[#ff3b30] shrink-0">
                 <AlertTriangle className="h-4 w-4" />
               </span>
               <div>
-                <p className="text-xs sm:text-sm font-semibold">
+                <p className="text-xs sm:text-sm font-semibold tracking-tight">
                   Có {overdueCount} khoản thu/chi quá hạn cần xử lý!
                 </p>
-                <p className="text-[11px] opacity-80">
+                <p className="text-[11px] opacity-80 mt-0.5">
                   Kiểm tra và ghi nhận giao dịch để đảm bảo số dư đối soát chính xác
                 </p>
               </div>
@@ -327,7 +325,7 @@ export default function DashboardHubPage() {
             <Button
               variant="outline"
               size="sm"
-              className="h-8 text-xs font-semibold bg-card border-rose-300 dark:border-rose-800 text-expense hover:bg-rose-50 dark:hover:bg-rose-950/30 shrink-0"
+              className="h-8 rounded-full text-xs font-semibold bg-card border-[#ff3b30]/30 text-[#ff3b30] hover:bg-[#ff3b30]/10 shrink-0"
               onClick={() => setSchedulesOpen(true)}
             >
               Xử lý ngay <ChevronRight className="h-3.5 w-3.5 ml-1" />
@@ -335,23 +333,23 @@ export default function DashboardHubPage() {
           </div>
         )}
 
-        {/* 1. HERO FINANCIAL OVERVIEW (4 KEY MASTER CARDS) */}
+        {/* 1. HERO FINANCIAL OVERVIEW (4 KEY APPLE BENTO CARDS) */}
         {loading ? (
           <SkeletonMetricCards />
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
             {/* CARD 1: NET PROFIT (HERO CARD) */}
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm hover:border-foreground/20 transition-all flex flex-col justify-between">
+            <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Lợi nhuận ròng
                 </span>
                 <span
                   className={cn(
-                    "inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full",
+                    "inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full",
                     activeStats.profit >= 0
-                      ? "bg-income/10 text-income border border-income/20"
-                      : "bg-expense/10 text-expense border border-expense/20",
+                      ? "bg-[#34c759]/12 text-[#34c759] border border-[#34c759]/20"
+                      : "bg-[#ff3b30]/12 text-[#ff3b30] border border-[#ff3b30]/20",
                   )}
                 >
                   {activeStats.profit >= 0 ? "+" : ""}
@@ -359,41 +357,41 @@ export default function DashboardHubPage() {
                 </span>
               </div>
 
-              <div className="my-3">
+              <div className="my-3.5">
                 <div
                   className={cn(
                     "text-2xl sm:text-3xl font-mono font-bold tracking-tight tabular-nums",
-                    activeStats.profit >= 0 ? "text-income" : "text-expense",
+                    activeStats.profit >= 0 ? "text-[#34c759]" : "text-[#ff3b30]",
                   )}
                 >
                   {displayMoney(activeStats.profit)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Kỳ xem: <strong className="text-foreground/80">{timeframeLabel}</strong>
+                  Kỳ xem: <strong className="text-foreground/85">{timeframeLabel}</strong>
                 </p>
               </div>
 
-              <div className="pt-2.5 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
+              <div className="pt-2.5 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs text-muted-foreground">
                 <span>{activeStats.txCount} giao dịch</span>
-                <span className="text-[11px] text-muted-foreground">
+                <span className="text-[11px] font-medium">
                   {activeStats.profit >= 0 ? "🟢 Dòng tiền dương" : "🔴 Dòng tiền âm"}
                 </span>
               </div>
             </div>
 
             {/* CARD 2: TOTAL INCOME */}
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm hover:border-foreground/20 transition-all flex flex-col justify-between">
+            <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Dòng tiền thu
                 </span>
-                <span className="p-1.5 rounded-xl bg-income/10 text-income">
+                <span className="p-2 rounded-xl bg-[#34c759]/12 text-[#34c759]">
                   <TrendingUp className="h-4 w-4" />
                 </span>
               </div>
 
-              <div className="my-3">
-                <div className="text-2xl sm:text-3xl font-mono font-bold text-income tracking-tight tabular-nums">
+              <div className="my-3.5">
+                <div className="text-2xl sm:text-3xl font-mono font-bold text-[#34c759] tracking-tight tabular-nums">
                   {displayMoney(activeStats.income)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -401,25 +399,25 @@ export default function DashboardHubPage() {
                 </p>
               </div>
 
-              <div className="pt-2.5 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
+              <div className="pt-2.5 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs text-muted-foreground">
                 <span>{activeStats.incomeCount} khoản thu</span>
-                <span className="font-mono text-xs text-income font-medium">100% doanh số</span>
+                <span className="font-mono text-xs text-[#34c759] font-semibold">100% doanh số</span>
               </div>
             </div>
 
             {/* CARD 3: TOTAL EXPENSE */}
-            <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm hover:border-foreground/20 transition-all flex flex-col justify-between">
+            <div className="relative overflow-hidden rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] transition-all flex flex-col justify-between">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Dòng tiền chi
                 </span>
-                <span className="p-1.5 rounded-xl bg-expense/10 text-expense">
+                <span className="p-2 rounded-xl bg-[#ff3b30]/12 text-[#ff3b30]">
                   <TrendingDown className="h-4 w-4" />
                 </span>
               </div>
 
-              <div className="my-3">
-                <div className="text-2xl sm:text-3xl font-mono font-bold text-expense tracking-tight tabular-nums">
+              <div className="my-3.5">
+                <div className="text-2xl sm:text-3xl font-mono font-bold text-[#ff3b30] tracking-tight tabular-nums">
                   {displayMoney(activeStats.expense)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -427,9 +425,9 @@ export default function DashboardHubPage() {
                 </p>
               </div>
 
-              <div className="pt-2.5 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
+              <div className="pt-2.5 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs text-muted-foreground">
                 <span>{activeStats.expenseCount} khoản chi</span>
-                <span className="font-mono text-xs text-muted-foreground">
+                <span className="font-mono text-xs text-muted-foreground font-medium">
                   Tỷ lệ chi: {activeStats.income > 0 ? ((activeStats.expense / activeStats.income) * 100).toFixed(0) : 0}%
                 </span>
               </div>
@@ -441,19 +439,19 @@ export default function DashboardHubPage() {
               tabIndex={0}
               onClick={() => setAccountOpen(true)}
               onKeyDown={(e) => e.key === "Enter" && setAccountOpen(true)}
-              className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm hover:border-foreground/25 hover:shadow-md cursor-pointer transition-all flex flex-col justify-between group text-left"
+              className="relative overflow-hidden rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.06)] cursor-pointer active:scale-[0.98] transition-all flex flex-col justify-between group text-left"
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                   Số dư tài khoản
                 </span>
-                <span className="p-1.5 rounded-xl bg-muted text-foreground/80 group-hover:bg-income/10 group-hover:text-income transition-colors">
+                <span className="p-2 rounded-xl bg-[#007aff]/12 text-[#007aff] group-hover:scale-105 transition-transform">
                   <Wallet className="h-4 w-4" />
                 </span>
               </div>
 
-              <div className="my-3">
-                <div className="text-2xl sm:text-3xl font-mono font-bold text-foreground tracking-tight tabular-nums">
+              <div className="my-3.5">
+                <div className="text-2xl sm:text-3xl font-mono font-bold text-[#007aff] dark:text-[#0a84ff] tracking-tight tabular-nums">
                   {displayMoney(liquidTotal)}
                 </div>
                 <p className="text-xs text-muted-foreground mt-1 flex items-center justify-between">
@@ -464,10 +462,10 @@ export default function DashboardHubPage() {
                 </p>
               </div>
 
-              <div className="pt-2.5 border-t border-border/60 flex items-center justify-between text-xs text-income font-medium">
+              <div className="pt-2.5 border-t border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between text-xs text-[#007aff] font-semibold">
                 <span>
                   {portfolioSettings.liquid_accounts.length > 0
-                    ? `${portfolioSettings.liquid_accounts.length} tài khoản ngân hàng`
+                    ? `${portfolioSettings.liquid_accounts.length} tài khoản thanh toán`
                     : "Cập nhật số dư"}
                 </span>
                 <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
@@ -485,28 +483,28 @@ export default function DashboardHubPage() {
               <section className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base sm:text-lg font-bold text-foreground">
+                    <h2 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
                       Mảng kinh doanh
                     </h2>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-black/[0.05] dark:bg-white/[0.08] text-muted-foreground">
                       {summaries.length}
                     </span>
                   </div>
                   <Link
                     href="/dashboard/businesses"
-                    className="text-xs font-semibold text-income hover:underline flex items-center gap-1"
+                    className="text-xs font-semibold text-[#007aff] hover:underline flex items-center gap-1"
                   >
                     <Plus className="h-3.5 w-3.5" /> Thêm mảng kinh doanh
                   </Link>
                 </div>
 
                 {summaries.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-border p-8 text-center bg-card">
+                  <div className="rounded-2xl border border-dashed border-black/[0.1] dark:border-white/[0.12] p-8 text-center bg-card/60">
                     <p className="text-muted-foreground mb-3 text-sm">
                       Chưa có việc kinh doanh nào được thiết lập.
                     </p>
                     <Link href="/dashboard/businesses">
-                      <AccentButton module="cashflow">Tạo việc đầu tiên</AccentButton>
+                      <Button variant="default">Tạo việc đầu tiên</Button>
                     </Link>
                   </div>
                 ) : (
@@ -529,7 +527,7 @@ export default function DashboardHubPage() {
                 <section id="bao-cao" className="space-y-3.5 pt-2">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h2 className="text-base sm:text-lg font-bold text-foreground">
+                      <h2 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
                         Báo cáo & Phân tích chuyên sâu
                       </h2>
                       <p className="text-xs text-muted-foreground">
@@ -539,7 +537,7 @@ export default function DashboardHubPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="text-xs text-muted-foreground hover:text-foreground"
+                      className="text-xs text-muted-foreground hover:text-foreground rounded-full"
                       onClick={() => setReportOpen(true)}
                     >
                       Báo cáo đầy đủ <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
@@ -559,13 +557,13 @@ export default function DashboardHubPage() {
               {/* 1. Account Balance Card */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-1">
-                  <h3 className="text-sm font-bold text-foreground">
-                    Tài khoản ngân hàng
+                  <h3 className="text-sm font-bold text-foreground tracking-tight">
+                    Tài khoản thanh toán
                   </h3>
                   <button
                     type="button"
                     onClick={() => setAccountOpen(true)}
-                    className="text-xs text-income hover:underline font-medium"
+                    className="text-xs text-[#007aff] hover:underline font-semibold"
                   >
                     Đối soát số dư
                   </button>
@@ -581,13 +579,13 @@ export default function DashboardHubPage() {
               {summaries.length > 0 && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between px-1">
-                    <h3 className="text-sm font-bold text-foreground">
+                    <h3 className="text-sm font-bold text-foreground tracking-tight">
                       Nguồn vốn kinh doanh
                     </h3>
                     <button
                       type="button"
                       onClick={() => setCapitalOpen(true)}
-                      className="text-xs text-income hover:underline font-medium"
+                      className="text-xs text-[#007aff] hover:underline font-semibold"
                     >
                       Tinh chỉnh vốn
                     </button>
@@ -604,18 +602,18 @@ export default function DashboardHubPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between px-1">
                   <div className="flex items-center gap-1.5">
-                    <h3 className="text-sm font-bold text-foreground">
+                    <h3 className="text-sm font-bold text-foreground tracking-tight">
                       Lịch thu chi sắp tới
                     </h3>
                     {dueSoonCount > 0 && (
-                      <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-full bg-muted text-foreground/80">
+                      <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-full bg-black/[0.05] dark:bg-white/[0.08] text-foreground/80">
                         {dueSoonCount}
                       </span>
                     )}
                   </div>
                   <Link
                     href="/dashboard/reminders"
-                    className="text-xs text-muted-foreground hover:text-income font-medium"
+                    className="text-xs text-muted-foreground hover:text-[#007aff] font-medium"
                   >
                     Xem tất cả
                   </Link>
@@ -660,3 +658,4 @@ export default function DashboardHubPage() {
     </ModulePageShell>
   );
 }
+

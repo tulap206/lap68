@@ -17,7 +17,7 @@ function DialogOverlay({
   return (
     <DialogPrimitive.Overlay
       className={cn(
-        "fixed inset-0 z-50 bg-foreground/25 backdrop-blur-[2px]",
+        "fixed inset-0 z-50 bg-black/35 backdrop-blur-md transition-opacity duration-200",
         className,
       )}
       {...props}
@@ -35,14 +35,14 @@ function DialogContent({
       <DialogOverlay />
       <DialogPrimitive.Content
         className={cn(
-          "fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-lg max-h-[min(90dvh,100%)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-xl border border-border bg-card p-5 sm:p-6 shadow-[0_8px_40px_rgba(28,28,26,0.12)]",
+          "fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-lg max-h-[min(90dvh,100%)] -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded-3xl border border-black/[0.08] dark:border-white/[0.1] bg-card/95 backdrop-blur-2xl p-6 shadow-[0_24px_64px_rgba(0,0,0,0.18)] dark:shadow-[0_24px_64px_rgba(0,0,0,0.5)] focus:outline-none",
           className,
         )}
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm text-muted-foreground opacity-70 hover:opacity-100 hover:text-foreground transition-colors">
-          <X className="h-4 w-4" />
+        <DialogPrimitive.Close className="absolute right-4.5 top-4.5 flex h-7 w-7 items-center justify-center rounded-full bg-black/[0.06] dark:bg-white/[0.1] text-muted-foreground hover:text-foreground transition-all active:scale-95">
+          <X className="h-3.5 w-3.5" />
         </DialogPrimitive.Close>
       </DialogPrimitive.Content>
     </DialogPortal>

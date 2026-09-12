@@ -65,24 +65,24 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
   const NavContent = ({ labeled }: { labeled: boolean }) => (
     <>
       {!labeled && (
-        <div className="hidden lg:block w-full h-5 mb-5 shrink-0" aria-hidden />
+        <div className="hidden lg:block w-full h-3 mb-4 shrink-0" aria-hidden />
       )}
 
       <Link
         href="/dashboard"
         onClick={() => setMobileOpen(false)}
         className={cn(
-          "relative flex items-center rounded-xl bg-primary text-primary-foreground shrink-0 transition-transform active:scale-[0.98]",
+          "relative flex items-center rounded-2xl bg-gradient-to-br from-[#007aff] to-[#0055b3] text-white shrink-0 shadow-[0_4px_12px_rgba(0,122,255,0.3)] transition-transform active:scale-[0.95]",
           labeled
             ? "h-11 w-full gap-3 px-3.5 mb-6"
             : "h-11 w-11 justify-center mb-6 lg:mb-8",
         )}
         title="LAP68"
       >
-        <Wallet className="h-4.5 w-4.5 shrink-0" />
+        <Wallet className="h-5 w-5 shrink-0" />
         {labeled && (
-          <span className="text-sm font-semibold tracking-tight">
-            LAP<span className="opacity-70">68</span>
+          <span className="text-sm font-bold tracking-tight">
+            LAP<span className="opacity-80">68</span>
           </span>
         )}
       </Link>
@@ -92,7 +92,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
           href="/dashboard"
           onClick={() => setMobileOpen(false)}
           className={cn(
-            "mb-3 flex items-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-xs shrink-0 transition-colors",
+            "mb-3 flex items-center rounded-xl text-muted-foreground hover:text-foreground hover:bg-black/[0.04] dark:hover:bg-white/[0.06] text-xs font-medium shrink-0 transition-colors",
             labeled ? "h-9 w-full gap-2 px-3" : "h-8 w-11 justify-center",
           )}
           title="Về hub"
@@ -103,8 +103,8 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
 
       <nav
         className={cn(
-          "flex flex-col gap-1 flex-1 w-full",
-          !labeled && "items-center gap-1.5 lg:mt-1",
+          "flex flex-col gap-1.5 flex-1 w-full",
+          !labeled && "items-center gap-2 lg:mt-1",
         )}
       >
         {menuItems.map((item) => {
@@ -126,21 +126,26 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                "group relative flex items-center rounded-xl transition-colors duration-200",
-                labeled ? "h-10 w-full gap-3 px-3" : "h-11 w-11 justify-center",
+                "group relative flex items-center rounded-xl transition-all duration-200 active:scale-[0.97]",
+                labeled ? "h-10 w-full gap-3 px-3.5" : "h-11 w-11 justify-center",
                 isActive
-                  ? "bg-foreground text-background"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground",
+                  ? "bg-[#007aff]/10 text-[#007aff] font-semibold dark:bg-[#0a84ff]/20 dark:text-[#0a84ff]"
+                  : "text-muted-foreground hover:bg-black/[0.04] dark:hover:bg-white/[0.06] hover:text-foreground",
               )}
               title={item.title}
             >
-              <Icon className="h-4.5 w-4.5 shrink-0" />
+              <Icon
+                className={cn(
+                  "h-4.5 w-4.5 shrink-0 transition-transform duration-200 group-hover:scale-105",
+                  isActive && "text-[#007aff] dark:text-[#0a84ff]",
+                )}
+              />
               {labeled ? (
-                <span className="text-sm font-medium truncate">
+                <span className="text-sm tracking-tight truncate">
                   {item.title}
                 </span>
               ) : (
-                <span className="absolute left-full ml-3 hidden group-hover:block whitespace-nowrap rounded-md border border-border bg-card px-2.5 py-1.5 text-xs font-medium text-foreground z-50 shadow-[0_4px_16px_rgba(28,28,26,0.08)]">
+                <span className="absolute left-full ml-3 hidden group-hover:block whitespace-nowrap rounded-xl border border-black/[0.08] dark:border-white/[0.1] bg-card/95 backdrop-blur-xl px-3 py-1.5 text-xs font-semibold text-foreground z-50 shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
                   {item.title}
                 </span>
               )}
@@ -152,9 +157,9 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       <button
         onClick={handleLogout}
         className={cn(
-          "flex items-center rounded-xl text-muted-foreground hover:bg-[var(--pale-red)] hover:text-expense transition-colors shrink-0",
+          "flex items-center rounded-xl text-muted-foreground hover:bg-[#ff3b30]/10 hover:text-[#ff3b30] transition-all shrink-0 active:scale-[0.96]",
           labeled
-            ? "h-10 w-full gap-3 px-3 mt-2"
+            ? "h-10 w-full gap-3 px-3.5 mt-2"
             : "h-11 w-11 justify-center lg:mt-3",
         )}
         title="Đăng xuất"
@@ -167,13 +172,14 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-dvh bg-background">
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 safe-top bg-card backdrop-blur-md border-b border-border">
+      {/* MOBILE TOP BAR */}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 safe-top bg-card/85 backdrop-blur-2xl border-b border-black/[0.06] dark:border-white/[0.08]">
         <div className="flex items-center gap-2.5 min-w-0">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#007aff] to-[#0055b3] text-white shadow-sm">
             <Wallet className="h-4 w-4" />
           </div>
           <div className="min-w-0">
-            <span className="text-foreground font-semibold tracking-tight block">
+            <span className="text-foreground font-bold tracking-tight block text-sm">
               LAP68
             </span>
             {user && (
@@ -187,27 +193,28 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
           variant="ghost"
           size="icon"
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="shrink-0"
+          className="shrink-0 rounded-full h-8.5 w-8.5"
           aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
         >
-          {mobileOpen ? <X /> : <Menu />}
+          {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
         </Button>
       </header>
 
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-30 bg-foreground/20 backdrop-blur-[1px]"
+          className="lg:hidden fixed inset-0 z-30 bg-black/30 backdrop-blur-sm transition-opacity"
           onClick={() => setMobileOpen(false)}
           aria-hidden
         />
       )}
 
+      {/* MACOS TRANSLUCENT SIDEBAR */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 h-dvh bg-sidebar border-r border-sidebar-border flex flex-col transition-transform duration-200 ease-out",
-          "w-[min(280px,85vw)] px-3 py-5 safe-top safe-bottom",
+          "fixed top-0 left-0 z-40 h-dvh bg-sidebar/85 backdrop-blur-2xl border-r border-black/[0.06] dark:border-white/[0.08] flex flex-col transition-transform duration-300 ease-out",
+          "w-[min(280px,85vw)] px-3.5 py-6 safe-top safe-bottom",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:w-[72px] lg:items-center lg:px-0 lg:pt-8 lg:pb-8",
+          "lg:translate-x-0 lg:w-[76px] lg:items-center lg:px-0 lg:pt-7 lg:pb-7",
         )}
       >
         <div className="lg:hidden flex flex-col flex-1 min-h-0 w-full">
@@ -218,16 +225,17 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         </div>
       </aside>
 
+      {/* MAIN VIEWPORT */}
       <main
         id="main-content"
-        className="lg:pl-[72px] pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0 min-h-dvh px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-8 safe-bottom relative z-10"
+        className="lg:pl-[76px] pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0 min-h-dvh px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-8 safe-bottom relative z-10"
       >
         {user && (
-          <div className="mb-4 sm:mb-5 hidden lg:flex justify-end items-center gap-2">
-            <span className="inline-flex h-1.5 w-1.5 rounded-full bg-success" />
-            <span className="text-xs text-muted-foreground">
+          <div className="mb-4 sm:mb-6 hidden lg:flex justify-end items-center gap-2">
+            <span className="inline-flex h-2 w-2 rounded-full bg-[#34c759] shadow-[0_0_8px_rgba(52,199,89,0.5)]" />
+            <span className="text-xs text-muted-foreground font-medium">
               Xin chào,{" "}
-              <strong className="text-foreground font-medium">
+              <strong className="text-foreground font-semibold">
                 {user.displayName}
               </strong>
             </span>
@@ -236,10 +244,10 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      {/* MOBILE BOTTOM NAVIGATION BAR */}
+      {/* MOBILE FLOATING TAB BAR (iOS Dock) */}
       <nav
         aria-label="Thanh điều hướng di động"
-        className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-card/95 backdrop-blur-lg border-t border-border/80 px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_-4px_16px_rgba(0,0,0,0.04)]"
+        className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 z-40 bg-card/90 dark:bg-[#1c1c1e]/90 backdrop-blur-2xl border border-black/[0.08] dark:border-white/[0.1] rounded-2xl px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_8px_32px_rgba(0,0,0,0.12)]"
       >
         {menuItems.map((item) => {
           const active =
@@ -260,16 +268,16 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
               key={`mobile-bottom-${item.href}`}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-150 min-w-[56px] min-h-[44px]",
+                "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-200 min-w-[56px] min-h-[44px] active:scale-95",
                 isActive
-                  ? "text-income font-bold"
+                  ? "text-[#007aff] dark:text-[#0a84ff] font-bold"
                   : "text-muted-foreground hover:text-foreground",
               )}
             >
               <div
                 className={cn(
-                  "p-1 rounded-lg transition-colors",
-                  isActive && "bg-income/10",
+                  "p-1.5 rounded-xl transition-all duration-200",
+                  isActive && "bg-[#007aff]/12 dark:bg-[#0a84ff]/20 shadow-xs",
                 )}
               >
                 <Icon className="h-4.5 w-4.5" />
@@ -284,3 +292,4 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
     </div>
   );
 }
+

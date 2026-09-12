@@ -1,6 +1,6 @@
 "use client";
 
-import { Wallet } from "lucide-react";
+import { Wallet, ChevronRight } from "lucide-react";
 import { displayMoney } from "@/lib/format-money";
 import { formatDisplayDateTime } from "@/lib/format-date";
 import {
@@ -29,36 +29,39 @@ export function AccountBalanceCard({
       type={onClick ? "button" : undefined}
       onClick={onClick}
       className={cn(
-        "rounded-xl border border-border bg-card overflow-hidden text-left w-full transition-colors",
-        onClick && "hover:border-foreground/15 cursor-pointer",
+        "rounded-2xl border border-black/[0.06] dark:border-white/[0.08] bg-card/90 dark:bg-card/95 backdrop-blur-xl shadow-[0_2px_12px_rgba(0,0,0,0.03)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.25)] overflow-hidden text-left w-full transition-all duration-200",
+        onClick && "hover:shadow-[0_6px_20px_rgba(0,0,0,0.06)] active:scale-[0.99] cursor-pointer",
         className,
       )}
     >
-      <div className="px-4 py-3 border-b border-border flex items-start justify-between gap-3">
+      <div className="px-5 py-3.5 border-b border-black/[0.04] dark:border-white/[0.06] flex items-center justify-between gap-3">
         <div className="min-w-0">
-          <div className="flex items-center gap-2">
-            <Wallet className="h-4 w-4 text-[#1f6c9f] shrink-0" />
-            <p className="text-sm font-semibold text-foreground">
-              Số dư tài khoản
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#007aff]/12 text-[#007aff]">
+              <Wallet className="h-4 w-4 shrink-0" />
+            </div>
+            <p className="text-sm font-semibold text-foreground tracking-tight">
+              Tài khoản thanh toán
             </p>
           </div>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
-            Tự cập nhật theo giao dịch thu/chi · có thể đối soát thủ công
+          <p className="text-[11px] text-muted-foreground mt-0.5 ml-9.5">
+            Tự động theo giao dịch chuyển khoản
           </p>
         </div>
         {onClick && (
-          <span className="text-[10px] text-muted-foreground shrink-0">
-            Cập nhật
-          </span>
+          <div className="flex items-center gap-1 text-[11px] font-semibold text-[#007aff] shrink-0">
+            <span>Cập nhật</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+          </div>
         )}
       </div>
 
-      <div className={cn("px-4 py-3", compact ? "space-y-2" : "space-y-3")}>
+      <div className={cn("px-5 py-4", compact ? "space-y-2.5" : "space-y-3.5")}>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-            Tổng hiện có
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Tổng số dư khả dụng
           </p>
-          <p className="font-mono font-bold text-xl text-[#1f6c9f] tabular-nums mt-0.5">
+          <p className="font-mono font-bold text-2xl text-[#007aff] dark:text-[#0a84ff] tabular-nums mt-0.5">
             {displayMoney(total)}
           </p>
           {settings.updated_at && (
@@ -71,19 +74,19 @@ export function AccountBalanceCard({
         {accounts.length > 0 && (
           <ul
             className={cn(
-              "divide-y divide-border rounded-lg border border-border overflow-hidden",
+              "divide-y divide-black/[0.04] dark:divide-white/[0.06] rounded-xl border border-black/[0.05] dark:border-white/[0.07] overflow-hidden bg-black/[0.02] dark:bg-white/[0.03]",
               compact && "text-sm",
             )}
           >
             {accounts.map((a) => (
               <li
                 key={a.id}
-                className="flex items-center justify-between gap-3 px-3 py-2 bg-muted/30"
+                className="flex items-center justify-between gap-3 px-3.5 py-2.5"
               >
-                <span className="text-muted-foreground truncate text-xs sm:text-sm">
+                <span className="text-muted-foreground font-medium truncate text-xs sm:text-sm">
                   {a.name}
                 </span>
-                <span className="font-mono text-foreground/90 tabular-nums text-xs sm:text-sm shrink-0">
+                <span className="font-mono font-semibold text-foreground tabular-nums text-xs sm:text-sm shrink-0">
                   {displayMoney(a.balance)}
                 </span>
               </li>
@@ -94,3 +97,4 @@ export function AccountBalanceCard({
     </Comp>
   );
 }
+
