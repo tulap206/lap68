@@ -132,9 +132,8 @@ export function AccountBalanceDialog({
         <DialogHeader>
           <DialogTitle>Số dư tài khoản</DialogTitle>
           <DialogDescription>
-            Nhập số dư thực tế từ app ngân hàng để đối soát. Sau đó mỗi giao
-            dịch thu/chi sẽ tự cộng hoặc trừ vào tài khoản tương ứng (tiền mặt →
-            TK tiền mặt, chuyển khoản/thẻ → TK ngân hàng).
+            Nhập số dư thực tế từ tài khoản ngân hàng để đối soát. Sau đó mỗi
+            giao dịch thu/chi sẽ tự cộng hoặc trừ vào tài khoản.
           </DialogDescription>
         </DialogHeader>
 
@@ -163,7 +162,7 @@ export function AccountBalanceDialog({
               <Input
                 value={row.name}
                 onChange={(e) => updateRow(row.id, { name: e.target.value })}
-                placeholder="VD: Vietcombank, Tiền mặt"
+                placeholder="VD: Vietcombank, MB Bank"
               />
               <div className="space-y-1">
                 <Label className="text-xs text-muted-foreground">

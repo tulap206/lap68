@@ -27,7 +27,6 @@ import {
 import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section";
 import {
   TransactionTypeBadge,
-  PaymentMethodLabel,
 } from "@/components/dashboard/cashflow-ui";
 import { ReminderPanel } from "@/components/dashboard/reminder-panel";
 import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog";

@@ -97,7 +97,7 @@ export async function importUserDataFromBackup(userId: string, data: ExportUserD
         schedule_id: null,
         description: t.description,
         transaction_date: t.transaction_date,
-        payment_method: t.payment_method || "cash",
+        payment_method: t.payment_method || "bank",
         ghi_chu: t.ghi_chu || {},
       })
       txCount++

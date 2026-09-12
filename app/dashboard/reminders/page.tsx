@@ -40,7 +40,7 @@ import {
   formatMoneyInput,
   parseMoneyInput,
 } from "@/lib/format-money";
-import type { Schedule, Business, PaymentMethod } from "@/lib/types";
+import type { Schedule, Business } from "@/lib/types";
 
 export default function RemindersPage() {
   const { user, logAction } = useAuth();
@@ -49,7 +49,6 @@ export default function RemindersPage() {
   const [loading, setLoading] = useState(true);
   const [completeTarget, setCompleteTarget] = useState<Schedule | null>(null);
   const [amount, setAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -88,7 +87,6 @@ export default function RemindersPage() {
     if (!s) return;
     setCompleteTarget(s);
     setAmount(s.amount ? formatMoneyInput(String(s.amount)) : "");
-    setPaymentMethod("cash");
   };
 
   const handleComplete = async () => {
@@ -100,7 +98,7 @@ export default function RemindersPage() {
     }
     setSaving(true);
     try {
-      await completeSchedule(completeTarget, parsed, paymentMethod);
+      await completeSchedule(completeTarget, parsed, "bank");
       logAction("Hoàn thành lịch", completeTarget.title);
       toast.success("Đã ghi nhận giao dịch");
       setCompleteTarget(null);
@@ -206,23 +204,6 @@ export default function RemindersPage() {
                     : ""
                 }
               />
-            </div>
-            <div className="space-y-2">
-              <Label>Phương thức</Label>
-              <Select
-                value={paymentMethod}
-                onValueChange={(v) => setPaymentMethod(v as PaymentMethod)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="cash">Tiền mặt</SelectItem>
-                  <SelectItem value="bank">Chuyển khoản</SelectItem>
-                  <SelectItem value="card">Thẻ</SelectItem>
-                  <SelectItem value="other">Khác</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
             <div className="flex gap-2">
               <Button

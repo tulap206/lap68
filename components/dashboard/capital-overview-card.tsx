@@ -8,10 +8,12 @@ export function CapitalOverviewCard({
   snapshot,
   compact = false,
   className,
+  onClick,
 }: {
   snapshot: CapitalSnapshot;
   compact?: boolean;
   className?: string;
+  onClick?: () => void;
 }) {
   const items = [
     {
@@ -30,8 +32,13 @@ export function CapitalOverviewCard({
 
   return (
     <div
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onClick={onClick}
+      onKeyDown={(e) => onClick && e.key === "Enter" && onClick()}
       className={cn(
-        "rounded-xl border border-border bg-card overflow-hidden",
+        "rounded-xl border border-border bg-card overflow-hidden text-left transition-all",
+        onClick && "cursor-pointer hover:border-foreground/25 hover:shadow-sm",
         className,
       )}
     >

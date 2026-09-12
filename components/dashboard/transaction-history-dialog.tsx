@@ -13,7 +13,6 @@ import {
 } from "@/components/dashboard/module-shell";
 import {
   TransactionTypeBadge,
-  PaymentMethodLabel,
 } from "@/components/dashboard/cashflow-ui";
 import { TablePagination } from "@/components/dashboard/table-pagination";
 import { Input } from "@/components/ui/input";
@@ -136,7 +135,7 @@ export function TransactionHistoryDialog({
 
         <div className="border border-border rounded-xl overflow-hidden bg-card mt-2">
           <ModuleResponsiveTable
-            headers={["Ngày", "Công việc", "Loại", "Mô tả", "Số tiền", "Thanh toán"]}
+            headers={["Ngày", "Công việc", "Loại", "Mô tả", "Số tiền"]}
             rows={paginatedTransactions.map((t) => [
               formatDisplayDate(t.transaction_date),
               <span
@@ -158,7 +157,6 @@ export function TransactionHistoryDialog({
                 {t.type === "income" ? "+" : "-"}
                 {displayMoney(t.amount)}
               </span>,
-              <PaymentMethodLabel key={`method-${t.id}`} method={t.payment_method} />,
             ])}
           />
 

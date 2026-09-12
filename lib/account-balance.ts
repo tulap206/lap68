@@ -49,8 +49,7 @@ export function buildPortfolioSettings(
 
 export function defaultLiquidAccounts(): LiquidAccount[] {
   return [
-    { id: crypto.randomUUID(), name: "Ngân hàng chính", balance: 0 },
-    { id: crypto.randomUUID(), name: "Tiền mặt", balance: 0 },
+    { id: crypto.randomUUID(), name: "Tài khoản ngân hàng", balance: 0 },
   ]
 }
 
@@ -60,41 +59,20 @@ export function transactionBalanceDelta(type: TransactionType, amount: number): 
   return type === "income" ? n : -n
 }
 
-function nameMatches(name: string, patterns: RegExp[]) {
-  const n = name.toLowerCase()
-  return patterns.some((p) => p.test(n))
-}
-
 /** Chọn tài khoản thanh khoản bị ảnh hưởng bởi giao dịch */
 export function resolveAccountForPayment(
   settings: UserPortfolioSettings,
-  paymentMethod: PaymentMethod
+  _paymentMethod?: PaymentMethod
 ): LiquidAccount | null {
   const accounts = settings.liquid_accounts
   if (accounts.length === 0) return null
 
   if (settings.primary_account_id) {
     const primary = accounts.find((a) => a.id === settings.primary_account_id)
-    if (primary && paymentMethod === "other") return primary
+    if (primary) return primary
   }
 
-  if (paymentMethod === "cash") {
-    return (
-      accounts.find((a) => nameMatches(a.name, [/tiền mặt/, /cash/, /mặt/])) ||
-      accounts.find((a) => a.id === settings.primary_account_id) ||
-      accounts[0]
-    )
-  }
-
-  if (paymentMethod === "bank" || paymentMethod === "card") {
-    return (
-      accounts.find((a) => nameMatches(a.name, [/ngân hàng/, /bank/, /vietcombank/, /techcombank/, /acb/, /vcb/])) ||
-      accounts.find((a) => !nameMatches(a.name, [/tiền mặt/, /cash/, /mặt/])) ||
-      accounts[0]
-    )
-  }
-
-  return accounts.find((a) => a.id === settings.primary_account_id) || accounts[0]
+  return accounts[0] || null
 }
 
 export function applyDeltaToAccounts(

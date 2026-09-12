@@ -14,7 +14,6 @@ import {
 } from "@/components/dashboard/module-shell";
 import {
   TransactionTypeBadge,
-  PaymentMethodLabel,
 } from "@/components/dashboard/cashflow-ui";
 import { SkeletonTable } from "@/components/ui/skeleton-loader";
 import {
@@ -73,7 +72,6 @@ export default function BusinessTransactionsPage() {
     categoryId: "",
     description: "",
     transactionDate: todayStoredDate(),
-    paymentMethod: "cash",
   });
 
   const load = useCallback(async () => {
@@ -120,7 +118,6 @@ export default function BusinessTransactionsPage() {
       categoryId: "",
       description: "",
       transactionDate: todayStoredDate(),
-      paymentMethod: "cash",
     });
     setDialogOpen(true);
   };
@@ -133,7 +130,6 @@ export default function BusinessTransactionsPage() {
       categoryId: t.category_id || "",
       description: t.description || "",
       transactionDate: toDateInputValue(t.transaction_date),
-      paymentMethod: t.payment_method,
     });
     setDialogOpen(true);
   };
@@ -155,7 +151,7 @@ export default function BusinessTransactionsPage() {
       schedule_id: null,
       description: form.description || null,
       transaction_date: toStoredDateValue(form.transactionDate),
-      payment_method: form.paymentMethod as Transaction["payment_method"],
+      payment_method: "bank" as Transaction["payment_method"],
       ghi_chu: {},
     };
     try {
@@ -225,7 +221,7 @@ export default function BusinessTransactionsPage() {
           </div>
         ) : (
           <ModuleResponsiveTable
-            headers={["Ngày", "Loại", "Mô tả", "Số tiền", "TT", ""]}
+            headers={["Ngày", "Loại", "Mô tả", "Số tiền", ""]}
             rows={filtered.map((t) => [
               formatDisplayDate(t.transaction_date),
               <TransactionTypeBadge key="t" type={t.type} />,
@@ -237,7 +233,6 @@ export default function BusinessTransactionsPage() {
                 {t.type === "income" ? "+" : "-"}
                 {displayMoney(t.amount)}
               </span>,
-              <PaymentMethodLabel key="p" method={t.payment_method} />,
               <div key="x" className="flex gap-1">
                 <Button variant="ghost" size="icon" onClick={() => openEdit(t)}>
                   <Edit2 className="h-4 w-4" />

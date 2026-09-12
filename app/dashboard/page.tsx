@@ -5,23 +5,21 @@ import Link from "next/link";
 import {
   Plus,
   LayoutGrid,
-  Landmark,
-  SlidersHorizontal,
   TrendingUp,
   TrendingDown,
-  PiggyBank,
-  BarChart3,
   Wallet,
   FileText,
   History,
   Calendar,
+  AlertTriangle,
+  ArrowUpRight,
+  ChevronRight,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import {
   ModulePageShell,
-  ModuleBrandHeader,
-  ModuleKpiCard,
   AccentButton,
 } from "@/components/dashboard/module-shell";
 import { BusinessHubCard } from "@/components/dashboard/business-hub-card";
@@ -35,6 +33,7 @@ import { AccountBalanceCard } from "@/components/dashboard/account-balance-card"
 import { TransactionHistoryDialog } from "@/components/dashboard/transaction-history-dialog";
 import { SchedulesSummaryDialog } from "@/components/dashboard/schedules-summary-dialog";
 import { SkeletonMetricCards } from "@/components/ui/skeleton-loader";
+import { Button } from "@/components/ui/button";
 import {
   fetchBusinessSummaries,
   fetchBusinesses,
@@ -60,23 +59,9 @@ import type {
 } from "@/lib/types";
 import { displayMoney } from "@/lib/format-money";
 import { parseDisplayDate } from "@/lib/format-date";
+import { cn } from "@/lib/utils";
 
-function SectionTitle({
-  children,
-  action,
-}: {
-  children: React.ReactNode;
-  action?: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-3">
-      <h2 className="text-base sm:text-lg font-bold text-foreground">
-        {children}
-      </h2>
-      {action}
-    </div>
-  );
-}
+type TimeframeOption = "month" | "all" | "last_month";
 
 export default function DashboardHubPage() {
   const { user } = useAuth();
@@ -85,6 +70,9 @@ export default function DashboardHubPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
+  const [timeframe, setTimeframe] = useState<TimeframeOption>("month");
+
+  // Dialog states
   const [capitalOpen, setCapitalOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
@@ -125,6 +113,15 @@ export default function DashboardHubPage() {
   }, [user, load]);
 
   const reminders = useMemo(() => buildReminderItems(schedules), [schedules]);
+
+  const overdueCount = useMemo(() => {
+    return reminders.filter((r) => r.urgency === "overdue").length;
+  }, [reminders]);
+
+  const dueSoonCount = useMemo(() => {
+    return reminders.filter((r) => r.urgency === "today" || r.urgency === "upcoming").length;
+  }, [reminders]);
+
   const overdueByBusiness = useMemo(() => {
     const map = new Map<string, number>();
     for (const s of schedules) {
@@ -138,57 +135,46 @@ export default function DashboardHubPage() {
     return map;
   }, [schedules]);
 
-  const portfolio = useMemo(() => {
-    const income = transactions
-      .filter((t) => t.type === "income")
-      .reduce((a, t) => a + t.amount, 0);
-    const expense = transactions
-      .filter((t) => t.type === "expense" && t.category?.name?.trim().toLowerCase() !== "chi tiêu cá nhân")
-      .reduce((a, t) => a + t.amount, 0);
-    const margin = income > 0 ? ((income - expense) / income) * 100 : 0;
-    return { income, expense, profit: income - expense, margin };
-  }, [transactions]);
+  // Current and last month dates
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth();
+  const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+  const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
 
-  const portfolioMonthly = useMemo(() => {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0-indexed
-
-    const monthlyTxs = transactions.filter((t) => {
+  // Compute active stats based on timeframe
+  const activeStats = useMemo(() => {
+    const filteredTxs = transactions.filter((t) => {
+      if (timeframe === "all") return true;
       const d = parseDisplayDate(t.transaction_date);
       if (!d) return false;
-      return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+      if (timeframe === "month") {
+        return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+      }
+      if (timeframe === "last_month") {
+        return d.getFullYear() === lastMonthYear && d.getMonth() === lastMonth;
+      }
+      return true;
     });
 
-    const income = monthlyTxs
-      .filter((t) => t.type === "income")
-      .reduce((a, t) => a + t.amount, 0);
-    const expense = monthlyTxs
-      .filter((t) => t.type === "expense" && t.category?.name?.trim().toLowerCase() !== "chi tiêu cá nhân")
-      .reduce((a, t) => a + t.amount, 0);
-    return { income, expense, profit: income - expense };
-  }, [transactions]);
+    const incomeTxs = filteredTxs.filter((t) => t.type === "income");
+    const expenseTxs = filteredTxs.filter((t) => t.type === "expense");
 
-  const personalSpending = useMemo(() => {
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth(); // 0-indexed
+    const income = incomeTxs.reduce((a, t) => a + t.amount, 0);
+    const expense = expenseTxs.reduce((a, t) => a + t.amount, 0);
+    const profit = income - expense;
+    const margin = income > 0 ? (profit / income) * 100 : 0;
 
-    const total = transactions
-      .filter((t) => t.type === "expense" && t.category?.name?.trim().toLowerCase() === "chi tiêu cá nhân")
-      .reduce((a, t) => a + t.amount, 0);
-
-    const monthly = transactions
-      .filter((t) => {
-        if (t.type !== "expense" || t.category?.name?.trim().toLowerCase() !== "chi tiêu cá nhân") return false;
-        const d = parseDisplayDate(t.transaction_date);
-        if (!d) return false;
-        return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
-      })
-      .reduce((a, t) => a + t.amount, 0);
-
-    return { total, monthly };
-  }, [transactions]);
+    return {
+      income,
+      expense,
+      profit,
+      margin,
+      txCount: filteredTxs.length,
+      incomeCount: incomeTxs.length,
+      expenseCount: expenseTxs.length,
+    };
+  }, [transactions, timeframe, currentYear, currentMonth, lastMonthYear, lastMonth]);
 
   const capitalSnapshot = useMemo(
     () => computePortfolioCapital(businesses, summaries),
@@ -216,251 +202,432 @@ export default function DashboardHubPage() {
     return map;
   }, [summaries, businesses]);
 
+  const timeframeLabel =
+    timeframe === "month"
+      ? `Tháng ${currentMonth + 1}/${currentYear}`
+      : timeframe === "last_month"
+        ? `Tháng ${lastMonth + 1}/${lastMonthYear}`
+        : "Toàn thời gian";
+
   return (
     <ModulePageShell module="cashflow">
-      <div className="space-y-8">
-        <ModuleBrandHeader
-          module="cashflow"
-          subtitle="Tổng quan thu chi, vốn và phân tích toàn bộ việc kinh doanh"
-          actions={
-            <div className="flex flex-wrap gap-2 w-full md:w-auto">
-              <AccentButton
-                module="cashflow"
+      <div className="space-y-6">
+        {/* TOP BAR: Title, Timeframe selector & Action Buttons */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-2 border-b border-border">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                Tổng quan dòng tiền & kinh doanh
+              </h1>
+              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium bg-income/10 text-income border border-income/20 px-2.5 py-0.5 rounded-full">
+                <Sparkles className="h-3 w-3" /> Trực quan & Tự động
+              </span>
+            </div>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Theo dõi hiệu quả tài chính, vốn đầu tư và phân tích toàn bộ mảng kinh doanh
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Timeframe Switcher Tabs */}
+            <div className="flex items-center p-1 bg-muted/60 border border-border/80 rounded-xl">
+              <button
                 type="button"
-                onClick={() => setAccountOpen(true)}
+                onClick={() => setTimeframe("month")}
+                className={cn(
+                  "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all",
+                  timeframe === "month"
+                    ? "bg-card text-foreground shadow-sm font-bold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
               >
-                <Wallet className="h-4 w-4" /> Số dư TK
-              </AccentButton>
-              <AccentButton
-                module="cashflow"
+                Tháng này
+              </button>
+              <button
                 type="button"
-                onClick={() => setHistoryOpen(true)}
+                onClick={() => setTimeframe("last_month")}
+                className={cn(
+                  "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all",
+                  timeframe === "last_month"
+                    ? "bg-card text-foreground shadow-sm font-bold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
               >
-                <History className="h-4 w-4" /> Lịch sử giao dịch
-              </AccentButton>
-              <AccentButton
-                module="cashflow"
+                Tháng trước
+              </button>
+              <button
                 type="button"
-                onClick={() => setSchedulesOpen(true)}
+                onClick={() => setTimeframe("all")}
+                className={cn(
+                  "px-3 py-1.5 text-xs font-semibold rounded-lg transition-all",
+                  timeframe === "all"
+                    ? "bg-card text-foreground shadow-sm font-bold"
+                    : "text-muted-foreground hover:text-foreground",
+                )}
               >
-                <Calendar className="h-4 w-4" /> Lịch thu chi
-              </AccentButton>
-              <AccentButton
-                module="cashflow"
-                type="button"
-                onClick={() => setCapitalOpen(true)}
-              >
-                <SlidersHorizontal className="h-4 w-4" /> Tinh chỉnh vốn
-              </AccentButton>
-              <AccentButton
-                module="cashflow"
-                type="button"
+                Toàn bộ
+              </button>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 text-xs gap-1.5 border-border"
                 onClick={() => setReportOpen(true)}
               >
-                <FileText className="h-4 w-4" /> Báo cáo
-              </AccentButton>
+                <FileText className="h-3.5 w-3.5" />
+                Báo cáo
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 text-xs gap-1.5 border-border"
+                onClick={() => setHistoryOpen(true)}
+              >
+                <History className="h-3.5 w-3.5" />
+                Lịch sử
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-9 text-xs gap-1.5 border-border"
+                onClick={() => setSchedulesOpen(true)}
+              >
+                <Calendar className="h-3.5 w-3.5" />
+                Lịch thu chi
+              </Button>
               <Link href="/dashboard/businesses">
-                <AccentButton module="cashflow" type="button">
-                  <LayoutGrid className="h-4 w-4" /> Quản lý việc
+                <AccentButton module="cashflow" className="h-9 text-xs gap-1.5">
+                  <LayoutGrid className="h-3.5 w-3.5" />
+                  Quản lý việc
                 </AccentButton>
               </Link>
             </div>
-          }
-        />
+          </div>
+        </div>
 
-        {/* 1. Chỉ số tài chính */}
-        <section>
-          <SectionTitle>Chỉ số tài chính</SectionTitle>
-          {loading ? (
-            <SkeletonMetricCards />
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 auto-rows-fr items-stretch">
-              <ModuleKpiCard
-                module="cashflow"
-                label="Tổng thu"
-                value={displayMoney(portfolio.income)}
-                icon={<TrendingUp className="h-5 w-5" />}
-                tone="income"
-              />
-              <ModuleKpiCard
-                module="cashflow"
-                label={`Thu tháng ${new Date().getMonth() + 1}`}
-                value={displayMoney(portfolioMonthly.income)}
-                hint="Tháng hiện tại"
-                icon={<TrendingUp className="h-5 w-5" />}
-                tone="income"
-              />
-              <ModuleKpiCard
-                module="cashflow"
-                label="Tổng chi"
-                value={displayMoney(portfolio.expense)}
-                icon={<TrendingDown className="h-5 w-5" />}
-                tone="expense"
-              />
-              <ModuleKpiCard
-                module="cashflow"
-                label={`Chi tháng ${new Date().getMonth() + 1}`}
-                value={displayMoney(portfolioMonthly.expense)}
-                hint="Tháng hiện tại"
-                icon={<TrendingDown className="h-5 w-5" />}
-                tone="expense"
-              />
-              <ModuleKpiCard
-                module="cashflow"
-                label="Lợi nhuận"
-                value={displayMoney(portfolio.profit)}
-                icon={<PiggyBank className="h-5 w-5" />}
-                tone="profit"
-              />
-              <ModuleKpiCard
-                module="cashflow"
-                label={`LN tháng ${new Date().getMonth() + 1}`}
-                value={displayMoney(portfolioMonthly.profit)}
-                hint="Tháng hiện tại"
-                icon={<PiggyBank className="h-5 w-5" />}
-                tone="profit"
-              />
-              <ModuleKpiCard
-                module="cashflow"
-                label="Tỷ suất LN"
-                value={`${portfolio.margin.toFixed(1)}%`}
-                icon={<BarChart3 className="h-5 w-5" />}
-                tone="margin"
-              />
-              <ModuleKpiCard
-                module="cashflow"
-                label="Số dư TK"
-                value={displayMoney(liquidTotal)}
-                hint={
-                  portfolioSettings.liquid_accounts.length > 0
-                    ? `${portfolioSettings.liquid_accounts.length} tài khoản`
-                    : "Chưa cập nhật"
-                }
-                icon={<Wallet className="h-5 w-5" />}
-                tone="balance"
-                onClick={() => setAccountOpen(true)}
-              />
-              <ModuleKpiCard
-                module="cashflow"
-                label="Vốn"
-                value={displayMoney(capitalSnapshot.base_capital)}
-                hint={`Ròng ${displayMoney(capitalSnapshot.available_capital)}`}
-                icon={<Landmark className="h-5 w-5" />}
-                tone="capital"
-                onClick={() => setCapitalOpen(true)}
-              />
-              <ModuleKpiCard
-                module="cashflow"
-                label="Chi tiêu cá nhân"
-                value={displayMoney(personalSpending.total)}
-                hint={`Tháng này: ${displayMoney(personalSpending.monthly)}`}
-                icon={<Wallet className="h-5 w-5" />}
-                tone="neutral"
-              />
-              <ModuleKpiCard
-                module="cashflow"
-                label="Việc KD"
-                value={String(summaries.length)}
-                icon={<LayoutGrid className="h-5 w-5" />}
-                tone="count"
-              />
+        {/* SMART ALERT: Overdue or due soon items */}
+        {overdueCount > 0 && (
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-rose-500/25 bg-rose-500/10 text-expense">
+            <div className="flex items-center gap-2.5">
+              <span className="p-1.5 rounded-lg bg-rose-500/20 text-rose-500">
+                <AlertTriangle className="h-4 w-4" />
+              </span>
+              <div>
+                <p className="text-xs sm:text-sm font-semibold">
+                  Có {overdueCount} khoản thu/chi quá hạn cần xử lý!
+                </p>
+                <p className="text-[11px] opacity-80">
+                  Kiểm tra và ghi nhận giao dịch để đảm bảo số dư đối soát chính xác
+                </p>
+              </div>
             </div>
-          )}
-        </section>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-8 text-xs font-semibold bg-card border-rose-300 dark:border-rose-800 text-expense hover:bg-rose-50 dark:hover:bg-rose-950/30 shrink-0"
+              onClick={() => setSchedulesOpen(true)}
+            >
+              Xử lý ngay <ChevronRight className="h-3.5 w-3.5 ml-1" />
+            </Button>
+          </div>
+        )}
 
-        {/* 2. Số dư TK + vốn + nhắc hẹn */}
+        {/* 1. HERO FINANCIAL OVERVIEW (4 KEY MASTER CARDS) */}
+        {loading ? (
+          <SkeletonMetricCards />
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {/* CARD 1: NET PROFIT (HERO CARD) */}
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm hover:border-foreground/20 transition-all flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Lợi nhuận ròng
+                </span>
+                <span
+                  className={cn(
+                    "inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full",
+                    activeStats.profit >= 0
+                      ? "bg-income/10 text-income border border-income/20"
+                      : "bg-expense/10 text-expense border border-expense/20",
+                  )}
+                >
+                  {activeStats.profit >= 0 ? "+" : ""}
+                  {activeStats.margin.toFixed(1)}%
+                </span>
+              </div>
+
+              <div className="my-3">
+                <div
+                  className={cn(
+                    "text-2xl sm:text-3xl font-mono font-bold tracking-tight tabular-nums",
+                    activeStats.profit >= 0 ? "text-income" : "text-expense",
+                  )}
+                >
+                  {displayMoney(activeStats.profit)}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Kỳ xem: <strong className="text-foreground/80">{timeframeLabel}</strong>
+                </p>
+              </div>
+
+              <div className="pt-2.5 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
+                <span>{activeStats.txCount} giao dịch</span>
+                <span className="text-[11px] text-muted-foreground">
+                  {activeStats.profit >= 0 ? "🟢 Dòng tiền dương" : "🔴 Dòng tiền âm"}
+                </span>
+              </div>
+            </div>
+
+            {/* CARD 2: TOTAL INCOME */}
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm hover:border-foreground/20 transition-all flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Dòng tiền thu
+                </span>
+                <span className="p-1.5 rounded-xl bg-income/10 text-income">
+                  <TrendingUp className="h-4 w-4" />
+                </span>
+              </div>
+
+              <div className="my-3">
+                <div className="text-2xl sm:text-3xl font-mono font-bold text-income tracking-tight tabular-nums">
+                  {displayMoney(activeStats.income)}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Tổng thu trong {timeframeLabel.toLowerCase()}
+                </p>
+              </div>
+
+              <div className="pt-2.5 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
+                <span>{activeStats.incomeCount} khoản thu</span>
+                <span className="font-mono text-xs text-income font-medium">100% doanh số</span>
+              </div>
+            </div>
+
+            {/* CARD 3: TOTAL EXPENSE */}
+            <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm hover:border-foreground/20 transition-all flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Dòng tiền chi
+                </span>
+                <span className="p-1.5 rounded-xl bg-expense/10 text-expense">
+                  <TrendingDown className="h-4 w-4" />
+                </span>
+              </div>
+
+              <div className="my-3">
+                <div className="text-2xl sm:text-3xl font-mono font-bold text-expense tracking-tight tabular-nums">
+                  {displayMoney(activeStats.expense)}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Tổng chi trong {timeframeLabel.toLowerCase()}
+                </p>
+              </div>
+
+              <div className="pt-2.5 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
+                <span>{activeStats.expenseCount} khoản chi</span>
+                <span className="font-mono text-xs text-muted-foreground">
+                  Tỷ lệ chi: {activeStats.income > 0 ? ((activeStats.expense / activeStats.income) * 100).toFixed(0) : 0}%
+                </span>
+              </div>
+            </div>
+
+            {/* CARD 4: BANK LIQUIDITY & CAPITAL */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => setAccountOpen(true)}
+              onKeyDown={(e) => e.key === "Enter" && setAccountOpen(true)}
+              className="relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm hover:border-foreground/25 hover:shadow-md cursor-pointer transition-all flex flex-col justify-between group text-left"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  Số dư tài khoản
+                </span>
+                <span className="p-1.5 rounded-xl bg-muted text-foreground/80 group-hover:bg-income/10 group-hover:text-income transition-colors">
+                  <Wallet className="h-4 w-4" />
+                </span>
+              </div>
+
+              <div className="my-3">
+                <div className="text-2xl sm:text-3xl font-mono font-bold text-foreground tracking-tight tabular-nums">
+                  {displayMoney(liquidTotal)}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 flex items-center justify-between">
+                  <span>Vốn khả dụng:</span>
+                  <strong className="font-mono text-foreground font-semibold">
+                    {displayMoney(capitalSnapshot.available_capital)}
+                  </strong>
+                </p>
+              </div>
+
+              <div className="pt-2.5 border-t border-border/60 flex items-center justify-between text-xs text-income font-medium">
+                <span>
+                  {portfolioSettings.liquid_accounts.length > 0
+                    ? `${portfolioSettings.liquid_accounts.length} tài khoản ngân hàng`
+                    : "Cập nhật số dư"}
+                </span>
+                <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 2. BENTO MAIN CONTENT (2 COLUMNS: 8 cols LEFT, 4 cols RIGHT) */}
         {!loading && (
-          <section className="space-y-4">
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-              <AccountBalanceCard
-                settings={portfolioSettings}
-                compact
-                onClick={() => setAccountOpen(true)}
-              />
-              {summaries.length > 0 && (
-                <CapitalOverviewCard snapshot={capitalSnapshot} compact />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* LEFT COLUMN: BUSINESS PORTFOLIO & REPORTS (8 Cols) */}
+            <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+              {/* SECTION: BUSINESSES */}
+              <section className="space-y-3.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-base sm:text-lg font-bold text-foreground">
+                      Mảng kinh doanh
+                    </h2>
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
+                      {summaries.length}
+                    </span>
+                  </div>
+                  <Link
+                    href="/dashboard/businesses"
+                    className="text-xs font-semibold text-income hover:underline flex items-center gap-1"
+                  >
+                    <Plus className="h-3.5 w-3.5" /> Thêm mảng kinh doanh
+                  </Link>
+                </div>
+
+                {summaries.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-border p-8 text-center bg-card">
+                    <p className="text-muted-foreground mb-3 text-sm">
+                      Chưa có việc kinh doanh nào được thiết lập.
+                    </p>
+                    <Link href="/dashboard/businesses">
+                      <AccentButton module="cashflow">Tạo việc đầu tiên</AccentButton>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {summaries.map((s, i) => (
+                      <BusinessHubCard
+                        key={s.business_id}
+                        summary={s}
+                        capital={capitalByBusiness.get(s.business_id)}
+                        overdueCount={overdueByBusiness.get(s.business_id) || 0}
+                        delay={i * 50}
+                      />
+                    ))}
+                  </div>
+                )}
+              </section>
+
+              {/* SECTION: CASHFLOW ANALYTICS & REPORTS */}
+              {transactions.length > 0 && (
+                <section id="bao-cao" className="space-y-3.5 pt-2">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-base sm:text-lg font-bold text-foreground">
+                        Báo cáo & Phân tích chuyên sâu
+                      </h2>
+                      <p className="text-xs text-muted-foreground">
+                        Biểu đồ xu hướng dòng tiền và tỷ trọng đóng góp của từng mảng kinh doanh
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => setReportOpen(true)}
+                    >
+                      Báo cáo đầy đủ <ArrowUpRight className="h-3.5 w-3.5 ml-1" />
+                    </Button>
+                  </div>
+
+                  <CashflowReportsSection
+                    transactions={transactions}
+                    summaries={summaries}
+                  />
+                </section>
               )}
             </div>
-            <div>
-              <SectionTitle
-                action={
+
+            {/* RIGHT COLUMN: LIQUIDITY, CAPITAL & SCHEDULES (4 Cols) */}
+            <div className="lg:col-span-5 xl:col-span-4 space-y-6">
+              {/* 1. Account Balance Card */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <h3 className="text-sm font-bold text-foreground">
+                    Tài khoản ngân hàng
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setAccountOpen(true)}
+                    className="text-xs text-income hover:underline font-medium"
+                  >
+                    Đối soát số dư
+                  </button>
+                </div>
+                <AccountBalanceCard
+                  settings={portfolioSettings}
+                  compact
+                  onClick={() => setAccountOpen(true)}
+                />
+              </div>
+
+              {/* 2. Capital Snapshot Card */}
+              {summaries.length > 0 && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between px-1">
+                    <h3 className="text-sm font-bold text-foreground">
+                      Nguồn vốn kinh doanh
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setCapitalOpen(true)}
+                      className="text-xs text-income hover:underline font-medium"
+                    >
+                      Tinh chỉnh vốn
+                    </button>
+                  </div>
+                  <CapitalOverviewCard
+                    snapshot={capitalSnapshot}
+                    compact
+                    onClick={() => setCapitalOpen(true)}
+                  />
+                </div>
+              )}
+
+              {/* 3. Upcoming Reminders & Schedules */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-1.5">
+                    <h3 className="text-sm font-bold text-foreground">
+                      Lịch thu chi sắp tới
+                    </h3>
+                    {dueSoonCount > 0 && (
+                      <span className="text-[11px] font-bold px-1.5 py-0.2 rounded-full bg-muted text-foreground/80">
+                        {dueSoonCount}
+                      </span>
+                    )}
+                  </div>
                   <Link
                     href="/dashboard/reminders"
-                    className="text-xs text-muted-foreground hover:text-income"
+                    className="text-xs text-muted-foreground hover:text-income font-medium"
                   >
                     Xem tất cả
                   </Link>
-                }
-              >
-                Nhắc hẹn sắp tới
-              </SectionTitle>
-              <ReminderPanel items={reminders.slice(0, 5)} compact />
+                </div>
+                <ReminderPanel items={reminders.slice(0, 5)} compact />
+              </div>
             </div>
-          </section>
-        )}
-
-        {/* 3. Việc kinh doanh */}
-        <section>
-          <SectionTitle
-            action={
-              <Link
-                href="/dashboard/businesses"
-                className="text-xs text-income hover:underline flex items-center gap-1"
-              >
-                <Plus className="h-3 w-3" /> Thêm việc
-              </Link>
-            }
-          >
-            Việc kinh doanh
-          </SectionTitle>
-          {loading ? (
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="h-40 rounded-xl bg-muted/50 animate-pulse"
-                />
-              ))}
-            </div>
-          ) : summaries.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border p-8 text-center">
-              <p className="text-muted-foreground mb-3">
-                Chưa có việc kinh doanh
-              </p>
-              <Link href="/dashboard/businesses">
-                <AccentButton module="cashflow">Tạo việc đầu tiên</AccentButton>
-              </Link>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
-              {summaries.map((s, i) => (
-                <BusinessHubCard
-                  key={s.business_id}
-                  summary={s}
-                  capital={capitalByBusiness.get(s.business_id)}
-                  overdueCount={overdueByBusiness.get(s.business_id) || 0}
-                  delay={i * 60}
-                />
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* 4. Báo cáo & phân tích */}
-        {!loading && transactions.length > 0 && (
-          <section id="bao-cao">
-            <SectionTitle>Báo cáo & phân tích</SectionTitle>
-            <p className="text-xs text-muted-foreground mb-4 -mt-1">
-              Dòng tiền, cơ cấu thu chi và so sánh giữa các việc kinh doanh
-            </p>
-            <CashflowReportsSection
-              transactions={transactions}
-              summaries={summaries}
-            />
-          </section>
+          </div>
         )}
       </div>
 
+      {/* DIALOGS */}
       <CapitalAdjustDialog
         open={capitalOpen}
         onOpenChange={setCapitalOpen}

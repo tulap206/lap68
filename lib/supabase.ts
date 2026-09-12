@@ -369,7 +369,11 @@ export async function syncScheduleStatuses(userId: string) {
   )
 }
 
-export async function completeSchedule(schedule: Schedule, amount: number, paymentMethod: Transaction["payment_method"] = "cash") {
+export async function completeSchedule(
+  schedule: Schedule,
+  amount: number,
+  paymentMethod: Transaction["payment_method"] = "bank",
+) {
   const tx = await insertTransaction({
     user_id: schedule.user_id,
     business_id: schedule.business_id,
