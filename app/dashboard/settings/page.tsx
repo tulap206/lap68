@@ -41,9 +41,9 @@ export default function SettingsPage() {
         {/* PROFILE & STATUS HEADER CARD */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Profile Card */}
-          <div className="md:col-span-2 p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="md:col-span-2 p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-lg shrink-0 shadow-sm">
+              <div className="w-12 h-12 rounded-2xl bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900 flex items-center justify-center font-bold text-lg shrink-0 shadow-xs">
                 {user.displayName.charAt(0).toUpperCase()}
               </div>
               <div className="min-w-0">
@@ -51,7 +51,7 @@ export default function SettingsPage() {
                   <h2 className="text-base sm:text-lg font-bold text-foreground truncate">
                     {user.displayName}
                   </h2>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-income/15 text-income border border-income/20 uppercase tracking-wider">
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 uppercase tracking-wider">
                     {user.role}
                   </span>
                 </div>
@@ -61,28 +61,28 @@ export default function SettingsPage() {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 text-xs text-muted-foreground border-t sm:border-t-0 pt-2 sm:pt-0 border-border">
-              <span className="flex items-center gap-1 text-income font-medium">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-100 dark:border-zinc-800">
+              <span className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 font-medium">
                 <CheckCircle2 className="h-3.5 w-3.5" /> Đã xác thực
               </span>
               <span>•</span>
-              <span>LAP68 v2.1</span>
+              <span>LAP68 Pro v2.2</span>
             </div>
           </div>
 
           {/* Cloud Database Status */}
-          <div className="p-5 rounded-2xl border border-border bg-card shadow-sm flex flex-col justify-between">
+          <div className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card shadow-xs flex flex-col justify-between">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                 Đám mây Supabase
               </span>
-              <span className="inline-flex items-center gap-1 text-xs font-semibold text-income">
-                <span className="w-2 h-2 rounded-full bg-income animate-pulse" /> Trực tuyến
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Trực tuyến
               </span>
             </div>
             <div className="my-2">
               <p className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                <Database className="h-4 w-4 text-income" /> Bảng độc lập `lap68_*`
+                <Database className="h-4 w-4 text-emerald-600 dark:text-emerald-400" /> Bảng độc lập `lap68_*`
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
                 Tự động đồng bộ hóa & đối soát thời gian thực
@@ -92,15 +92,15 @@ export default function SettingsPage() {
         </div>
 
         {/* TAB SWITCHER */}
-        <div className="flex items-center gap-2 border-b border-border pb-1 overflow-x-auto">
+        <div className="flex items-center gap-1 p-1 bg-zinc-200/60 dark:bg-zinc-800/70 backdrop-blur-md rounded-2xl border border-black/[0.04] dark:border-white/[0.06] w-fit overflow-x-auto">
           <button
             type="button"
             onClick={() => setActiveTab("backup")}
             className={cn(
-              "px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 whitespace-nowrap",
+              "px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 whitespace-nowrap active:scale-[0.98]",
               activeTab === "backup"
-                ? "bg-card text-foreground shadow-sm border border-border font-bold text-income"
-                : "text-muted-foreground hover:text-foreground",
+                ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs"
+                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100",
             )}
           >
             <Cloud className="h-4 w-4" /> Sao lưu & Phục hồi
@@ -109,10 +109,10 @@ export default function SettingsPage() {
             type="button"
             onClick={() => setActiveTab("logs")}
             className={cn(
-              "px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 whitespace-nowrap",
+              "px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 whitespace-nowrap active:scale-[0.98]",
               activeTab === "logs"
-                ? "bg-card text-foreground shadow-sm border border-border font-bold text-income"
-                : "text-muted-foreground hover:text-foreground",
+                ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs"
+                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100",
             )}
           >
             <History className="h-4 w-4" /> Lịch sử thao tác
@@ -121,10 +121,10 @@ export default function SettingsPage() {
             type="button"
             onClick={() => setActiveTab("about")}
             className={cn(
-              "px-4 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 whitespace-nowrap",
+              "px-4 py-1.5 text-xs sm:text-sm font-semibold rounded-xl transition-all flex items-center gap-2 whitespace-nowrap active:scale-[0.98]",
               activeTab === "about"
-                ? "bg-card text-foreground shadow-sm border border-border font-bold text-income"
-                : "text-muted-foreground hover:text-foreground",
+                ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs"
+                : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100",
             )}
           >
             <ShieldCheck className="h-4 w-4" /> An toàn & Nguyên tắc
@@ -156,37 +156,37 @@ export default function SettingsPage() {
 
         {activeTab === "about" && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
+            <div className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-3 shadow-xs">
               <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                <ShieldCheck className="h-5 w-5 text-income" /> Nguyên tắc độc lập dữ liệu
+                <ShieldCheck className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> Nguyên tắc độc lập dữ liệu
               </h3>
               <ul className="text-xs sm:text-sm text-muted-foreground space-y-2 leading-relaxed">
                 <li className="flex items-start gap-2">
-                  <span className="text-income font-bold">•</span>
+                  <span className="text-emerald-500 font-bold">•</span>
                   Dự án <strong>LAP68</strong> hoạt động hoàn toàn độc lập với các hệ thống khác.
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-income font-bold">•</span>
-                  Mọi dữ liệu chỉ được lưu trữ trên các bảng có tiền tố <code className="text-foreground font-mono font-semibold bg-muted px-1.5 py-0.5 rounded">lap68_*</code>.
+                  <span className="text-emerald-500 font-bold">•</span>
+                  Mọi dữ liệu chỉ được lưu trữ trên các bảng có tiền tố <code className="text-foreground font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">lap68_*</code>.
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-income font-bold">•</span>
+                  <span className="text-emerald-500 font-bold">•</span>
                   Không can thiệp hoặc sửa đổi bất kỳ bảng nào thuộc hệ thống khác.
                 </li>
               </ul>
             </div>
 
-            <div className="p-5 rounded-2xl border border-border bg-card space-y-3">
+            <div className="p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-3 shadow-xs">
               <h3 className="text-base font-bold text-foreground flex items-center gap-2">
-                <HardDrive className="h-5 w-5 text-income" /> Đối soát & Dòng tiền thực
+                <HardDrive className="h-5 w-5 text-emerald-600 dark:text-emerald-400" /> Đối soát & Dòng tiền thực
               </h3>
               <ul className="text-xs sm:text-sm text-muted-foreground space-y-2 leading-relaxed">
                 <li className="flex items-start gap-2">
-                  <span className="text-income font-bold">•</span>
+                  <span className="text-emerald-500 font-bold">•</span>
                   Mọi giao dịch thu/chi được ghi nhận trực tiếp vào số dư tài khoản ngân hàng thực tế.
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-income font-bold">•</span>
+                  <span className="text-emerald-500 font-bold">•</span>
                   Vốn đầu tư ban đầu được quản lý cố định, lãi/lỗ kinh doanh được cộng dồn vào Vốn ròng khả dụng.
                 </li>
               </ul>
@@ -197,3 +197,4 @@ export default function SettingsPage() {
     </ModulePageShell>
   );
 }
+

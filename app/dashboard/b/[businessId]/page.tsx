@@ -12,6 +12,8 @@ import {
   SlidersHorizontal,
   BarChart3,
   FileText,
+  ArrowRight,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -20,19 +22,16 @@ import {
   ModulePageShell,
   ModuleSubpageHeader,
   ModuleSectionCard,
-  ModuleKpiCard,
-  ModuleResponsiveTable,
-  AccentButton,
 } from "@/components/dashboard/module-shell";
+import { BusinessSubNav } from "@/components/dashboard/business-sub-nav";
 import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section";
-import {
-  TransactionTypeBadge,
-} from "@/components/dashboard/cashflow-ui";
+import { TransactionTypeBadge } from "@/components/dashboard/cashflow-ui";
 import { ReminderPanel } from "@/components/dashboard/reminder-panel";
 import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog";
 import { ReportDialog } from "@/components/dashboard/report-dialog";
 import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card";
 import { SkeletonMetricCards } from "@/components/ui/skeleton-loader";
+import { Button } from "@/components/ui/button";
 import {
   fetchBusiness,
   fetchBusinesses,
@@ -50,6 +49,7 @@ import {
 import { displayMoney } from "@/lib/format-money";
 import { formatDisplayDate } from "@/lib/format-date";
 import type { Business, Schedule, Transaction } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export default function BusinessDashboardPage() {
   const { user } = useAuth();
@@ -130,173 +130,328 @@ export default function BusinessDashboardPage() {
 
   return (
     <ModulePageShell module="cashflow">
-      <div className="space-y-8">
-        <ModuleSubpageHeader
-          module="cashflow"
-          title={business?.name || "..."}
-          subtitle={
-            business?.description || "Tổng quan dòng tiền việc kinh doanh"
-          }
-          actions={
-            <div className="flex flex-wrap gap-2">
-              <AccentButton
-                module="cashflow"
-                type="button"
-                onClick={() => setCapitalOpen(true)}
-              >
-                <SlidersHorizontal className="h-4 w-4" /> Tinh chỉnh vốn
-              </AccentButton>
-              <AccentButton
-                module="cashflow"
-                type="button"
-                onClick={() => setReportOpen(true)}
-              >
-                <FileText className="h-4 w-4" /> Báo cáo
-              </AccentButton>
-              <Link href={`/dashboard/b/${businessId}/schedules`}>
-                <AccentButton module="cashflow" type="button">
-                  <CalendarClock className="h-4 w-4" /> Lịch thu/chi
-                </AccentButton>
-              </Link>
-              <Link href={`/dashboard/b/${businessId}/transactions`}>
-                <AccentButton module="cashflow" type="button">
-                  <Plus className="h-4 w-4" /> Giao dịch
-                </AccentButton>
-              </Link>
-            </div>
-          }
-        />
+      <div className="space-y-6">
+        {/* SUB NAVIGATION TABS */}
+        <BusinessSubNav businessId={businessId} />
 
+        {/* HEADER */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-black/[0.06] dark:border-white/[0.08]">
+          <div className="flex items-center gap-3">
+            <span
+              className="w-5 h-5 rounded-full shrink-0 shadow-xs ring-4 ring-white dark:ring-zinc-900"
+              style={{ backgroundColor: business?.color || "#18181b" }}
+            />
+            <div>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                  {business?.name || "..."}
+                </h1>
+                {business?.code && (
+                  <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 uppercase">
+                    #{business.code}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+                {business?.description || "Tổng quan hiệu quả tài chính và dòng tiền"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              className="rounded-full text-xs gap-1.5 h-8.5 px-3.5"
+              onClick={() => setCapitalOpen(true)}
+            >
+              <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
+              Tinh chỉnh vốn
+            </Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              className="rounded-full text-xs gap-1.5 h-8.5 px-3.5"
+              onClick={() => setReportOpen(true)}
+            >
+              <FileText className="h-3.5 w-3.5 text-muted-foreground" />
+              Báo cáo
+            </Button>
+            <Link href={`/dashboard/b/${businessId}/transactions`}>
+              <Button
+                variant="default"
+                size="sm"
+                className="rounded-full text-xs gap-1.5 h-8.5 px-4 font-semibold"
+              >
+                <Plus className="h-3.5 w-3.5" /> Ghi giao dịch
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        {/* 5 BENTO KPI CARDS */}
         {loading ? (
           <SkeletonMetricCards />
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 auto-rows-fr items-stretch">
-            <ModuleKpiCard
-              module="cashflow"
-              label="Tổng thu"
-              value={displayMoney(stats.income)}
-              icon={<TrendingUp className="h-5 w-5" />}
-              tone="income"
-              onClick={() =>
-                router.push(
-                  `/dashboard/b/${businessId}/transactions?type=income`,
-                )
-              }
-            />
-            <ModuleKpiCard
-              module="cashflow"
-              label="Tổng chi"
-              value={displayMoney(stats.expense)}
-              icon={<TrendingDown className="h-5 w-5" />}
-              tone="expense"
-              onClick={() =>
-                router.push(
-                  `/dashboard/b/${businessId}/transactions?type=expense`,
-                )
-              }
-            />
-            <ModuleKpiCard
-              module="cashflow"
-              label="Lợi nhuận"
-              value={displayMoney(stats.profit)}
-              icon={<PiggyBank className="h-5 w-5" />}
-              tone="profit"
-            />
-            <ModuleKpiCard
-              module="cashflow"
-              label="Tỷ suất LN"
-              value={`${stats.margin.toFixed(1)}%`}
-              icon={<BarChart3 className="h-5 w-5" />}
-              tone="margin"
-            />
-            <ModuleKpiCard
-              module="cashflow"
-              label="Vốn"
-              value={
-                capitalSnapshot
-                  ? displayMoney(capitalSnapshot.base_capital)
-                  : "—"
-              }
-              hint={
-                capitalSnapshot
-                  ? `Ròng ${displayMoney(capitalSnapshot.available_capital)}`
-                  : undefined
-              }
-              icon={<Landmark className="h-5 w-5" />}
-              tone="capital"
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+            {/* 1. NET PROFIT */}
+            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                  Lợi nhuận ròng
+                </span>
+                <span
+                  className={cn(
+                    "text-[10px] font-bold px-2 py-0.5 rounded-full border",
+                    stats.profit >= 0
+                      ? "bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400"
+                      : "bg-rose-50 text-rose-700 border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-400",
+                  )}
+                >
+                  {stats.profit >= 0 ? "+" : ""}
+                  {stats.margin.toFixed(1)}%
+                </span>
+              </div>
+              <div className="my-2.5">
+                <div
+                  className={cn(
+                    "text-xl sm:text-2xl font-mono font-bold tracking-tight tabular-nums whitespace-nowrap",
+                    stats.profit >= 0
+                      ? "text-emerald-600 dark:text-emerald-400"
+                      : "text-rose-600 dark:text-rose-400",
+                  )}
+                >
+                  {displayMoney(stats.profit)}
+                </div>
+              </div>
+              <p className="text-[11px] text-zinc-400 truncate">
+                {stats.count} giao dịch đã ghi
+              </p>
+            </div>
+
+            {/* 2. INCOME */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=income`)}
+              className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-all text-left"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                  Tổng thu
+                </span>
+                <span className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                  <TrendingUp className="h-3.5 w-3.5" />
+                </span>
+              </div>
+              <div className="my-2.5">
+                <div className="text-xl sm:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums whitespace-nowrap">
+                  {displayMoney(stats.income)}
+                </div>
+              </div>
+              <p className="text-[11px] text-emerald-600 font-medium flex items-center justify-between">
+                <span>Dòng tiền vào</span>
+                <ChevronRight className="h-3 w-3" />
+              </p>
+            </div>
+
+            {/* 3. EXPENSE */}
+            <div
+              role="button"
+              tabIndex={0}
+              onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=expense`)}
+              className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-all text-left"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                  Tổng chi
+                </span>
+                <span className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
+                  <TrendingDown className="h-3.5 w-3.5" />
+                </span>
+              </div>
+              <div className="my-2.5">
+                <div className="text-xl sm:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums whitespace-nowrap">
+                  {displayMoney(stats.expense)}
+                </div>
+              </div>
+              <p className="text-[11px] text-rose-600 font-medium flex items-center justify-between">
+                <span>Dòng tiền ra</span>
+                <ChevronRight className="h-3 w-3" />
+              </p>
+            </div>
+
+            {/* 4. MARGIN */}
+            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                  Tỷ suất sinh lời
+                </span>
+                <span className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+                  <BarChart3 className="h-3.5 w-3.5" />
+                </span>
+              </div>
+              <div className="my-2.5">
+                <div className="text-xl sm:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums whitespace-nowrap">
+                  {stats.margin.toFixed(1)}%
+                </div>
+              </div>
+              <p className="text-[11px] text-zinc-400 truncate">
+                Trên tổng doanh thu
+              </p>
+            </div>
+
+            {/* 5. CAPITAL */}
+            <div
+              role="button"
+              tabIndex={0}
               onClick={() => setCapitalOpen(true)}
-            />
+              className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-all text-left col-span-2 sm:col-span-1"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                  Vốn đầu tư
+                </span>
+                <span className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                  <Landmark className="h-3.5 w-3.5" />
+                </span>
+              </div>
+              <div className="my-2.5">
+                <div className="text-xl sm:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums whitespace-nowrap">
+                  {capitalSnapshot ? displayMoney(capitalSnapshot.base_capital) : "—"}
+                </div>
+              </div>
+              <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium flex items-center justify-between">
+                <span>
+                  {capitalSnapshot ? `Ròng ${displayMoney(capitalSnapshot.available_capital)}` : "Chỉnh vốn"}
+                </span>
+                <ChevronRight className="h-3 w-3" />
+              </p>
+            </div>
           </div>
         )}
 
+        {/* CAPITAL OVERVIEW CARD IF AVAILABLE */}
         {capitalSnapshot && (
           <CapitalOverviewCard snapshot={capitalSnapshot} compact />
         )}
 
+        {/* REMINDERS IF ANY */}
         {reminders.length > 0 && (
-          <section>
-            <h3 className="text-sm font-bold text-foreground/80 mb-2">
-              Nhắc hẹn việc này
+          <div className="space-y-2">
+            <h3 className="text-sm font-bold text-foreground tracking-tight">
+              Nhắc hẹn của mảng này
             </h3>
             <ReminderPanel items={reminders.slice(0, 3)} compact />
-          </section>
+          </div>
         )}
 
-        <ModuleSectionCard
-          title="Giao dịch gần đây"
-          description={`${stats.count} giao dịch`}
-        >
-          <ModuleResponsiveTable
-            headers={["Ngày", "Loại", "Mô tả", "Số tiền"]}
-            rows={recent.map((t) => [
-              formatDisplayDate(t.transaction_date),
-              <TransactionTypeBadge key="t" type={t.type} />,
-              t.description || "—",
-              <span
-                key="a"
-                className={
-                  t.type === "income"
-                    ? "text-income font-mono"
-                    : "text-expense font-mono"
-                }
-              >
-                {t.type === "income" ? "+" : "-"}
-                {displayMoney(t.amount)}
-              </span>,
-            ])}
-          />
-        </ModuleSectionCard>
+        {/* RECENT TRANSACTIONS */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-base font-bold text-foreground tracking-tight">
+                Giao dịch gần đây
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Tổng cộng {stats.count} giao dịch đã ghi nhận
+              </p>
+            </div>
+            <Link
+              href={`/dashboard/b/${businessId}/transactions`}
+              className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 hover:text-foreground flex items-center gap-1"
+            >
+              Xem tất cả <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
 
+          {recent.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center bg-card">
+              <p className="text-xs text-muted-foreground mb-3">
+                Chưa có giao dịch nào được ghi nhận cho mảng này.
+              </p>
+              <Link href={`/dashboard/b/${businessId}/transactions`}>
+                <Button size="sm" className="rounded-full text-xs">
+                  <Plus className="h-3.5 w-3.5 mr-1" /> Ghi giao dịch đầu tiên
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-800/70 shadow-xs">
+              {recent.map((t) => (
+                <div
+                  key={t.id}
+                  className="flex items-center justify-between p-3.5 hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <TransactionTypeBadge type={t.type} />
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground truncate">
+                        {t.description || "Giao dịch không tên"}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        {formatDisplayDate(t.transaction_date)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0 whitespace-nowrap">
+                    <span
+                      className={cn(
+                        "font-mono font-bold text-sm tabular-nums",
+                        t.type === "income"
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-rose-600 dark:text-rose-400",
+                      )}
+                    >
+                      {t.type === "income" ? "+" : "-"}
+                      {displayMoney(t.amount)}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* CASHFLOW REPORTS SECTION */}
         {!loading && transactions.length > 0 && (
-          <section>
-            <h3 className="text-sm font-bold text-foreground/80 mb-1">
-              Báo cáo & phân tích
-            </h3>
-            <p className="text-xs text-muted-foreground mb-4">
-              Thu chi và cơ cấu danh mục của việc này
-            </p>
+          <div className="space-y-3 pt-2">
+            <div>
+              <h2 className="text-base font-bold text-foreground tracking-tight">
+                Báo cáo & Cơ cấu chi phí
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Phân bổ thu chi theo danh mục và hiệu suất dòng tiền
+              </p>
+            </div>
             <CashflowReportsSection
               transactions={transactions}
               showComparison={false}
             />
-          </section>
+          </div>
         )}
 
+        {/* CAPITAL ADJUSTMENT HISTORY */}
         {capitalLedger.length > 0 && (
-          <ModuleSectionCard title="Điều chỉnh vốn gần đây">
-            <div className="divide-y divide-border">
+          <div className="space-y-3">
+            <h2 className="text-base font-bold text-foreground tracking-tight">
+              Lịch sử điều chỉnh vốn
+            </h2>
+            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-800/70 shadow-xs">
               {capitalLedger.map((entry) => (
                 <div
                   key={entry.id}
-                  className="flex items-center justify-between gap-3 px-4 py-3 text-sm"
+                  className="flex items-center justify-between p-3.5 text-sm"
                 >
                   <div className="min-w-0">
                     <p
-                      className={
+                      className={cn(
+                        "font-semibold text-xs",
                         entry.type === "deposit"
-                          ? "text-income font-medium"
-                          : "text-expense font-medium"
-                      }
+                          ? "text-emerald-600 dark:text-emerald-400"
+                          : "text-rose-600 dark:text-rose-400",
+                      )}
                     >
                       {capitalAdjustLabel(entry.type)}
                     </p>
@@ -304,16 +459,17 @@ export default function BusinessDashboardPage() {
                       {entry.note || "—"}
                     </p>
                   </div>
-                  <span className="font-mono font-semibold text-foreground/90 tabular-nums shrink-0">
+                  <span className="font-mono font-bold text-sm tabular-nums whitespace-nowrap">
                     {entry.type === "deposit" ? "+" : "-"}
                     {displayMoney(entry.amount)}
                   </span>
                 </div>
               ))}
             </div>
-          </ModuleSectionCard>
+          </div>
         )}
 
+        {/* DIALOGS */}
         <CapitalAdjustDialog
           open={capitalOpen}
           onOpenChange={setCapitalOpen}
@@ -332,3 +488,4 @@ export default function BusinessDashboardPage() {
     </ModulePageShell>
   );
 }
+

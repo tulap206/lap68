@@ -2,17 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { Plus, Edit2, Trash2 } from "lucide-react";
+import { Plus, Edit2, Trash2, Tag, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import {
   ModulePageShell,
   ModuleSubpageHeader,
-  ModuleSectionCard,
-  ModuleResponsiveTable,
-  AccentButton,
-  moduleBadgeClass,
 } from "@/components/dashboard/module-shell";
+import { BusinessSubNav } from "@/components/dashboard/business-sub-nav";
 import { SkeletonTable } from "@/components/ui/skeleton-loader";
 import {
   fetchCategories,
@@ -40,12 +37,14 @@ import { cn } from "@/lib/utils";
 import type { Category } from "@/lib/types";
 
 const COLORS = [
-  "#059669",
-  "#2563EB",
-  "#DC2626",
-  "#D97706",
-  "#7C6BA8",
-  "#64748B",
+  "#10b981", // Emerald
+  "#3b82f6", // Blue
+  "#f59e0b", // Amber
+  "#ec4899", // Pink
+  "#8b5cf6", // Purple
+  "#14b8a6", // Teal
+  "#f43f5e", // Rose
+  "#64748b", // Slate
 ];
 
 export default function BusinessCategoriesPage() {
@@ -83,7 +82,8 @@ export default function BusinessCategoriesPage() {
     setDialogOpen(true);
   };
 
-  const openEdit = (c: Category) => {
+  const openEdit = (c: Category, e: React.MouseEvent) => {
+    e.stopPropagation();
     setEditing(c);
     setForm({ name: c.name, type: c.type, color: c.color });
     setDialogOpen(true);
@@ -91,7 +91,7 @@ export default function BusinessCategoriesPage() {
 
   const handleSave = async () => {
     if (!user || !form.name.trim()) {
-      toast.error("Nhập tên danh mục");
+      toast.error("Vui lòng nhập tên danh mục");
       return;
     }
     try {
@@ -113,150 +113,210 @@ export default function BusinessCategoriesPage() {
         });
         logAction("Thêm danh mục", form.name);
       }
-      toast.success("Đã lưu");
+      toast.success("Đã lưu danh mục");
       setDialogOpen(false);
       loadData();
     } catch {
-      toast.error("Không thể lưu");
+      toast.error("Không thể lưu danh mục");
     }
   };
 
-  const handleDelete = async (c: Category) => {
-    if (!confirm(`Xóa danh mục "${c.name}"?`)) return;
+  const handleDelete = async (c: Category, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm(`Bạn có chắc muốn xóa danh mục "${c.name}"?`)) return;
     try {
       await deleteCategory(c.id);
       logAction("Xóa danh mục", c.name);
-      toast.success("Đã xóa");
+      toast.success("Đã xóa danh mục");
       loadData();
     } catch {
-      toast.error("Không thể xóa — có thể đang được dùng");
+      toast.error("Không thể xóa — có thể danh mục đang chứa giao dịch");
     }
   };
 
   return (
     <ModulePageShell module="cashflow">
-      <ModuleSubpageHeader
-        module="cashflow"
-        title="Danh mục"
-        subtitle="Phân loại thu chi theo việc kinh doanh"
-        actions={
-          <AccentButton module="cashflow" onClick={openCreate}>
-            <Plus className="h-4 w-4" /> Thêm
-          </AccentButton>
-        }
-      />
-      <ModuleSectionCard title="Danh sách danh mục">
+      <div className="space-y-6">
+        {/* SUB NAVIGATION */}
+        <BusinessSubNav businessId={businessId} />
+
+        {/* HEADER */}
+        <ModuleSubpageHeader
+          module="cashflow"
+          title="Danh mục thu chi"
+          subtitle="Phân loại các khoản tiền thu và chi để phục vụ phân tích báo cáo"
+          actions={
+            <Button
+              onClick={openCreate}
+              className="rounded-full h-9 px-4 font-semibold text-xs gap-1.5 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 shadow-xs"
+            >
+              <Plus className="h-4 w-4" /> Thêm danh mục
+            </Button>
+          }
+        />
+
+        {/* CATEGORIES GRID */}
         {loading ? (
           <div className="p-6">
             <SkeletonTable />
           </div>
+        ) : categories.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 p-12 text-center bg-card">
+            <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-3 text-zinc-500">
+              <Tag className="h-6 w-6" />
+            </div>
+            <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+              Chưa có danh mục nào
+            </h3>
+            <p className="text-xs text-zinc-500 max-w-sm mx-auto mt-1 mb-4">
+              Tạo danh mục để phân loại các nguồn thu nhập và chi phí chi tiết.
+            </p>
+            <Button size="sm" onClick={openCreate} className="rounded-full text-xs">
+              <Plus className="h-3.5 w-3.5 mr-1" /> Thêm danh mục đầu tiên
+            </Button>
+          </div>
         ) : (
-          <ModuleResponsiveTable
-            headers={["Tên", "Loại", "Màu", ""]}
-            rows={categories.map((c) => [
-              c.name,
-              <span
-                key="type"
-                className={cn(
-                  moduleBadgeClass,
-                  c.type === "income" ? "badge-income" : "badge-expense",
-                )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            {categories.map((c) => (
+              <div
+                key={c.id}
+                className="group relative rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-all flex items-center justify-between"
               >
-                {c.type === "income" ? "Thu" : "Chi"}
-              </span>,
-              <span key="color" className="inline-flex items-center gap-2">
-                <span
-                  className="h-4 w-4 rounded-full border"
-                  style={{ backgroundColor: c.color }}
+                <div className="flex items-center gap-3 min-w-0 pr-2">
+                  <span
+                    className="w-3.5 h-3.5 rounded-full shrink-0 shadow-xs ring-2 ring-white dark:ring-zinc-900"
+                    style={{ backgroundColor: c.color }}
+                  />
+                  <div className="min-w-0">
+                    <p className="font-bold text-sm text-foreground truncate">
+                      {c.name}
+                    </p>
+                    <span
+                      className={cn(
+                        "inline-flex items-center text-[10px] font-semibold px-2 py-0.2 rounded-full border mt-0.5",
+                        c.type === "income"
+                          ? "bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400"
+                          : "bg-rose-50 text-rose-700 border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-400",
+                      )}
+                    >
+                      {c.type === "income" ? "Khoản Thu" : "Khoản Chi"}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                  <button
+                    type="button"
+                    onClick={(e) => openEdit(c, e)}
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                    title="Sửa"
+                    aria-label="Sửa"
+                  >
+                    <Edit2 className="h-3.5 w-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={(e) => handleDelete(c, e)}
+                    className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                    title="Xóa"
+                    aria-label="Xóa"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* DIALOG FORM */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="sm:max-w-[400px] rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold">
+                {editing ? "Chỉnh sửa danh mục" : "Tạo danh mục mới"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-2">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                  Tên danh mục <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Ví dụ: Bán lẻ, Nhập hàng, Marketing..."
+                  className="rounded-xl h-10"
                 />
-                {c.color}
-              </span>,
-              <div key="actions" className="flex gap-1">
-                <Button variant="ghost" size="icon" onClick={() => openEdit(c)}>
-                  <Edit2 className="h-4 w-4" />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                  Loại thu chi
+                </Label>
+                <Select
+                  value={form.type}
+                  onValueChange={(v) =>
+                    setForm({ ...form, type: v as "income" | "expense" })
+                  }
+                >
+                  <SelectTrigger className="rounded-xl h-10">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="income">Khoản Thu (Tiền vào)</SelectItem>
+                    <SelectItem value="expense">Khoản Chi (Tiền ra)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                  Màu đại diện
+                </Label>
+                <div className="flex items-center gap-2 pt-1">
+                  {COLORS.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setForm({ ...form, color: c })}
+                      className={cn(
+                        "h-7 w-7 rounded-full transition-transform flex items-center justify-center shadow-xs",
+                        form.color === c
+                          ? "ring-2 ring-offset-2 ring-zinc-900 dark:ring-zinc-100 scale-110"
+                          : "hover:scale-105",
+                      )}
+                      style={{ backgroundColor: c }}
+                      aria-label={`Chọn màu ${c}`}
+                    >
+                      {form.color === c && (
+                        <Check className="h-3.5 w-3.5 text-white drop-shadow-xs" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex gap-2.5 pt-3">
+                <Button
+                  variant="secondary"
+                  className="flex-1 rounded-xl h-10 text-xs font-semibold"
+                  onClick={() => setDialogOpen(false)}
+                >
+                  Hủy
                 </Button>
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDelete(c)}
-                  className="text-expense"
+                  className="flex-1 rounded-xl h-10 text-xs font-semibold bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                  onClick={handleSave}
                 >
-                  <Trash2 className="h-4 w-4" />
+                  {editing ? "Cập nhật" : "Tạo mới"}
                 </Button>
-              </div>,
-            ])}
-          />
-        )}
-      </ModuleSectionCard>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editing ? "Sửa danh mục" : "Thêm danh mục"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Tên</Label>
-              <Input
-                value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Loại</Label>
-              <Select
-                value={form.type}
-                onValueChange={(v) =>
-                  setForm({ ...form, type: v as "income" | "expense" })
-                }
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="income">Thu</SelectItem>
-                  <SelectItem value="expense">Chi</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Màu</Label>
-              <div className="flex gap-2">
-                {COLORS.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    className={cn(
-                      "h-8 w-8 rounded-full border-2",
-                      form.color === c ? "border-white" : "border-transparent",
-                    )}
-                    style={{ backgroundColor: c }}
-                    onClick={() => setForm({ ...form, color: c })}
-                  />
-                ))}
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setDialogOpen(false)}
-              >
-                Hủy
-              </Button>
-              <AccentButton
-                module="cashflow"
-                className="flex-1"
-                onClick={handleSave}
-              >
-                Lưu
-              </AccentButton>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      </div>
     </ModulePageShell>
   );
 }
+

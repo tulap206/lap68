@@ -2,19 +2,15 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
-import { Plus, Edit2, Trash2, Search } from "lucide-react";
+import { Plus, Edit2, Trash2, Search, ArrowDownLeft, ArrowUpRight } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import {
   ModulePageShell,
   ModuleSubpageHeader,
-  ModuleSectionCard,
-  ModuleResponsiveTable,
-  AccentButton,
 } from "@/components/dashboard/module-shell";
-import {
-  TransactionTypeBadge,
-} from "@/components/dashboard/cashflow-ui";
+import { BusinessSubNav } from "@/components/dashboard/business-sub-nav";
+import { TransactionTypeBadge } from "@/components/dashboard/cashflow-ui";
 import { SkeletonTable } from "@/components/ui/skeleton-loader";
 import {
   fetchTransactions,
@@ -51,6 +47,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import type { Transaction, Category } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export default function BusinessTransactionsPage() {
   const { user, logAction } = useAuth();
@@ -108,6 +105,11 @@ export default function BusinessTransactionsPage() {
     [transactions, search, typeFilter],
   );
 
+  const categoryMap = useMemo(
+    () => new Map(categories.map((c) => [c.id, c.name])),
+    [categories],
+  );
+
   const filteredCategories = categories.filter((c) => c.type === form.type);
 
   const openCreate = () => {
@@ -122,7 +124,8 @@ export default function BusinessTransactionsPage() {
     setDialogOpen(true);
   };
 
-  const openEdit = (t: Transaction) => {
+  const openEdit = (t: Transaction, e: React.MouseEvent) => {
+    e.stopPropagation();
     setEditing(t);
     setForm({
       type: t.type,
@@ -162,192 +165,302 @@ export default function BusinessTransactionsPage() {
         await insertTransaction(payload);
         logAction("Thêm giao dịch", displayMoney(amount));
       }
-      toast.success("Đã lưu");
+      toast.success("Đã lưu giao dịch");
       setDialogOpen(false);
       load();
     } catch {
-      toast.error("Không thể lưu");
+      toast.error("Không thể lưu giao dịch");
     }
   };
 
-  const handleDelete = async (t: Transaction) => {
-    if (!confirm("Xóa giao dịch?")) return;
-    await deleteTransaction(t.id);
-    logAction("Xóa giao dịch", displayMoney(t.amount));
-    load();
+  const handleDelete = async (t: Transaction, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm("Bạn có chắc muốn xóa giao dịch này?")) return;
+    try {
+      await deleteTransaction(t.id);
+      logAction("Xóa giao dịch", displayMoney(t.amount));
+      toast.success("Đã xóa giao dịch");
+      load();
+    } catch {
+      toast.error("Không thể xóa giao dịch");
+    }
   };
 
   return (
     <ModulePageShell module="cashflow">
-      <ModuleSubpageHeader
-        module="cashflow"
-        title="Giao dịch"
-        subtitle="Thu chi của việc kinh doanh này"
-        actions={
-          <AccentButton module="cashflow" onClick={openCreate}>
-            <Plus className="h-4 w-4" /> Thêm
-          </AccentButton>
-        }
-      />
-      <ModuleSectionCard
-        title={`${filtered.length} giao dịch`}
-        filters={
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <div className="relative w-full sm:w-auto">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                className="pl-9 w-full sm:w-44 h-9"
-                placeholder="Tìm..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-full sm:w-28 h-9">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Tất cả</SelectItem>
-                <SelectItem value="income">Thu</SelectItem>
-                <SelectItem value="expense">Chi</SelectItem>
-              </SelectContent>
-            </Select>
+      <div className="space-y-6">
+        {/* SUB NAVIGATION */}
+        <BusinessSubNav businessId={businessId} />
+
+        {/* HEADER & ACTIONS */}
+        <ModuleSubpageHeader
+          module="cashflow"
+          title="Sổ giao dịch thu chi"
+          subtitle="Quản lý và ghi nhận chi tiết các dòng tiền thu chi"
+          actions={
+            <Button
+              onClick={openCreate}
+              className="rounded-full h-9 px-4 font-semibold text-xs gap-1.5 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 shadow-xs"
+            >
+              <Plus className="h-4 w-4" /> Ghi giao dịch
+            </Button>
+          }
+        />
+
+        {/* CONTROLS BAR: SEARCH & SEGMENTED TABS */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-card p-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs">
+          <div className="relative w-full sm:w-72">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
+            <Input
+              className="pl-9 h-9 text-xs rounded-xl bg-zinc-100/70 dark:bg-zinc-800/70 border-none focus-visible:ring-1"
+              placeholder="Tìm kiếm theo mô tả, số tiền..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
           </div>
-        }
-      >
+
+          <div className="apple-segmented w-full sm:w-auto">
+            <button
+              type="button"
+              onClick={() => setTypeFilter("all")}
+              className={cn("apple-segmented-item", typeFilter === "all" && "active")}
+            >
+              Tất cả ({transactions.length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setTypeFilter("income")}
+              className={cn("apple-segmented-item", typeFilter === "income" && "active")}
+            >
+              Thu ({transactions.filter((t) => t.type === "income").length})
+            </button>
+            <button
+              type="button"
+              onClick={() => setTypeFilter("expense")}
+              className={cn("apple-segmented-item", typeFilter === "expense" && "active")}
+            >
+              Chi ({transactions.filter((t) => t.type === "expense").length})
+            </button>
+          </div>
+        </div>
+
+        {/* TRANSACTIONS LIST */}
         {loading ? (
           <div className="p-6">
             <SkeletonTable />
           </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 p-12 text-center bg-card">
+            <p className="text-xs text-muted-foreground mb-3">
+              Không tìm thấy giao dịch nào phù hợp với bộ lọc.
+            </p>
+            <Button size="sm" onClick={openCreate} className="rounded-full text-xs">
+              <Plus className="h-3.5 w-3.5 mr-1" /> Ghi giao dịch mới
+            </Button>
+          </div>
         ) : (
-          <ModuleResponsiveTable
-            headers={["Ngày", "Loại", "Mô tả", "Số tiền", ""]}
-            rows={filtered.map((t) => [
-              formatDisplayDate(t.transaction_date),
-              <TransactionTypeBadge key="t" type={t.type} />,
-              t.description || "—",
-              <span
-                key="a"
-                className={`font-mono font-semibold ${t.type === "income" ? "text-income" : "text-expense"}`}
-              >
-                {t.type === "income" ? "+" : "-"}
-                {displayMoney(t.amount)}
-              </span>,
-              <div key="x" className="flex gap-1">
-                <Button variant="ghost" size="icon" onClick={() => openEdit(t)}>
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDelete(t)}
-                  className="text-expense"
+          <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-800/70 shadow-xs">
+            {filtered.map((t) => {
+              const catName = t.category_id ? categoryMap.get(t.category_id) : null;
+              return (
+                <div
+                  key={t.id}
+                  className="flex items-center justify-between p-3.5 sm:px-5 hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 transition-colors group"
                 >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>,
-            ])}
-          />
-        )}
-      </ModuleSectionCard>
+                  {/* LEFT: TYPE ICON, TITLE, CATEGORY & DATE */}
+                  <div className="flex items-center gap-3.5 min-w-0 pr-3">
+                    <span
+                      className={cn(
+                        "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
+                        t.type === "income"
+                          ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400"
+                          : "bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400",
+                      )}
+                    >
+                      {t.type === "income" ? (
+                        <ArrowDownLeft className="h-4 w-4" />
+                      ) : (
+                        <ArrowUpRight className="h-4 w-4" />
+                      )}
+                    </span>
 
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>
-              {editing ? "Sửa giao dịch" : "Thêm giao dịch"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label>Loại</Label>
-                <Select
-                  value={form.type}
-                  onValueChange={(v) =>
-                    setForm({
-                      ...form,
-                      type: v as "income" | "expense",
-                      categoryId: "",
-                    })
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-semibold text-foreground truncate">
+                          {t.description || "Giao dịch không tên"}
+                        </p>
+                        {catName && (
+                          <span className="inline-flex text-[10px] font-medium px-2 py-0.2 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 shrink-0">
+                            {catName}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-0.5">
+                        {formatDisplayDate(t.transaction_date)}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* RIGHT: AMOUNT & ACTIONS */}
+                  <div className="flex items-center gap-3 shrink-0">
+                    <div className="text-right whitespace-nowrap">
+                      <span
+                        className={cn(
+                          "font-mono font-bold text-sm tabular-nums",
+                          t.type === "income"
+                            ? "text-emerald-600 dark:text-emerald-400"
+                            : "text-rose-600 dark:text-rose-400",
+                        )}
+                      >
+                        {t.type === "income" ? "+" : "-"}
+                        {displayMoney(t.amount)}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+                      <button
+                        type="button"
+                        onClick={(e) => openEdit(t, e)}
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                        title="Sửa"
+                        aria-label="Sửa"
+                      >
+                        <Edit2 className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => handleDelete(t, e)}
+                        className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                        title="Xóa"
+                        aria-label="Xóa"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* DIALOG FORM */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="sm:max-w-[420px] rounded-2xl">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold">
+                {editing ? "Chỉnh sửa giao dịch" : "Ghi nhận giao dịch mới"}
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 pt-2">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                    Loại giao dịch
+                  </Label>
+                  <Select
+                    value={form.type}
+                    onValueChange={(v) =>
+                      setForm({
+                        ...form,
+                        type: v as "income" | "expense",
+                        categoryId: "",
+                      })
+                    }
+                  >
+                    <SelectTrigger className="rounded-xl h-10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="income">Thu (Tiền vào)</SelectItem>
+                      <SelectItem value="expense">Chi (Tiền ra)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                    Ngày giao dịch
+                  </Label>
+                  <Input
+                    type="date"
+                    value={toDateInputValue(form.transactionDate)}
+                    onChange={(e) =>
+                      setForm({ ...form, transactionDate: e.target.value })
+                    }
+                    className="rounded-xl h-10"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                  Số tiền (VNĐ) <span className="text-rose-500">*</span>
+                </Label>
+                <Input
+                  className="font-mono text-base font-bold rounded-xl h-10"
+                  value={form.amount}
+                  onChange={(e) =>
+                    setForm({ ...form, amount: formatMoneyInput(e.target.value) })
                   }
+                  placeholder="0"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                  Danh mục
+                </Label>
+                <Select
+                  value={form.categoryId}
+                  onValueChange={(v) => setForm({ ...form, categoryId: v })}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
+                  <SelectTrigger className="rounded-xl h-10">
+                    <SelectValue placeholder="Chọn danh mục (tùy chọn)" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="income">Thu</SelectItem>
-                    <SelectItem value="expense">Chi</SelectItem>
+                    {filteredCategories.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label>Ngày</Label>
+
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
+                  Mô tả / Diễn giải
+                </Label>
                 <Input
-                  type="date"
-                  value={toDateInputValue(form.transactionDate)}
+                  value={form.description}
                   onChange={(e) =>
-                    setForm({ ...form, transactionDate: e.target.value })
+                    setForm({ ...form, description: e.target.value })
                   }
+                  placeholder="Ví dụ: Bán đơn hàng số #102, Tiền điện nước..."
+                  className="rounded-xl h-10"
                 />
               </div>
+
+              <div className="flex gap-2.5 pt-3">
+                <Button
+                  variant="secondary"
+                  className="flex-1 rounded-xl h-10 text-xs font-semibold"
+                  onClick={() => setDialogOpen(false)}
+                >
+                  Hủy
+                </Button>
+                <Button
+                  className="flex-1 rounded-xl h-10 text-xs font-semibold bg-zinc-900 text-zinc-100 dark:bg-zinc-100 dark:text-zinc-900"
+                  onClick={handleSave}
+                >
+                  {editing ? "Cập nhật" : "Ghi nhận"}
+                </Button>
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label>Số tiền</Label>
-              <Input
-                className="font-mono"
-                value={form.amount}
-                onChange={(e) =>
-                  setForm({ ...form, amount: formatMoneyInput(e.target.value) })
-                }
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Danh mục</Label>
-              <Select
-                value={form.categoryId}
-                onValueChange={(v) => setForm({ ...form, categoryId: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn" />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredCategories.map((c) => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Mô tả</Label>
-              <Input
-                value={form.description}
-                onChange={(e) =>
-                  setForm({ ...form, description: e.target.value })
-                }
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                className="flex-1"
-                onClick={() => setDialogOpen(false)}
-              >
-                Hủy
-              </Button>
-              <AccentButton
-                module="cashflow"
-                className="flex-1"
-                onClick={handleSave}
-              >
-                Lưu
-              </AccentButton>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      </div>
     </ModulePageShell>
   );
 }
+
