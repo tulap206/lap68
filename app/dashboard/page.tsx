@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Plus,
   LayoutGrid,
+  LayoutList,
   TrendingUp,
   TrendingDown,
   Wallet,
@@ -23,6 +24,7 @@ import {
   AccentButton,
 } from "@/components/dashboard/module-shell";
 import { BusinessHubCard } from "@/components/dashboard/business-hub-card";
+import { BusinessHubList } from "@/components/dashboard/business-hub-list";
 import { ReminderPanel } from "@/components/dashboard/reminder-panel";
 import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section";
 import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialog";
@@ -71,6 +73,7 @@ export default function DashboardHubPage() {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState<TimeframeOption>("month");
+  const [businessViewMode, setBusinessViewMode] = useState<"list" | "grid">("list");
 
   // Dialog states
   const [capitalOpen, setCapitalOpen] = useState(false);
@@ -478,30 +481,73 @@ export default function DashboardHubPage() {
               <section className="space-y-3.5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
+                    <h2 className="text-base sm:text-lg font-bold text-zinc-900 dark:text-zinc-100 tracking-tight">
                       Mảng kinh doanh
                     </h2>
-                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-black/[0.05] dark:bg-white/[0.08] text-muted-foreground">
+                    <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
                       {summaries.length}
                     </span>
                   </div>
-                  <Link
-                    href="/dashboard/businesses"
-                    className="text-xs font-semibold text-[#007aff] hover:underline flex items-center gap-1"
-                  >
-                    <Plus className="h-3.5 w-3.5" /> Thêm mảng kinh doanh
-                  </Link>
+
+                  <div className="flex items-center gap-2">
+                    {/* View Switcher: List vs Grid */}
+                    {summaries.length > 0 && (
+                      <div className="flex items-center p-0.5 bg-zinc-100 dark:bg-zinc-800 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60">
+                        <button
+                          type="button"
+                          onClick={() => setBusinessViewMode("list")}
+                          className={cn(
+                            "p-1.5 rounded-md transition-all",
+                            businessViewMode === "list"
+                              ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs font-semibold"
+                              : "text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200",
+                          )}
+                          title="Xem dạng danh sách gọn gàng"
+                          aria-label="Xem dạng danh sách gọn gàng"
+                        >
+                          <LayoutList className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setBusinessViewMode("grid")}
+                          className={cn(
+                            "p-1.5 rounded-md transition-all",
+                            businessViewMode === "grid"
+                              ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs font-semibold"
+                              : "text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200",
+                          )}
+                          title="Xem dạng thẻ lưới"
+                          aria-label="Xem dạng thẻ lưới"
+                        >
+                          <LayoutGrid className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    )}
+
+                    <Link
+                      href="/dashboard/businesses"
+                      className="text-xs font-semibold text-zinc-900 dark:text-zinc-100 hover:underline flex items-center gap-1 bg-zinc-100 dark:bg-zinc-800 px-3 py-1.5 rounded-lg border border-zinc-200/60 dark:border-zinc-700/60 transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" /> Thêm mảng
+                    </Link>
+                  </div>
                 </div>
 
                 {summaries.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-black/[0.1] dark:border-white/[0.12] p-8 text-center bg-card/60">
-                    <p className="text-muted-foreground mb-3 text-sm">
+                  <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center bg-card">
+                    <p className="text-zinc-500 mb-3 text-sm">
                       Chưa có việc kinh doanh nào được thiết lập.
                     </p>
                     <Link href="/dashboard/businesses">
                       <Button variant="default">Tạo việc đầu tiên</Button>
                     </Link>
                   </div>
+                ) : businessViewMode === "list" ? (
+                  <BusinessHubList
+                    summaries={summaries}
+                    capitalMap={capitalByBusiness}
+                    overdueMap={overdueByBusiness}
+                  />
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                     {summaries.map((s, i) => (
