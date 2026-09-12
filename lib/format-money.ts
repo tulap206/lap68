@@ -8,5 +8,6 @@ export const parseMoneyInput = (value: string): number => {
 }
 
 export const displayMoney = (value: number): string => {
-  return value.toLocaleString("vi-VN") + " đ"
+  return value.toLocaleString("vi-VN") + "\u00A0đ"
 }
+
