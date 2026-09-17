@@ -208,36 +208,36 @@ export default function BusinessTransactionsPage() {
         />
 
         {/* CONTROLS BAR: SEARCH & SEGMENTED TABS */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-card p-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-card p-3 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 shadow-xs">
           <div className="relative w-full sm:w-72">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-zinc-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400" />
             <Input
-              className="pl-9 h-9 text-xs rounded-xl bg-zinc-100/70 dark:bg-zinc-800/70 border-none focus-visible:ring-1"
-              placeholder="Tìm kiếm theo mô tả, số tiền..."
+              className="pl-9 h-10 text-base sm:text-xs rounded-xl bg-zinc-100/70 dark:bg-zinc-800/70 border-none focus-visible:ring-1"
+              placeholder="Tìm theo mô tả, số tiền..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
-          <div className="apple-segmented w-full sm:w-auto">
+          <div className="apple-segmented w-full sm:w-auto grid grid-cols-3 sm:flex">
             <button
               type="button"
               onClick={() => setTypeFilter("all")}
-              className={cn("apple-segmented-item", typeFilter === "all" && "active")}
+              className={cn("apple-segmented-item text-center justify-center", typeFilter === "all" && "active")}
             >
               Tất cả ({transactions.length})
             </button>
             <button
               type="button"
               onClick={() => setTypeFilter("income")}
-              className={cn("apple-segmented-item", typeFilter === "income" && "active")}
+              className={cn("apple-segmented-item text-center justify-center", typeFilter === "income" && "active")}
             >
               Thu ({transactions.filter((t) => t.type === "income").length})
             </button>
             <button
               type="button"
               onClick={() => setTypeFilter("expense")}
-              className={cn("apple-segmented-item", typeFilter === "expense" && "active")}
+              className={cn("apple-segmented-item text-center justify-center", typeFilter === "expense" && "active")}
             >
               Chi ({transactions.filter((t) => t.type === "expense").length})
             </button>
@@ -268,7 +268,7 @@ export default function BusinessTransactionsPage() {
                   className="flex items-center justify-between p-3.5 sm:px-5 hover:bg-zinc-50/80 dark:hover:bg-zinc-800/40 transition-colors group"
                 >
                   {/* LEFT: TYPE ICON, TITLE, CATEGORY & DATE */}
-                  <div className="flex items-center gap-3.5 min-w-0 pr-3">
+                  <div className="flex items-center gap-3 min-w-0 pr-2">
                     <span
                       className={cn(
                         "w-9 h-9 rounded-xl flex items-center justify-center shrink-0",
@@ -285,7 +285,7 @@ export default function BusinessTransactionsPage() {
                     </span>
 
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                         <p className="text-sm font-semibold text-foreground truncate">
                           {t.description || "Giao dịch không tên"}
                         </p>
@@ -302,11 +302,11 @@ export default function BusinessTransactionsPage() {
                   </div>
 
                   {/* RIGHT: AMOUNT & ACTIONS */}
-                  <div className="flex items-center gap-3 shrink-0">
+                  <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
                     <div className="text-right whitespace-nowrap">
                       <span
                         className={cn(
-                          "font-mono font-bold text-sm tabular-nums",
+                          "font-mono font-bold text-sm sm:text-base tabular-nums",
                           t.type === "income"
                             ? "text-emerald-600 dark:text-emerald-400"
                             : "text-rose-600 dark:text-rose-400",
@@ -317,11 +317,11 @@ export default function BusinessTransactionsPage() {
                       </span>
                     </div>
 
-                    <div className="flex items-center gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 opacity-90 sm:opacity-70 sm:group-hover:opacity-100 transition-opacity">
                       <button
                         type="button"
                         onClick={(e) => openEdit(t, e)}
-                        className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors p-1"
+                        className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors p-1.5 rounded-lg active:bg-zinc-100 dark:active:bg-zinc-800"
                         title="Sửa"
                         aria-label="Sửa"
                       >
@@ -330,7 +330,7 @@ export default function BusinessTransactionsPage() {
                       <button
                         type="button"
                         onClick={(e) => handleDelete(t, e)}
-                        className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors p-1"
+                        className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors p-1.5 rounded-lg active:bg-zinc-100 dark:active:bg-zinc-800"
                         title="Xóa"
                         aria-label="Xóa"
                       >

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Bell,
   Calendar,
   Settings,
   LogOut,
@@ -14,6 +13,7 @@ import {
   ArrowLeftRight,
   Tags,
   CalendarClock,
+  LayoutGrid,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,8 +23,8 @@ import { useEffect, useState } from "react";
 
 const globalItems = [
   { title: "Tổng quan", href: "/dashboard", icon: LayoutDashboard },
-  { title: "Nhắc hẹn", href: "/dashboard/reminders", icon: Bell },
-  { title: "Lịch", href: "/dashboard/calendar", icon: Calendar },
+  { title: "Lịch & Nhắc hẹn", href: "/dashboard/calendar", icon: CalendarClock },
+  { title: "Mảng việc", href: "/dashboard/businesses", icon: LayoutGrid },
   { title: "Cài đặt", href: "/dashboard/settings", icon: Settings },
 ];
 
@@ -49,13 +49,19 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
   const menuItems = businessId ? businessSubItems(businessId) : globalItems;
 
   useEffect(() => {
-    if (!mobileOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = prev;
-    };
+    if (mobileOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = prev;
+      };
+    }
   }, [mobileOpen]);
+
+  // Auto close menu on route changes
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   const handleLogout = () => {
     logout();
@@ -95,7 +101,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
             "mb-3 flex items-center rounded-lg text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium shrink-0 transition-colors",
             labeled ? "h-8.5 w-full gap-2 px-3" : "h-8 w-10.5 justify-center",
           )}
-          title="Về hub"
+          title="Về tổng quan"
         >
           ← {labeled && <span>Về tổng quan</span>}
         </Link>
@@ -127,7 +133,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
               onClick={() => setMobileOpen(false)}
               className={cn(
                 "group relative flex items-center rounded-xl transition-all duration-150 active:scale-[0.97]",
-                labeled ? "h-9.5 w-full gap-3 px-3" : "h-10.5 w-10.5 justify-center",
+                labeled ? "h-10 w-full gap-3 px-3" : "h-10.5 w-10.5 justify-center",
                 isActive
                   ? "bg-zinc-900 text-white font-medium shadow-xs dark:bg-white dark:text-zinc-950"
                   : "text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100",
@@ -159,7 +165,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         className={cn(
           "flex items-center rounded-xl text-zinc-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 transition-all shrink-0 active:scale-[0.96]",
           labeled
-            ? "h-9.5 w-full gap-3 px-3 mt-2"
+            ? "h-10 w-full gap-3 px-3 mt-2"
             : "h-10.5 w-10.5 justify-center lg:mt-3",
         )}
         title="Đăng xuất"
@@ -171,19 +177,19 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-dvh bg-background">
+    <div className="min-h-dvh bg-background flex flex-col">
       {/* MOBILE TOP BAR */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-4 py-3 safe-top bg-card/90 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center justify-between px-4 safe-top bg-card/92 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800">
         <div className="flex items-center gap-2.5 min-w-0">
           <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-xs">
             <Wallet className="h-4 w-4" />
           </div>
           <div className="min-w-0">
-            <span className="text-foreground font-bold tracking-tight block text-sm">
+            <span className="text-foreground font-bold tracking-tight block text-sm leading-tight">
               LAP68
             </span>
             {user && (
-              <span className="text-[10px] text-muted-foreground truncate block max-w-[140px]">
+              <span className="text-[10px] text-muted-foreground truncate block max-w-[150px] leading-tight">
                 {user.displayName}
               </span>
             )}
@@ -193,16 +199,16 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
           variant="ghost"
           size="icon"
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="shrink-0 rounded-full h-8.5 w-8.5"
+          className="shrink-0 rounded-full h-9 w-9 text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
           aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
         >
-          {mobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </Button>
       </header>
 
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-30 bg-black/20 backdrop-blur-[2px] transition-opacity"
+          className="lg:hidden fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px] transition-opacity animate-in fade-in-0 duration-200"
           onClick={() => setMobileOpen(false)}
           aria-hidden
         />
@@ -211,8 +217,8 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       {/* MACOS TRANSLUCENT SIDEBAR */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 h-dvh bg-card/90 backdrop-blur-xl border-r border-zinc-200/80 dark:border-zinc-800 flex flex-col transition-transform duration-200 ease-out",
-          "w-[min(280px,85vw)] px-3.5 py-5 safe-top safe-bottom",
+          "fixed top-0 left-0 z-40 h-dvh bg-card/95 backdrop-blur-xl border-r border-zinc-200/80 dark:border-zinc-800 flex flex-col transition-transform duration-200 ease-out",
+          "w-[min(280px,85vw)] px-3.5 py-5 safe-top safe-bottom shadow-xl lg:shadow-none",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:w-[72px] lg:items-center lg:px-0 lg:pt-6 lg:pb-6",
         )}
@@ -228,7 +234,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       {/* MAIN VIEWPORT */}
       <main
         id="main-content"
-        className="lg:pl-[72px] pt-[calc(3.5rem+env(safe-area-inset-top))] lg:pt-0 min-h-dvh px-3.5 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 pb-[calc(5.5rem+env(safe-area-inset-bottom))] lg:pb-8 safe-bottom relative z-10"
+        className="flex-1 w-full min-h-dvh pt-[calc(4.25rem+env(safe-area-inset-top))] pb-[calc(6.25rem+env(safe-area-inset-bottom))] px-3.5 sm:px-6 lg:pt-6 lg:pb-10 lg:pl-[88px] lg:px-8 relative z-10"
       >
         {user && (
           <div className="mb-4 sm:mb-6 hidden lg:flex justify-end items-center gap-2">
@@ -247,7 +253,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       {/* MOBILE FLOATING TAB BAR (iOS Dock) */}
       <nav
         aria-label="Thanh điều hướng di động"
-        className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 z-40 bg-card/95 backdrop-blur-xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl px-2 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_4px_20px_rgba(0,0,0,0.06)]"
+        className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 z-40 bg-card/95 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl px-1.5 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_4px_24px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
       >
         {menuItems.map((item) => {
           const active =
@@ -268,21 +274,21 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
               key={`mobile-bottom-${item.href}`}
               href={item.href}
               className={cn(
-                "flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-xl transition-all duration-150 min-w-[56px] min-h-[44px] active:scale-95",
+                "flex-1 flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl transition-all duration-150 min-h-[44px] active:scale-95 text-center select-none",
                 isActive
                   ? "text-zinc-900 dark:text-zinc-100 font-bold"
-                  : "text-zinc-500 hover:text-zinc-900",
+                  : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200",
               )}
             >
               <div
                 className={cn(
                   "p-1.5 rounded-xl transition-all duration-150",
-                  isActive && "bg-zinc-100 dark:bg-zinc-800",
+                  isActive && "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100",
                 )}
               >
-                <Icon className="h-4.5 w-4.5" />
+                <Icon className="h-4.5 w-4.5 shrink-0" />
               </div>
-              <span className="text-[10px] leading-none tracking-tight">
+              <span className="text-[10px] leading-tight tracking-tight truncate max-w-full font-medium">
                 {item.title}
               </span>
             </Link>

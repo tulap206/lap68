@@ -31,7 +31,6 @@ import { CapitalAdjustDialog } from "@/components/dashboard/capital-adjust-dialo
 import { ReportDialog } from "@/components/dashboard/report-dialog";
 import { CapitalOverviewCard } from "@/components/dashboard/capital-overview-card";
 import { AccountBalanceDialog } from "@/components/dashboard/account-balance-dialog";
-import { AccountBalanceCard } from "@/components/dashboard/account-balance-card";
 import { TransactionHistoryDialog } from "@/components/dashboard/transaction-history-dialog";
 import { SchedulesSummaryDialog } from "@/components/dashboard/schedules-summary-dialog";
 import { SkeletonMetricCards } from "@/components/ui/skeleton-loader";
@@ -231,14 +230,14 @@ export default function DashboardHubPage() {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
             {/* Apple Segmented Control */}
-            <div className="apple-segmented">
+            <div className="apple-segmented w-full sm:w-auto grid grid-cols-3 sm:flex">
               <button
                 type="button"
                 onClick={() => setTimeframe("month")}
                 className={cn(
-                  "apple-segmented-item",
+                  "apple-segmented-item text-center justify-center",
                   timeframe === "month" && "active",
                 )}
               >
@@ -248,7 +247,7 @@ export default function DashboardHubPage() {
                 type="button"
                 onClick={() => setTimeframe("last_month")}
                 className={cn(
-                  "apple-segmented-item",
+                  "apple-segmented-item text-center justify-center",
                   timeframe === "last_month" && "active",
                 )}
               >
@@ -258,7 +257,7 @@ export default function DashboardHubPage() {
                 type="button"
                 onClick={() => setTimeframe("all")}
                 className={cn(
-                  "apple-segmented-item",
+                  "apple-segmented-item text-center justify-center",
                   timeframe === "all" && "active",
                 )}
               >
@@ -266,12 +265,12 @@ export default function DashboardHubPage() {
               </button>
             </div>
 
-            {/* Apple Pill Quick Actions */}
-            <div className="flex items-center gap-1.5">
+            {/* Apple Pill Quick Actions - Horizontal Scroll on Mobile */}
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide w-full sm:w-auto shrink-0">
               <Button
                 variant="secondary"
                 size="sm"
-                className="rounded-full text-xs gap-1.5 h-8.5 px-3.5"
+                className="rounded-full text-xs gap-1.5 h-8.5 px-3.5 whitespace-nowrap shrink-0"
                 onClick={() => setReportOpen(true)}
               >
                 <FileText className="h-3.5 w-3.5 text-muted-foreground" />
@@ -280,7 +279,7 @@ export default function DashboardHubPage() {
               <Button
                 variant="secondary"
                 size="sm"
-                className="rounded-full text-xs gap-1.5 h-8.5 px-3.5"
+                className="rounded-full text-xs gap-1.5 h-8.5 px-3.5 whitespace-nowrap shrink-0"
                 onClick={() => setHistoryOpen(true)}
               >
                 <History className="h-3.5 w-3.5 text-muted-foreground" />
@@ -289,17 +288,17 @@ export default function DashboardHubPage() {
               <Button
                 variant="secondary"
                 size="sm"
-                className="rounded-full text-xs gap-1.5 h-8.5 px-3.5"
+                className="rounded-full text-xs gap-1.5 h-8.5 px-3.5 whitespace-nowrap shrink-0"
                 onClick={() => setSchedulesOpen(true)}
               >
                 <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                 Lịch thu chi
               </Button>
-              <Link href="/dashboard/businesses">
+              <Link href="/dashboard/businesses" className="shrink-0">
                 <Button
                   variant="default"
                   size="sm"
-                  className="rounded-full text-xs gap-1.5 h-8.5 px-4 font-semibold"
+                  className="rounded-full text-xs gap-1.5 h-8.5 px-4 font-semibold whitespace-nowrap"
                 >
                   <LayoutGrid className="h-3.5 w-3.5" />
                   Quản lý việc
@@ -461,12 +460,14 @@ export default function DashboardHubPage() {
               </div>
 
               <div className="pt-2.5 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-700 dark:text-zinc-300 font-medium">
-                <span>
+                <span className="truncate">
                   {portfolioSettings.liquid_accounts.length > 0
                     ? `${portfolioSettings.liquid_accounts.length} tài khoản thanh toán`
                     : "Cập nhật số dư"}
                 </span>
-                <ArrowUpRight className="h-3.5 w-3.5 text-zinc-400 group-hover:text-zinc-900 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                <span className="inline-flex items-center gap-1 text-[11px] text-[#007aff] font-semibold shrink-0">
+                  Đối soát <ArrowUpRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                </span>
               </div>
             </div>
           </div>
@@ -593,28 +594,8 @@ export default function DashboardHubPage() {
               )}
             </div>
 
-            {/* RIGHT COLUMN: LIQUIDITY, CAPITAL & SCHEDULES (4 Cols) */}
+            {/* RIGHT COLUMN: CAPITAL & SCHEDULES (4 Cols) */}
             <div className="lg:col-span-5 xl:col-span-4 space-y-6">
-              {/* 1. Account Balance Card */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between px-1">
-                  <h3 className="text-sm font-bold text-foreground tracking-tight">
-                    Tài khoản thanh toán
-                  </h3>
-                  <button
-                    type="button"
-                    onClick={() => setAccountOpen(true)}
-                    className="text-xs text-[#007aff] hover:underline font-semibold"
-                  >
-                    Đối soát số dư
-                  </button>
-                </div>
-                <AccountBalanceCard
-                  settings={portfolioSettings}
-                  compact
-                  onClick={() => setAccountOpen(true)}
-                />
-              </div>
 
               {/* 2. Capital Snapshot Card */}
               {summaries.length > 0 && (
@@ -653,7 +634,7 @@ export default function DashboardHubPage() {
                     )}
                   </div>
                   <Link
-                    href="/dashboard/reminders"
+                    href="/dashboard/calendar?view=agenda"
                     className="text-xs text-muted-foreground hover:text-[#007aff] font-medium"
                   >
                     Xem tất cả

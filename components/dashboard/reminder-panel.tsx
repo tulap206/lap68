@@ -156,7 +156,7 @@ export function ReminderPanel({
           return (
             <Link
               key={`${schedule.id}-${dueDate}`}
-              href="/dashboard/reminders"
+              href="/dashboard/calendar?view=agenda"
               className="block decoration-transparent text-inherit"
             >
               {cardContent}

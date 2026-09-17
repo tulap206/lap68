@@ -17,8 +17,8 @@ export function BusinessSubNav({ businessId }: { businessId: string }) {
   const items = tabs(businessId);
 
   return (
-    <div className="mb-5 overflow-x-auto pb-1 scrollbar-hide">
-      <div className="inline-flex p-1 bg-zinc-200/60 dark:bg-zinc-800/70 backdrop-blur-md rounded-2xl border border-black/[0.04] dark:border-white/[0.06] gap-1">
+    <div className="mb-5 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
+      <div className="inline-flex p-1 bg-zinc-200/60 dark:bg-zinc-800/70 backdrop-blur-md rounded-2xl border border-black/[0.04] dark:border-white/[0.06] gap-1 min-w-full sm:min-w-0">
         {items.map((item) => {
           const active = pathname === item.href;
           const Icon = item.icon;
@@ -27,13 +27,13 @@ export function BusinessSubNav({ businessId }: { businessId: string }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap active:scale-[0.98]",
+                "flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap active:scale-[0.98] min-h-[38px] select-none",
                 active
                   ? "bg-white dark:bg-zinc-700 text-zinc-900 dark:text-zinc-100 shadow-xs"
                   : "text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100",
               )}
             >
-              <Icon className="h-3.5 w-3.5" />
+              <Icon className="h-3.5 w-3.5 shrink-0" />
               {item.label}
             </Link>
           );

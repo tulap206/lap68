@@ -158,11 +158,11 @@ export default function BusinessDashboardPage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide w-full sm:w-auto shrink-0">
             <Button
               variant="secondary"
               size="sm"
-              className="rounded-full text-xs gap-1.5 h-8.5 px-3.5"
+              className="rounded-full text-xs gap-1.5 h-8.5 px-3.5 whitespace-nowrap shrink-0"
               onClick={() => setCapitalOpen(true)}
             >
               <SlidersHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
@@ -171,17 +171,17 @@ export default function BusinessDashboardPage() {
             <Button
               variant="secondary"
               size="sm"
-              className="rounded-full text-xs gap-1.5 h-8.5 px-3.5"
+              className="rounded-full text-xs gap-1.5 h-8.5 px-3.5 whitespace-nowrap shrink-0"
               onClick={() => setReportOpen(true)}
             >
               <FileText className="h-3.5 w-3.5 text-muted-foreground" />
               Báo cáo
             </Button>
-            <Link href={`/dashboard/b/${businessId}/transactions`}>
+            <Link href={`/dashboard/b/${businessId}/transactions`} className="shrink-0">
               <Button
                 variant="default"
                 size="sm"
-                className="rounded-full text-xs gap-1.5 h-8.5 px-4 font-semibold"
+                className="rounded-full text-xs gap-1.5 h-8.5 px-4 font-semibold whitespace-nowrap"
               >
                 <Plus className="h-3.5 w-3.5" /> Ghi giao dịch
               </Button>
@@ -193,16 +193,16 @@ export default function BusinessDashboardPage() {
         {loading ? (
           <SkeletonMetricCards />
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-3.5">
             {/* 1. NET PROFIT */}
-            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs flex flex-col justify-between">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-zinc-500 truncate">
                   Lợi nhuận ròng
                 </span>
                 <span
                   className={cn(
-                    "text-[10px] font-bold px-2 py-0.5 rounded-full border",
+                    "text-[10px] font-bold px-1.5 sm:px-2 py-0.2 rounded-full border shrink-0",
                     stats.profit >= 0
                       ? "bg-emerald-50 text-emerald-700 border-emerald-200/60 dark:bg-emerald-950/40 dark:text-emerald-400"
                       : "bg-rose-50 text-rose-700 border-rose-200/60 dark:bg-rose-950/40 dark:text-rose-400",
@@ -212,10 +212,10 @@ export default function BusinessDashboardPage() {
                   {stats.margin.toFixed(1)}%
                 </span>
               </div>
-              <div className="my-2.5">
+              <div className="my-2">
                 <div
                   className={cn(
-                    "text-xl sm:text-2xl font-mono font-bold tracking-tight tabular-nums whitespace-nowrap",
+                    "text-lg sm:text-xl lg:text-2xl font-mono font-bold tracking-tight tabular-nums truncate",
                     stats.profit >= 0
                       ? "text-emerald-600 dark:text-emerald-400"
                       : "text-rose-600 dark:text-rose-400",
@@ -224,7 +224,7 @@ export default function BusinessDashboardPage() {
                   {displayMoney(stats.profit)}
                 </div>
               </div>
-              <p className="text-[11px] text-zinc-400 truncate">
+              <p className="text-[10px] sm:text-[11px] text-zinc-400 truncate">
                 {stats.count} giao dịch đã ghi
               </p>
             </div>
@@ -234,23 +234,23 @@ export default function BusinessDashboardPage() {
               role="button"
               tabIndex={0}
               onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=income`)}
-              className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-all text-left"
+              className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-3.5 sm:p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-all text-left"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
                   Tổng thu
                 </span>
-                <span className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                <span className="p-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
                   <TrendingUp className="h-3.5 w-3.5" />
                 </span>
               </div>
-              <div className="my-2.5">
-                <div className="text-xl sm:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums whitespace-nowrap">
+              <div className="my-2">
+                <div className="text-lg sm:text-xl lg:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums truncate">
                   {displayMoney(stats.income)}
                 </div>
               </div>
-              <p className="text-[11px] text-emerald-600 font-medium flex items-center justify-between">
-                <span>Dòng tiền vào</span>
+              <p className="text-[10px] sm:text-[11px] text-emerald-600 font-medium flex items-center justify-between">
+                <span>Tiền vào</span>
                 <ChevronRight className="h-3 w-3" />
               </p>
             </div>
@@ -260,44 +260,44 @@ export default function BusinessDashboardPage() {
               role="button"
               tabIndex={0}
               onClick={() => router.push(`/dashboard/b/${businessId}/transactions?type=expense`)}
-              className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-all text-left"
+              className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-3.5 sm:p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-all text-left"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
                   Tổng chi
                 </span>
-                <span className="p-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
+                <span className="p-1 rounded-lg bg-rose-50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400">
                   <TrendingDown className="h-3.5 w-3.5" />
                 </span>
               </div>
-              <div className="my-2.5">
-                <div className="text-xl sm:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums whitespace-nowrap">
+              <div className="my-2">
+                <div className="text-lg sm:text-xl lg:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums truncate">
                   {displayMoney(stats.expense)}
                 </div>
               </div>
-              <p className="text-[11px] text-rose-600 font-medium flex items-center justify-between">
-                <span>Dòng tiền ra</span>
+              <p className="text-[10px] sm:text-[11px] text-rose-600 font-medium flex items-center justify-between">
+                <span>Tiền ra</span>
                 <ChevronRight className="h-3 w-3" />
               </p>
             </div>
 
             {/* 4. MARGIN */}
-            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs flex flex-col justify-between">
+            <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-3.5 sm:p-4 shadow-xs flex flex-col justify-between">
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
-                  Tỷ suất sinh lời
+                <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                  Tỷ suất LN
                 </span>
-                <span className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+                <span className="p-1 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
                   <BarChart3 className="h-3.5 w-3.5" />
                 </span>
               </div>
-              <div className="my-2.5">
-                <div className="text-xl sm:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums whitespace-nowrap">
+              <div className="my-2">
+                <div className="text-lg sm:text-xl lg:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums truncate">
                   {stats.margin.toFixed(1)}%
                 </div>
               </div>
-              <p className="text-[11px] text-zinc-400 truncate">
-                Trên tổng doanh thu
+              <p className="text-[10px] sm:text-[11px] text-zinc-400 truncate">
+                Trên tổng thu
               </p>
             </div>
 
@@ -306,22 +306,22 @@ export default function BusinessDashboardPage() {
               role="button"
               tabIndex={0}
               onClick={() => setCapitalOpen(true)}
-              className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-all text-left col-span-2 sm:col-span-1"
+              className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-3.5 sm:p-4 shadow-xs flex flex-col justify-between cursor-pointer hover:border-zinc-300 dark:hover:border-zinc-700 transition-all text-left col-span-2 sm:col-span-1"
             >
               <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+                <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
                   Vốn đầu tư
                 </span>
-                <span className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                <span className="p-1 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
                   <Landmark className="h-3.5 w-3.5" />
                 </span>
               </div>
-              <div className="my-2.5">
-                <div className="text-xl sm:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums whitespace-nowrap">
+              <div className="my-2">
+                <div className="text-lg sm:text-xl lg:text-2xl font-mono font-bold text-zinc-900 dark:text-zinc-100 tracking-tight tabular-nums truncate">
                   {capitalSnapshot ? displayMoney(capitalSnapshot.base_capital) : "—"}
                 </div>
               </div>
-              <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium flex items-center justify-between">
+              <p className="text-[10px] sm:text-[11px] text-amber-600 dark:text-amber-400 font-medium flex items-center justify-between">
                 <span>
                   {capitalSnapshot ? `Ròng ${displayMoney(capitalSnapshot.available_capital)}` : "Chỉnh vốn"}
                 </span>

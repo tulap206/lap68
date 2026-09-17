@@ -83,7 +83,7 @@ export function TransactionHistoryDialog({
         setEndDate("");
       }
     }}>
-      <DialogContent className="max-w-4xl w-[95vw] md:w-full">
+      <DialogContent className="max-w-4xl">
         <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-foreground/60 to-foreground/20 rounded-t-2xl" />
         <DialogHeader>
           <DialogTitle>Lịch sử giao dịch gần đây</DialogTitle>
@@ -93,12 +93,12 @@ export function TransactionHistoryDialog({
         </DialogHeader>
 
         {/* Date Filter Panel */}
-        <div className="flex flex-wrap items-end gap-3 mt-4 mb-2">
+        <div className="flex flex-wrap items-end gap-3 mt-3 mb-2">
           <div className="flex flex-col gap-1 w-full sm:w-auto">
             <span className="text-xs font-semibold text-muted-foreground">Từ ngày</span>
             <Input
               type="date"
-              className="h-9 w-full sm:w-40 font-medium"
+              className="h-10 text-base sm:text-xs w-full sm:w-40 font-medium"
               value={startDate}
               onChange={(e) => {
                 setStartDate(e.target.value);
@@ -110,7 +110,7 @@ export function TransactionHistoryDialog({
             <span className="text-xs font-semibold text-muted-foreground">Đến ngày</span>
             <Input
               type="date"
-              className="h-9 w-full sm:w-40 font-medium"
+              className="h-10 text-base sm:text-xs w-full sm:w-40 font-medium"
               value={endDate}
               onChange={(e) => {
                 setEndDate(e.target.value);

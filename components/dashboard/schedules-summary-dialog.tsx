@@ -74,7 +74,7 @@ export function SchedulesSummaryDialog({
       onOpenChange(v);
       if (v) setPage(1); // Reset page on open
     }}>
-      <DialogContent className="max-w-4xl w-[95vw] md:w-full">
+      <DialogContent className="max-w-4xl">
         <div className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-foreground/60 to-foreground/20 rounded-t-2xl" />
         <DialogHeader>
           <DialogTitle>Tổng hợp lịch thu chi</DialogTitle>

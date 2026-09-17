@@ -291,14 +291,14 @@ export function ReportDialog({
         <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-foreground/80 via-foreground/40 to-foreground/10 z-50" />
 
         {/* Horizontal Header Controls Bar (no-print) */}
-        <div className="p-4 border-b border-border bg-muted/30 flex flex-wrap items-center justify-between gap-3 no-print sticky top-0 z-40 backdrop-blur-md">
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="p-3 sm:p-4 border-b border-border bg-muted/30 flex flex-wrap items-center justify-between gap-2.5 no-print sticky top-0 z-40 backdrop-blur-md">
+          <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
             {/* Business Select */}
             <Select
               value={selectedBusinessId}
               onValueChange={setSelectedBusinessId}
             >
-              <SelectTrigger className="w-40 h-8 bg-muted border-border text-xs">
+              <SelectTrigger className="w-full sm:w-40 h-9 bg-muted border-border text-xs">
                 <SelectValue placeholder="Chọn dự án" />
               </SelectTrigger>
               <SelectContent className="bg-muted border-border text-foreground/90">
@@ -316,7 +316,7 @@ export function ReportDialog({
               value={periodType}
               onValueChange={(val) => setPeriodType(val as PeriodType)}
             >
-              <SelectTrigger className="w-32 h-8 bg-muted border-border text-xs">
+              <SelectTrigger className="flex-1 sm:flex-none sm:w-32 h-9 bg-muted border-border text-xs">
                 <SelectValue placeholder="Kỳ báo cáo" />
               </SelectTrigger>
               <SelectContent className="bg-muted border-border text-foreground/90">
@@ -334,7 +334,7 @@ export function ReportDialog({
                 value={String(year)}
                 onValueChange={(val) => setYear(Number(val))}
               >
-                <SelectTrigger className="w-24 h-8 bg-muted border-border text-xs">
+                <SelectTrigger className="flex-1 sm:flex-none sm:w-24 h-9 bg-muted border-border text-xs">
                   <SelectValue placeholder="Năm" />
                 </SelectTrigger>
                 <SelectContent className="bg-muted border-border text-foreground/90">
@@ -353,7 +353,7 @@ export function ReportDialog({
                 value={String(month)}
                 onValueChange={(val) => setMonth(Number(val))}
               >
-                <SelectTrigger className="w-24 h-8 bg-muted border-border text-xs">
+                <SelectTrigger className="flex-1 sm:flex-none sm:w-26 h-9 bg-muted border-border text-xs">
                   <SelectValue placeholder="Tháng" />
                 </SelectTrigger>
                 <SelectContent className="bg-muted border-border text-foreground/90">
@@ -372,7 +372,7 @@ export function ReportDialog({
                 value={String(quarter)}
                 onValueChange={(val) => setQuarter(Number(val))}
               >
-                <SelectTrigger className="w-24 h-8 bg-muted border-border text-xs">
+                <SelectTrigger className="flex-1 sm:flex-none sm:w-24 h-9 bg-muted border-border text-xs">
                   <SelectValue placeholder="Quý" />
                 </SelectTrigger>
                 <SelectContent className="bg-muted border-border text-foreground/90">
@@ -390,7 +390,7 @@ export function ReportDialog({
                 value={String(half)}
                 onValueChange={(val) => setHalf(Number(val))}
               >
-                <SelectTrigger className="w-32 h-8 bg-muted border-border text-xs">
+                <SelectTrigger className="flex-1 sm:flex-none sm:w-32 h-9 bg-muted border-border text-xs">
                   <SelectValue placeholder="Kỳ" />
                 </SelectTrigger>
                 <SelectContent className="bg-muted border-border text-foreground/90">
@@ -402,19 +402,19 @@ export function ReportDialog({
 
             {/* Custom Dates Select */}
             {periodType === "custom" && (
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1.5 w-full sm:w-auto">
                 <Input
                   type="date"
                   value={customStart}
                   onChange={(e) => setCustomStart(e.target.value)}
-                  className="w-28 h-8 bg-muted border-border text-xs p-1 px-2"
+                  className="flex-1 sm:w-28 h-9 bg-muted border-border text-base sm:text-xs p-1 px-2"
                 />
                 <span className="text-muted-foreground text-xs">-</span>
                 <Input
                   type="date"
                   value={customEnd}
                   onChange={(e) => setCustomEnd(e.target.value)}
-                  className="w-28 h-8 bg-muted border-border text-xs p-1 px-2"
+                  className="flex-1 sm:w-28 h-9 bg-muted border-border text-base sm:text-xs p-1 px-2"
                 />
               </div>
             )}
@@ -424,14 +424,14 @@ export function ReportDialog({
             variant="outline"
             size="sm"
             onClick={handlePrint}
-            className="h-8 bg-muted hover:bg-muted border-border text-foreground/90 gap-1.5 text-xs cursor-pointer px-3"
+            className="h-9 bg-muted hover:bg-muted border-border text-foreground/90 gap-1.5 text-xs cursor-pointer px-3 shrink-0"
           >
             <Printer className="h-3.5 w-3.5" /> In
           </Button>
         </div>
 
         {/* Report Content Panel */}
-        <div id="printable-report-area" className="p-6 space-y-6">
+        <div id="printable-report-area" className="p-4 sm:p-6 space-y-5 sm:space-y-6">
           {/* Header */}
           <div className="border-b border-border pb-4 flex justify-between items-end print-border print-text-dark">
             <div>
