@@ -369,7 +369,7 @@ export default function BusinessTransactionsPage() {
                       })
                     }
                   >
-                    <SelectTrigger className="rounded-xl h-10">
+                    <SelectTrigger className="rounded-xl h-10 text-base sm:text-xs">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -388,7 +388,7 @@ export default function BusinessTransactionsPage() {
                     onChange={(e) =>
                       setForm({ ...form, transactionDate: e.target.value })
                     }
-                    className="rounded-xl h-10"
+                    className="rounded-xl h-10 text-base sm:text-xs"
                   />
                 </div>
               </div>
@@ -415,7 +415,7 @@ export default function BusinessTransactionsPage() {
                   value={form.categoryId}
                   onValueChange={(v) => setForm({ ...form, categoryId: v })}
                 >
-                  <SelectTrigger className="rounded-xl h-10">
+                  <SelectTrigger className="rounded-xl h-10 text-base sm:text-xs">
                     <SelectValue placeholder="Chọn danh mục (tùy chọn)" />
                   </SelectTrigger>
                   <SelectContent>
@@ -438,7 +438,7 @@ export default function BusinessTransactionsPage() {
                     setForm({ ...form, description: e.target.value })
                   }
                   placeholder="Ví dụ: Bán đơn hàng số #102, Tiền điện nước..."
-                  className="rounded-xl h-10"
+                  className="rounded-xl h-10 text-base sm:text-xs"
                 />
               </div>
 

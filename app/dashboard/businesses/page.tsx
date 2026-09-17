@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Plus, Edit2, Archive, Briefcase, ChevronRight, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
@@ -39,6 +40,7 @@ const COLORS = [
 
 export default function BusinessesPage() {
   const { user, logAction } = useAuth();
+  const router = useRouter();
   const [items, setItems] = useState<Business[]>([]);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Business | null>(null);
@@ -165,11 +167,11 @@ export default function BusinessesPage() {
                 role="button"
                 tabIndex={0}
                 onClick={() => {
-                  window.location.href = `/dashboard/b/${b.id}`;
+                  router.push(`/dashboard/b/${b.id}`);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
-                    window.location.href = `/dashboard/b/${b.id}`;
+                    router.push(`/dashboard/b/${b.id}`);
                   }
                 }}
                 className="group relative rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card p-5 shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 hover:shadow-sm transition-all text-left cursor-pointer flex flex-col justify-between active:scale-[0.99]"
@@ -251,7 +253,7 @@ export default function BusinessesPage() {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="Ví dụ: Bán hàng online, Dịch vụ sửa chữa..."
-                  className="rounded-xl h-10"
+                  className="rounded-xl h-10 text-base sm:text-xs"
                 />
               </div>
 
@@ -263,7 +265,7 @@ export default function BusinessesPage() {
                   value={form.code}
                   onChange={(e) => setForm({ ...form, code: e.target.value })}
                   placeholder="Ví dụ: ONL, SVC, LAP68..."
-                  className="rounded-xl h-10 font-mono uppercase"
+                  className="rounded-xl h-10 text-base sm:text-xs font-mono uppercase"
                 />
               </div>
 
@@ -271,7 +273,7 @@ export default function BusinessesPage() {
                 <Label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                   Màu sắc đại diện
                 </Label>
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex flex-wrap items-center gap-2 pt-1">
                   {COLORS.map((c) => (
                     <button
                       key={c}
@@ -304,7 +306,7 @@ export default function BusinessesPage() {
                     setForm({ ...form, description: e.target.value })
                   }
                   placeholder="Ghi chú thêm về mảng này..."
-                  className="rounded-xl h-10"
+                  className="rounded-xl h-10 text-base sm:text-xs"
                 />
               </div>
 

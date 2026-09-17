@@ -186,30 +186,33 @@ export function ScheduleFormDialog({
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Tiêu đề</Label>
+            <Label className="text-xs">Tiêu đề <span className="text-rose-500">*</span></Label>
             <Input
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
               placeholder="VD: Tiền thuê mặt bằng"
+              className="h-10 text-base sm:text-xs rounded-xl"
             />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label>Ngày đến hạn</Label>
+              <Label className="text-xs">Ngày đến hạn</Label>
               <Input
                 type="date"
                 value={form.dueDate}
                 onChange={(e) => setForm({ ...form, dueDate: e.target.value })}
+                className="h-10 text-base sm:text-xs rounded-xl"
               />
             </div>
             <div className="space-y-2">
-              <Label>Số tiền (VND)</Label>
+              <Label className="text-xs">Số tiền (VND)</Label>
               <Input
-                className="font-mono"
+                className="font-mono h-10 text-base sm:text-xs rounded-xl"
                 value={form.amount}
                 onChange={(e) =>
                   setForm({ ...form, amount: formatMoneyInput(e.target.value) })
                 }
+                placeholder="0"
               />
             </div>
           </div>
@@ -255,22 +258,23 @@ export function ScheduleFormDialog({
             </div>
           )}
           <div className="space-y-2">
-            <Label>Nhắc trước (ngày, cách nhau dấu phẩy)</Label>
+            <Label className="text-xs">Nhắc trước (ngày, cách nhau dấu phẩy)</Label>
             <Input
               value={form.reminderDays}
               onChange={(e) =>
                 setForm({ ...form, reminderDays: e.target.value })
               }
               placeholder="7,3,1,0"
+              className="h-10 text-base sm:text-xs rounded-xl"
             />
           </div>
           <div className="space-y-2">
-            <Label>Danh mục</Label>
+            <Label className="text-xs">Danh mục</Label>
             <Select
               value={form.categoryId}
               onValueChange={(v) => setForm({ ...form, categoryId: v })}
             >
-              <SelectTrigger>
+              <SelectTrigger className="h-10 text-base sm:text-xs rounded-xl">
                 <SelectValue placeholder="Chọn danh mục" />
               </SelectTrigger>
               <SelectContent>
@@ -283,29 +287,31 @@ export function ScheduleFormDialog({
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>Mô tả</Label>
+            <Label className="text-xs">Mô tả</Label>
             <Input
               value={form.description}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
               }
+              placeholder="Ghi chú thêm..."
+              className="h-10 text-base sm:text-xs rounded-xl"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2.5 pt-2">
             <Button
               variant="outline"
-              className="flex-1"
+              className="flex-1 h-10 rounded-xl text-xs font-semibold"
               onClick={() => handleOpenChange(false)}
             >
               Hủy
             </Button>
             <AccentButton
               module="cashflow"
-              className="flex-1"
+              className="flex-1 h-10 rounded-xl text-xs font-semibold"
               onClick={submit}
               disabled={saving || !form.title.trim()}
             >
-              {saving ? "Đang lưu..." : "Lưu"}
+              {saving ? "Đang lưu..." : "Lưu lịch"}
             </AccentButton>
           </div>
         </div>

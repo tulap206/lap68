@@ -247,7 +247,7 @@ export default function BusinessCategoriesPage() {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="Ví dụ: Bán lẻ, Nhập hàng, Marketing..."
-                  className="rounded-xl h-10"
+                  className="rounded-xl h-10 text-base sm:text-xs"
                 />
               </div>
 
@@ -261,7 +261,7 @@ export default function BusinessCategoriesPage() {
                     setForm({ ...form, type: v as "income" | "expense" })
                   }
                 >
-                  <SelectTrigger className="rounded-xl h-10">
+                  <SelectTrigger className="rounded-xl h-10 text-base sm:text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -275,7 +275,7 @@ export default function BusinessCategoriesPage() {
                 <Label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                   Màu đại diện
                 </Label>
-                <div className="flex items-center gap-2 pt-1">
+                <div className="flex flex-wrap items-center gap-2 pt-1">
                   {COLORS.map((c) => (
                     <button
                       key={c}
