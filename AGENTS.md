@@ -9,3 +9,4 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **Independent project.** Do not modify `79moto` or `3lmoto` / `3lmotohue` repos or their database tables.
 - **Supabase:** only `lap68_*` tables. See `docs/NGUYEN_TAC_DOC_LAP.md`.
 - **Real data:** persist via existing Supabase flow in `lib/supabase.ts`; no mock business data.
+- **Git workflow:** Tự động commit & push code lên GitHub remote (`main`) ngay khi hoàn tất task.
