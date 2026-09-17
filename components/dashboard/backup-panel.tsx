@@ -8,6 +8,9 @@ import {
   RotateCcw,
   Trash2,
   HardDrive,
+  CheckCircle2,
+  Clock,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { AccentButton } from "@/components/dashboard/module-shell";
@@ -65,7 +68,7 @@ export function BackupPanel({
     try {
       await createCloudBackup(userId);
       onLog("Sao lưu trực tuyến", "Tạo bản snapshot trên cloud");
-      toast.success("Đã lưu lên cloud");
+      toast.success("Đã tạo bản sao lưu trên cloud thành công");
       load();
     } catch {
       toast.error("Không thể tạo sao lưu");
@@ -88,7 +91,7 @@ export function BackupPanel({
       a.click();
       URL.revokeObjectURL(url);
       onLog("Xuất file", "Sao lưu JSON local");
-      toast.success("Đã xuất file");
+      toast.success("Đã xuất tệp sao lưu JSON");
     } catch {
       toast.error("Không thể xuất dữ liệu");
     } finally {
@@ -104,9 +107,10 @@ export function BackupPanel({
       const data = JSON.parse(await file.text());
       const result = await importUserDataFromBackup(userId, data);
       onLog("Nhập file", `${file.name} — ${result.txCount} giao dịch`);
-      toast.success("Đã nhập từ file");
+      toast.success(`Đã khôi phục thành công ${result.txCount} giao dịch`);
+      load();
     } catch {
-      toast.error("File không hợp lệ");
+      toast.error("Tệp JSON không hợp lệ hoặc sai cấu trúc");
     } finally {
       setImporting(false);
       e.target.value = "";
@@ -116,7 +120,7 @@ export function BackupPanel({
   const handleRestore = async (backup: Lap68Backup) => {
     if (
       !confirm(
-        `Khôi phục từ "${backup.label || "bản sao lưu"}"? Dữ liệu sẽ được gộp thêm.`,
+        `Khôi phục dữ liệu từ "${backup.label || "bản sao lưu"}"? Dữ liệu sẽ được đồng bộ và gộp thêm an toàn.`,
       )
     )
       return;
@@ -128,9 +132,10 @@ export function BackupPanel({
         "Khôi phục cloud",
         `${label || backup.id} — ${result.txCount} giao dịch`,
       );
-      toast.success("Đã khôi phục");
+      toast.success("Đã khôi phục dữ liệu từ đám mây thành công");
+      load();
     } catch {
-      toast.error("Không thể khôi phục");
+      toast.error("Không thể khôi phục dữ liệu");
     } finally {
       setRestoringId(null);
     }
@@ -148,47 +153,66 @@ export function BackupPanel({
       a.download = `lap68-${backup.id.slice(0, 8)}.json`;
       a.click();
       URL.revokeObjectURL(url);
+      toast.success("Đã tải tệp JSON về máy");
     } catch {
-      toast.error("Không thể tải file");
+      toast.error("Không thể tải tệp");
     }
   };
 
   const handleDelete = async (backup: Lap68Backup) => {
-    if (!confirm(`Xóa "${backup.label || "bản sao lưu"}"?`)) return;
+    if (!confirm(`Xóa bản sao lưu "${backup.label || "bản sao lưu"}"?`)) return;
     try {
       await deleteCloudBackup(backup.id);
       onLog("Xóa sao lưu", backup.label || backup.id);
-      toast.success("Đã xóa");
+      toast.success("Đã xóa bản sao lưu");
       load();
     } catch {
-      toast.error("Không thể xóa");
+      toast.error("Không thể xóa bản sao lưu");
     }
   };
 
   return (
-    <div className="p-4 sm:p-5 flex flex-col flex-1 min-h-0 h-full gap-4">
-      <div className="space-y-3 shrink-0">
-        <AccentButton
-          module="cashflow"
-          onClick={handleCloudBackup}
-          disabled={creating}
-          className="w-full sm:w-auto"
-        >
-          <Cloud className="h-4 w-4" />
-          {creating ? "Đang lưu..." : "Lưu trực tuyến"}
-        </AccentButton>
-        <div className="grid grid-cols-2 gap-2">
+    <div className="p-4 sm:p-6 space-y-6">
+      {/* ACTION HERO BANNER */}
+      <div className="p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="space-y-1">
+          <div className="flex items-center gap-2">
+            <h3 className="text-sm sm:text-base font-bold text-foreground">
+              Sao lưu & Xuất nhập dữ liệu an toàn
+            </h3>
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200/60">
+              Supabase Cloud
+            </span>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Hệ thống lưu trữ tối đa 15 bản snapshot trên Cloud. Có thể tải tệp JSON về máy để chuyển dữ liệu.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleCloudBackup}
+            disabled={creating}
+            className="rounded-full text-xs gap-1.5 h-9 px-4 font-semibold shadow-xs"
+          >
+            <Cloud className={cn("h-4 w-4", creating && "animate-spin")} />
+            {creating ? "Đang lưu..." : "Sao lưu ngay"}
+          </Button>
+
           <Button
             variant="outline"
             size="sm"
             onClick={handleExport}
             disabled={exporting}
-            className="w-full"
+            className="rounded-full text-xs gap-1.5 h-9 px-3.5"
           >
             <Download className="h-3.5 w-3.5" />
-            {exporting ? "Đang xuất..." : "Xuất file"}
+            {exporting ? "Đang xuất..." : "Xuất JSON"}
           </Button>
-          <label className="min-w-0">
+
+          <label className="inline-flex">
             <input
               type="file"
               accept=".json"
@@ -199,91 +223,106 @@ export function BackupPanel({
             <Button
               variant="outline"
               size="sm"
-              className="w-full cursor-pointer"
+              className="rounded-full text-xs gap-1.5 h-9 px-3.5 cursor-pointer"
               asChild
             >
               <span>
                 <Upload className="h-3.5 w-3.5" />
-                {importing ? "Đang nhập..." : "Nhập file"}
+                {importing ? "Đang nhập..." : "Nhập JSON"}
               </span>
             </Button>
           </label>
         </div>
-        <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
-          Cloud lưu tối đa 15 bản trên Supabase · File JSON dùng khi chuyển máy
-          · Khôi phục/nhập gộp thêm, không xóa dữ liệu hiện có
-        </p>
       </div>
 
-      <div className="border-t border-border pt-3 flex flex-col flex-1 min-h-0">
-        <p className="text-xs font-semibold text-muted-foreground mb-2 shrink-0">
-          Bản sao lưu cloud
-        </p>
+      {/* BACKUPS LIST */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5 text-foreground/70" /> Danh sách bản sao lưu đám mây ({backups.length})
+          </h4>
+          <span className="text-xs text-muted-foreground">
+            Tối đa 15 bản gần nhất
+          </span>
+        </div>
+
         {loading ? (
           <SkeletonTable />
         ) : backups.length === 0 ? (
-          <div className="flex-1 flex items-center justify-center rounded-lg border border-dashed border-border min-h-[200px]">
-            <div className="text-center px-4">
-              <HardDrive className="h-6 w-6 text-muted-foreground/70 mx-auto mb-1.5" />
-              <p className="text-xs text-muted-foreground">
-                Chưa có bản cloud — nhấn &quot;Lưu trực tuyến&quot;
-              </p>
-            </div>
+          <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center bg-card space-y-2">
+            <HardDrive className="h-8 w-8 text-muted-foreground/40 mx-auto" />
+            <p className="text-sm font-semibold text-foreground">
+              Chưa có bản sao lưu nào trên đám mây
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Nhấn nút &quot;Sao lưu ngay&quot; để tạo bản snapshot đầu tiên của bạn.
+            </p>
           </div>
         ) : (
-          <ul className="divide-y divide-border rounded-lg border border-border overflow-hidden overflow-y-auto flex-1 min-h-0 max-h-[340px]">
+          <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-800 shadow-xs">
             {backups.map((b) => (
-              <li
+              <div
                 key={b.id}
-                className="flex items-center gap-3 px-3 py-2.5 hover:bg-muted/40 transition-colors"
+                className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors"
               >
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm text-foreground/90 truncate">
-                    {b.label || "Sao lưu"}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">
-                    {formatDisplayDateTime(b.created_at)} ·{" "}
-                    {formatBytes(b.file_size)}
-                  </p>
+                <div className="flex items-start gap-3 min-w-0">
+                  <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5">
+                    <Cloud className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0 space-y-0.5">
+                    <p className="text-sm font-semibold text-foreground truncate">
+                      {b.label || "Bản sao lưu tự động"}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <span>{formatDisplayDateTime(b.created_at)}</span>
+                      <span>•</span>
+                      <span className="font-mono">{formatBytes(b.file_size)}</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-                  <button
-                    type="button"
-                    className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors p-1"
-                    title="Khôi phục"
-                    aria-label="Khôi phục"
+
+                <div className="flex items-center justify-end gap-1.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-100 dark:border-zinc-800">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-8 text-xs gap-1 rounded-lg px-2.5"
                     onClick={() => handleRestore(b)}
                     disabled={restoringId === b.id}
+                    title="Khôi phục dữ liệu từ bản này"
                   >
                     <RotateCcw
                       className={cn(
-                        "h-4 w-4",
+                        "h-3.5 w-3.5",
                         restoringId === b.id && "animate-spin",
                       )}
                     />
-                  </button>
-                  <button
-                    type="button"
-                    className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors p-1"
-                    title="Tải JSON"
-                    aria-label="Tải JSON"
+                    Khôi phục
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs gap-1 rounded-lg px-2.5 text-zinc-600 dark:text-zinc-400"
                     onClick={() => handleDownloadCloud(b)}
+                    title="Tải tệp JSON về máy"
                   >
-                    <Download className="h-4 w-4" />
-                  </button>
-                  <button
-                    type="button"
-                    className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors p-1"
-                    title="Xóa"
-                    aria-label="Xóa"
+                    <Download className="h-3.5 w-3.5" />
+                    Tải về
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 rounded-lg text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400"
                     onClick={() => handleDelete(b)}
+                    title="Xóa bản sao lưu"
                   >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>
