@@ -15,7 +15,6 @@ import {
   AlertTriangle,
   Search,
   Plus,
-  Sparkles,
   Layers,
 } from "lucide-react";
 import Link from "next/link";
@@ -293,19 +292,9 @@ function CalendarContent() {
       <div className="space-y-6">
         {/* 1. TOP BAR: Title, View Switcher & Actions */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
-                Lịch & Nhắc hẹn thu chi
-              </h1>
-              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold bg-[#007aff]/10 text-[#007aff] px-2.5 py-0.5 rounded-full">
-                <Sparkles className="h-3 w-3" /> Thông minh & Tinh gọn
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Toàn cảnh lịch thu chi định kỳ, nhắc hẹn khẩn cấp và tiến độ dòng tiền
-            </p>
-          </div>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+            Lịch & Nhắc hẹn thu chi
+          </h1>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
             {/* Apple Pro Segmented Switcher */}
