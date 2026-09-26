@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/auth-context";
+import { ViewModeProvider } from "@/contexts/view-mode-context";
+import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,7 +24,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f6f3",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f8f9fa" },
+    { media: "(prefers-color-scheme: dark)", color: "#09090b" },
+  ],
 };
 
 export default function RootLayout({
@@ -31,18 +36,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi">
-      <body className="min-h-dvh font-sans">
+    <html lang="vi" suppressHydrationWarning>
+      <body className="min-h-dvh font-sans bg-background text-foreground">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-primary focus:px-3 focus:py-2 focus:text-primary-foreground"
         >
           Bỏ qua đến nội dung
         </a>
-        <AuthProvider>
-          {children}
-          <Toaster position="top-right" richColors theme="light" />
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <ViewModeProvider>
+            <AuthProvider>
+              {children}
+              <Toaster position="top-right" richColors closeButton />
+            </AuthProvider>
+          </ViewModeProvider>
+        </ThemeProvider>
         <Analytics />
       </body>
     </html>

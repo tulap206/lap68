@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
-  Calendar,
   Settings,
   LogOut,
   Menu,
@@ -14,10 +13,15 @@ import {
   Tags,
   CalendarClock,
   LayoutGrid,
+  Smartphone,
+  Monitor,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/auth-context";
+import { useViewMode } from "@/contexts/view-mode-context";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ViewModeToggle } from "@/components/view-mode-toggle";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -42,6 +46,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { viewMode, setViewMode, isEffectiveMobile, mounted } = useViewMode();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const businessMatch = pathname.match(/^\/dashboard\/b\/([^/]+)/);
@@ -67,6 +72,10 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
     logout();
     router.push("/login");
   };
+
+  const isMobileLayout = mounted ? isEffectiveMobile : false;
+  const isForcedMobile = viewMode === "mobile";
+  const isForcedDesktop = viewMode === "desktop";
 
   const NavContent = ({ labeled }: { labeled: boolean }) => (
     <>
@@ -160,142 +169,243 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         })}
       </nav>
 
-      <button
-        onClick={handleLogout}
-        className={cn(
-          "flex items-center rounded-xl text-zinc-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 transition-all shrink-0 active:scale-[0.96]",
-          labeled
-            ? "h-10 w-full gap-3 px-3 mt-2"
-            : "h-10.5 w-10.5 justify-center lg:mt-3",
+      {/* SIDEBAR BOTTOM CONTROLS */}
+      <div className={cn("flex flex-col gap-2 w-full pt-3 border-t border-zinc-200/60 dark:border-zinc-800/80", !labeled && "items-center")}>
+        {labeled ? (
+          <div className="flex items-center justify-between px-1 py-1">
+            <span className="text-xs text-muted-foreground font-medium">Giao diện</span>
+            <div className="flex items-center gap-1">
+              <ThemeToggle size="icon" />
+              <ViewModeToggle size="icon" />
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <ThemeToggle size="icon" />
+            <ViewModeToggle size="icon" />
+          </div>
         )}
-        title="Đăng xuất"
-      >
-        <LogOut className="h-4.5 w-4.5 shrink-0" />
-        {labeled && <span className="text-sm font-medium">Đăng xuất</span>}
-      </button>
+
+        <button
+          onClick={handleLogout}
+          className={cn(
+            "flex items-center rounded-xl text-zinc-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 hover:text-rose-600 transition-all shrink-0 active:scale-[0.96]",
+            labeled
+              ? "h-10 w-full gap-3 px-3"
+              : "h-10.5 w-10.5 justify-center",
+          )}
+          title="Đăng xuất"
+        >
+          <LogOut className="h-4.5 w-4.5 shrink-0" />
+          {labeled && <span className="text-sm font-medium">Đăng xuất</span>}
+        </button>
+      </div>
     </>
   );
 
   return (
-    <div className="min-h-dvh bg-background flex flex-col">
-      {/* MOBILE TOP BAR */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center justify-between px-4 safe-top bg-card/92 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-xs">
-            <Wallet className="h-4 w-4" />
+    <div
+      className={cn(
+        "min-h-dvh bg-background flex flex-col transition-colors duration-200",
+        isForcedMobile && "bg-zinc-950/5 dark:bg-black/60 min-h-screen py-0 lg:py-6"
+      )}
+    >
+      {/* FORCED MOBILE PREVIEW BANNER (VISIBLE WHEN FORCING MOBILE ON DESKTOP) */}
+      {isForcedMobile && (
+        <div className="hidden lg:flex items-center justify-between max-w-md mx-auto w-full mb-3 px-4 py-2 rounded-2xl bg-card border border-emerald-500/30 shadow-sm text-xs">
+          <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-semibold">
+            <Smartphone className="h-4 w-4" />
+            <span>Chế độ mô phỏng Mobile</span>
           </div>
-          <div className="min-w-0">
-            <span className="text-foreground font-bold tracking-tight block text-sm leading-tight">
-              LAP68
-            </span>
-            {user && (
-              <span className="text-[10px] text-muted-foreground truncate block max-w-[150px] leading-tight">
-                {user.displayName}
-              </span>
-            )}
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setViewMode("desktop")}
+              className="px-2 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-foreground font-medium hover:bg-zinc-200 text-[11px]"
+            >
+              Về Desktop
+            </button>
+            <button
+              onClick={() => setViewMode("auto")}
+              className="px-2 py-1 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-foreground font-medium hover:bg-zinc-200 text-[11px]"
+            >
+              Tự động
+            </button>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="shrink-0 rounded-full h-9 w-9 text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
-          aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
-        >
-          {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-        </Button>
-      </header>
-
-      {mobileOpen && (
-        <div
-          className="lg:hidden fixed inset-0 z-30 bg-black/30 backdrop-blur-[2px] transition-opacity animate-in fade-in-0 duration-200"
-          onClick={() => setMobileOpen(false)}
-          aria-hidden
-        />
       )}
 
-      {/* MACOS TRANSLUCENT SIDEBAR */}
-      <aside
+      {/* WRAPPER FOR SIMULATED MOBILE OR FULL DESKTOP */}
+      <div
         className={cn(
-          "fixed top-0 left-0 z-40 h-dvh bg-card/95 backdrop-blur-xl border-r border-zinc-200/80 dark:border-zinc-800 flex flex-col transition-transform duration-200 ease-out",
-          "w-[min(280px,85vw)] px-3.5 py-5 safe-top safe-bottom shadow-xl lg:shadow-none",
-          mobileOpen ? "translate-x-0" : "-translate-x-full",
-          "lg:translate-x-0 lg:w-[72px] lg:items-center lg:px-0 lg:pt-6 lg:pb-6",
+          "w-full flex-1 flex flex-col relative",
+          isForcedMobile && "lg:max-w-[430px] lg:mx-auto lg:min-h-[850px] lg:h-auto lg:shadow-2xl lg:border lg:border-zinc-200/90 dark:lg:border-zinc-800 lg:rounded-[36px] lg:overflow-hidden bg-background"
         )}
       >
-        <div className="lg:hidden flex flex-col flex-1 min-h-0 w-full">
-          <NavContent labeled />
-        </div>
-        <div className="hidden lg:flex flex-col flex-1 items-center w-full">
-          <NavContent labeled={false} />
-        </div>
-      </aside>
-
-      {/* MAIN VIEWPORT */}
-      <main
-        id="main-content"
-        className="flex-1 w-full min-h-dvh pt-[calc(4.25rem+env(safe-area-inset-top))] pb-[calc(6.25rem+env(safe-area-inset-bottom))] px-3.5 sm:px-6 lg:pt-6 lg:pb-10 lg:pl-[88px] lg:px-8 relative z-10"
-      >
-        {user && (
-          <div className="mb-4 sm:mb-6 hidden lg:flex justify-end items-center gap-2">
-            <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
-            <span className="text-xs text-zinc-500 font-medium">
-              Xin chào,{" "}
-              <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">
-                {user.displayName}
-              </strong>
-            </span>
-          </div>
-        )}
-        {children}
-      </main>
-
-      {/* MOBILE FLOATING TAB BAR (iOS Dock) */}
-      <nav
-        aria-label="Thanh điều hướng di động"
-        className="lg:hidden fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 z-40 bg-card/95 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl px-1.5 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_4px_24px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)]"
-      >
-        {menuItems.map((item) => {
-          const active =
-            pathname === item.href ||
-            (item.href !== `/dashboard/b/${businessId}` &&
-              pathname.startsWith(item.href + "/"));
-          const isExactBusinessHome =
-            item.href === `/dashboard/b/${businessId}` &&
-            pathname === item.href;
-          const isActive =
-            businessId && item.href === `/dashboard/b/${businessId}`
-              ? isExactBusinessHome
-              : active;
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={`mobile-bottom-${item.href}`}
-              href={item.href}
-              className={cn(
-                "flex-1 flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl transition-all duration-150 min-h-[44px] active:scale-95 text-center select-none",
-                isActive
-                  ? "text-zinc-900 dark:text-zinc-100 font-bold"
-                  : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200",
-              )}
-            >
-              <div
-                className={cn(
-                  "p-1.5 rounded-xl transition-all duration-150",
-                  isActive && "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100",
-                )}
-              >
-                <Icon className="h-4.5 w-4.5 shrink-0" />
+        {/* MOBILE TOP BAR (Shown in mobile layout or forced mobile) */}
+        {(isMobileLayout || isForcedMobile) && (
+          <header className={cn(
+            "fixed top-0 left-0 right-0 z-40 h-14 flex items-center justify-between px-4 safe-top bg-card/92 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800",
+            isForcedMobile && "lg:absolute lg:top-0 lg:left-0 lg:right-0"
+          )}>
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-xs">
+                <Wallet className="h-4 w-4" />
               </div>
-              <span className="text-[10px] leading-tight tracking-tight truncate max-w-full font-medium">
-                {item.title}
-              </span>
-            </Link>
-          );
-        })}
-      </nav>
+              <div className="min-w-0">
+                <span className="text-foreground font-bold tracking-tight block text-sm leading-tight">
+                  LAP68
+                </span>
+                {user && (
+                  <span className="text-[10px] text-muted-foreground truncate block max-w-[120px] leading-tight">
+                    {user.displayName}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <ThemeToggle size="icon" />
+              <ViewModeToggle size="icon" />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="shrink-0 rounded-full h-9 w-9 text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
+              >
+                {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              </Button>
+            </div>
+          </header>
+        )}
+
+        {/* MOBILE DRAWER OVERLAY */}
+        {mobileOpen && (
+          <div
+            className={cn(
+              "fixed inset-0 z-50 bg-black/40 backdrop-blur-[2px] transition-opacity animate-in fade-in-0 duration-200",
+              isForcedMobile && "lg:absolute"
+            )}
+            onClick={() => setMobileOpen(false)}
+            aria-hidden
+          />
+        )}
+
+        {/* MOBILE DRAWER & DESKTOP SIDEBAR */}
+        <aside
+          className={cn(
+            "fixed top-0 left-0 z-50 h-dvh bg-card/95 backdrop-blur-xl border-r border-zinc-200/80 dark:border-zinc-800 flex flex-col transition-transform duration-200 ease-out",
+            "w-[min(280px,85vw)] px-3.5 py-5 safe-top safe-bottom shadow-xl",
+            mobileOpen ? "translate-x-0" : "-translate-x-full",
+            // Desktop appearance when in desktop view mode or auto view on large screens:
+            !isForcedMobile && !isMobileLayout && "lg:translate-x-0 lg:w-[72px] lg:items-center lg:px-0 lg:pt-6 lg:pb-6 lg:shadow-none lg:z-40",
+            // If forced desktop on mobile screen:
+            isForcedDesktop && "lg:translate-x-0",
+            // If forced mobile on desktop:
+            isForcedMobile && "lg:hidden"
+          )}
+        >
+          {/* Labeled drawer content for mobile menu */}
+          <div className={cn("flex flex-col flex-1 min-h-0 w-full", !isForcedMobile && !isMobileLayout && "lg:hidden")}>
+            <NavContent labeled />
+          </div>
+
+          {/* Compact icon sidebar for desktop */}
+          {!isForcedMobile && !isMobileLayout && (
+            <div className="hidden lg:flex flex-col flex-1 items-center w-full">
+              <NavContent labeled={false} />
+            </div>
+          )}
+        </aside>
+
+        {/* MAIN VIEWPORT */}
+        <main
+          id="main-content"
+          className={cn(
+            "flex-1 w-full min-h-dvh relative z-10",
+            (isMobileLayout || isForcedMobile)
+              ? "pt-[calc(4.25rem+env(safe-area-inset-top))] pb-[calc(6.25rem+env(safe-area-inset-bottom))] px-3.5 sm:px-6"
+              : "pt-6 pb-10 px-4 sm:px-6 lg:pl-[88px] lg:px-8"
+          )}
+        >
+          {/* TOP RIGHT BAR ON DESKTOP */}
+          {!isMobileLayout && !isForcedMobile && user && (
+            <div className="mb-4 sm:mb-6 hidden lg:flex justify-between items-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground font-medium">Bố cục:</span>
+                <ViewModeToggle variant="compact-pill" />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <ThemeToggle size="icon" />
+                <div className="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800" />
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
+                  <span className="text-xs text-zinc-500 font-medium">
+                    Xin chào,{" "}
+                    <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">
+                      {user.displayName}
+                    </strong>
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {children}
+        </main>
+
+        {/* MOBILE FLOATING TAB BAR (iOS Dock) */}
+        {(isMobileLayout || isForcedMobile) && (
+          <nav
+            aria-label="Thanh điều hướng di động"
+            className={cn(
+              "fixed bottom-3 left-3 right-3 sm:left-6 sm:right-6 z-40 bg-card/95 backdrop-blur-2xl border border-zinc-200/90 dark:border-zinc-800 rounded-2xl px-1.5 py-1.5 pb-[max(0.375rem,env(safe-area-inset-bottom))] flex items-center justify-around shadow-[0_4px_24px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)]",
+              isForcedMobile && "lg:absolute lg:bottom-3 lg:left-3 lg:right-3"
+            )}
+          >
+            {menuItems.map((item) => {
+              const active =
+                pathname === item.href ||
+                (item.href !== `/dashboard/b/${businessId}` &&
+                  pathname.startsWith(item.href + "/"));
+              const isExactBusinessHome =
+                item.href === `/dashboard/b/${businessId}` &&
+                pathname === item.href;
+              const isActive =
+                businessId && item.href === `/dashboard/b/${businessId}`
+                  ? isExactBusinessHome
+                  : active;
+              const Icon = item.icon;
+
+              return (
+                <Link
+                  key={`mobile-bottom-${item.href}`}
+                  href={item.href}
+                  className={cn(
+                    "flex-1 flex flex-col items-center justify-center gap-0.5 py-1 px-1 rounded-xl transition-all duration-150 min-h-[44px] active:scale-95 text-center select-none",
+                    isActive
+                      ? "text-zinc-900 dark:text-zinc-100 font-bold"
+                      : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "p-1.5 rounded-xl transition-all duration-150",
+                      isActive && "bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100",
+                    )}
+                  >
+                    <Icon className="h-4.5 w-4.5 shrink-0" />
+                  </div>
+                  <span className="text-[10px] leading-tight tracking-tight truncate max-w-full font-medium">
+                    {item.title}
+                  </span>
+                </Link>
+              );
+            })}
+          </nav>
+        )}
+      </div>
     </div>
   );
 }
-

@@ -2,25 +2,27 @@
 
 import { useState } from "react";
 import {
-  User,
   ShieldCheck,
-  Database,
   Cloud,
   History,
   HardDrive,
-  Info,
   CheckCircle2,
   LogOut,
   Bell,
   Send,
   Sparkles,
-  Lock,
-  Server,
   Zap,
+  Palette,
+  Monitor,
+  Smartphone,
+  Sun,
+  Moon,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
+import { useViewMode } from "@/contexts/view-mode-context";
+import { useTheme } from "next-themes";
 import {
   ModulePageShell,
   ModuleSectionCard,
@@ -28,14 +30,18 @@ import {
 import { BackupPanel } from "@/components/dashboard/backup-panel";
 import { ActivityLogPanel } from "@/components/dashboard/activity-log-panel";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ViewModeToggle } from "@/components/view-mode-toggle";
 import { cn } from "@/lib/utils";
 
-type SettingsTab = "backup" | "telegram" | "logs" | "about";
+type SettingsTab = "appearance" | "backup" | "telegram" | "logs" | "about";
 
 export default function SettingsPage() {
   const { user, logout, logAction } = useAuth();
+  const { viewMode, setViewMode } = useViewMode();
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<SettingsTab>("backup");
+  const [activeTab, setActiveTab] = useState<SettingsTab>("appearance");
   const [testingTelegram, setTestingTelegram] = useState(false);
 
   if (!user) return null;
@@ -49,7 +55,7 @@ export default function SettingsPage() {
     setTestingTelegram(true);
     try {
       const res = await fetch("/api/cron/reminders");
-      const data = await res.json();
+      await res.json();
       if (res.ok) {
         toast.success("Đã kiểm tra hệ thống thông báo Telegram");
       } else {
@@ -121,6 +127,16 @@ export default function SettingsPage() {
           <div className="apple-segmented w-full sm:w-auto grid grid-cols-2 sm:flex">
             <button
               type="button"
+              onClick={() => setActiveTab("appearance")}
+              className={cn(
+                "apple-segmented-item text-center justify-center flex items-center gap-1.5 whitespace-nowrap",
+                activeTab === "appearance" && "active",
+              )}
+            >
+              <Palette className="h-3.5 w-3.5" /> Giao diện & Hiển thị
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveTab("backup")}
               className={cn(
                 "apple-segmented-item text-center justify-center flex items-center gap-1.5 whitespace-nowrap",
@@ -163,6 +179,193 @@ export default function SettingsPage() {
         </div>
 
         {/* 3. TAB CONTENT PANELS */}
+        {/* TAB 0: APPEARANCE & DISPLAY (NEW) */}
+        {activeTab === "appearance" && (
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* THEME SETTINGS CARD */}
+              <div className="p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-5 shadow-xs">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 shrink-0">
+                      <Sun className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-foreground">
+                        Chủ đề màu sắc (Theme)
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        Chuyển đổi giữa chế độ Sáng, Tối và Hệ thống
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                  <div className="mb-4">
+                    <span className="text-xs font-semibold text-muted-foreground block mb-2">
+                      Chọn chủ đề hiển thị:
+                    </span>
+                    <ThemeToggle variant="segmented" className="w-full justify-between" />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2.5 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setTheme("light")}
+                      className={cn(
+                        "p-3 rounded-2xl border text-left transition-all relative overflow-hidden",
+                        theme === "light"
+                          ? "border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-zinc-50 dark:bg-zinc-900"
+                          : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300"
+                      )}
+                    >
+                      <div className="w-full h-10 rounded-lg bg-white border border-zinc-200 flex items-center justify-center mb-2 shadow-xs">
+                        <Sun className="h-4 w-4 text-amber-500" />
+                      </div>
+                      <span className="text-xs font-bold block text-foreground">Sáng</span>
+                      <span className="text-[10px] text-muted-foreground">Apple Clean Light</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setTheme("dark")}
+                      className={cn(
+                        "p-3 rounded-2xl border text-left transition-all relative overflow-hidden",
+                        theme === "dark"
+                          ? "border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-zinc-50 dark:bg-zinc-900"
+                          : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300"
+                      )}
+                    >
+                      <div className="w-full h-10 rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center mb-2 shadow-xs">
+                        <Moon className="h-4 w-4 text-blue-400" />
+                      </div>
+                      <span className="text-xs font-bold block text-foreground">Tối</span>
+                      <span className="text-[10px] text-muted-foreground">Apple Pro Dark</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setTheme("system")}
+                      className={cn(
+                        "p-3 rounded-2xl border text-left transition-all relative overflow-hidden",
+                        theme === "system"
+                          ? "border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-zinc-50 dark:bg-zinc-900"
+                          : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300"
+                      )}
+                    >
+                      <div className="w-full h-10 rounded-lg bg-gradient-to-r from-white to-zinc-950 border border-zinc-300 flex items-center justify-center mb-2 shadow-xs">
+                        <Monitor className="h-4 w-4 text-zinc-500" />
+                      </div>
+                      <span className="text-xs font-bold block text-foreground">Hệ thống</span>
+                      <span className="text-[10px] text-muted-foreground">Tự động đồng bộ</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* VIEW MODE SETTINGS CARD */}
+              <div className="p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-5 shadow-xs">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 shrink-0">
+                      <Monitor className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-bold text-foreground">
+                        Bố cục Desktop & Mobile
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        Chuyển đổi giao diện máy tính và ứng dụng di động
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                  <div className="mb-4">
+                    <span className="text-xs font-semibold text-muted-foreground block mb-2">
+                      Chọn chế độ bố cục:
+                    </span>
+                    <ViewModeToggle variant="segmented" className="w-full justify-between" />
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-2.5 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("auto")}
+                      className={cn(
+                        "p-3 rounded-2xl border text-left transition-all relative overflow-hidden",
+                        viewMode === "auto"
+                          ? "border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-zinc-50 dark:bg-zinc-900"
+                          : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300"
+                      )}
+                    >
+                      <div className="w-full h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-2 shadow-xs">
+                        <Sparkles className="h-4 w-4 text-zinc-500" />
+                      </div>
+                      <span className="text-xs font-bold block text-foreground">Tự động</span>
+                      <span className="text-[10px] text-muted-foreground">Theo kích thước màn</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("desktop")}
+                      className={cn(
+                        "p-3 rounded-2xl border text-left transition-all relative overflow-hidden",
+                        viewMode === "desktop"
+                          ? "border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-zinc-50 dark:bg-zinc-900"
+                          : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300"
+                      )}
+                    >
+                      <div className="w-full h-10 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200/40 flex items-center justify-center mb-2 shadow-xs">
+                        <Monitor className="h-4 w-4 text-blue-500" />
+                      </div>
+                      <span className="text-xs font-bold block text-foreground">Máy tính</span>
+                      <span className="text-[10px] text-muted-foreground">Sidebar & Bảng rộng</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setViewMode("mobile")}
+                      className={cn(
+                        "p-3 rounded-2xl border text-left transition-all relative overflow-hidden",
+                        viewMode === "mobile"
+                          ? "border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-zinc-50 dark:bg-zinc-900"
+                          : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300"
+                      )}
+                    >
+                      <div className="w-full h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/40 flex items-center justify-center mb-2 shadow-xs">
+                        <Smartphone className="h-4 w-4 text-emerald-500" />
+                      </div>
+                      <span className="text-xs font-bold block text-foreground">Di động</span>
+                      <span className="text-[10px] text-muted-foreground">iOS Dock & Thẻ gọn</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* QUICK FEATURE SUMMARY */}
+            <div className="p-5 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-3 shadow-xs">
+              <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-amber-500" />
+                Mẹo sử dụng nhanh
+              </h4>
+              <ul className="text-xs text-muted-foreground space-y-2 leading-relaxed">
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-500 font-bold">•</span>
+                  <span>Bạn có thể chuyển đổi nhanh chế độ <strong>Sáng / Tối</strong> và <strong>Desktop / Mobile</strong> bất kỳ lúc nào bằng các nút trên thanh Header trên cùng hoặc thanh Sidebar.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-500 font-bold">•</span>
+                  <span>Lựa chọn của bạn sẽ được lưu tự động trên trình duyệt và áp dụng cho toàn bộ các trang của hệ thống LAP68.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
+
         {/* TAB 1: BACKUP & DATA */}
         {activeTab === "backup" && (
           <div className="space-y-4">

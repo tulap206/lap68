@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Eye, EyeOff, Loader2, Wallet, ShieldCheck, Sparkles } from "lucide-react";
 
 export default function LoginPage() {
@@ -53,6 +54,11 @@ export default function LoginPage() {
             "radial-gradient(ellipse 60% 50% at 50% 10%, rgba(16,185,129,0.06), transparent), radial-gradient(ellipse 50% 40% at 80% 90%, rgba(59,130,246,0.04), transparent)",
         }}
       />
+
+      {/* TOP RIGHT THEME TOGGLE */}
+      <div className="absolute top-4 right-4 z-20">
+        <ThemeToggle size="icon" className="bg-card/80 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800 shadow-xs" />
+      </div>
 
       <div className="relative w-full max-w-[400px] z-10 flex flex-col items-center gap-6">
         {/* LOGO & TITLE */}
