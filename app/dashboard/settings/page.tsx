@@ -2,10 +2,8 @@
 
 import { useState } from "react";
 import {
-  ShieldCheck,
   Cloud,
   History,
-  HardDrive,
   CheckCircle2,
   LogOut,
   Bell,
@@ -31,7 +29,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
 
-type SettingsTab = "appearance" | "backup" | "telegram" | "logs" | "about";
+type SettingsTab = "appearance" | "backup" | "telegram" | "logs";
 
 export default function SettingsPage() {
   const { user, logout, logAction } = useAuth();
@@ -96,16 +94,8 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          {/* Database & Logout Actions */}
+          {/* Logout Action */}
           <div className="flex items-center gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-zinc-100 dark:border-zinc-800 shrink-0">
-            <div className="hidden sm:flex flex-col text-right text-xs">
-              <span className="font-semibold text-foreground flex items-center justify-end gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                Supabase Online
-              </span>
-              <span className="text-[11px] text-muted-foreground">Bảng `lap68_*` độc lập</span>
-            </div>
-
             <Button
               variant="outline"
               size="sm"
@@ -160,16 +150,6 @@ export default function SettingsPage() {
               )}
             >
               <History className="h-3.5 w-3.5" /> Nhật ký thao tác
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("about")}
-              className={cn(
-                "apple-segmented-item text-center justify-center flex items-center gap-1.5 whitespace-nowrap",
-                activeTab === "about" && "active",
-              )}
-            >
-              <ShieldCheck className="h-3.5 w-3.5" /> Nguyên tắc & Bảo mật
             </button>
           </div>
         </div>
@@ -402,73 +382,6 @@ export default function SettingsPage() {
                 <ActivityLogPanel userId={user.id} />
               </div>
             </ModuleSectionCard>
-          </div>
-        )}
-
-        {/* TAB 4: ABOUT & SYSTEM PRINCIPLES */}
-        {activeTab === "about" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-3.5 shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 shrink-0">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-foreground">
-                    Nguyên tắc độc lập dữ liệu
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Đảm bảo an toàn tuyệt đối cho hệ thống
-                  </p>
-                </div>
-              </div>
-
-              <ul className="text-xs sm:text-sm text-muted-foreground space-y-2.5 leading-relaxed pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 font-bold">•</span>
-                  <span>Dự án <strong>LAP68</strong> hoạt động hoàn toàn độc lập, tách biệt với các dự án khác.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 font-bold">•</span>
-                  <span>Mọi dữ liệu chỉ được lưu trữ và truy vấn trên các bảng có tiền tố <code className="text-foreground font-mono font-semibold bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">lap68_*</code>.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 font-bold">•</span>
-                  <span>Không bao giờ can thiệp hoặc tác động đến bất kỳ bảng nào thuộc hệ thống khác.</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-3.5 shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 shrink-0">
-                  <HardDrive className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-foreground">
-                    Dòng tiền & Đối soát thực tế
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Quản trị thanh khoản và nguồn vốn kinh doanh
-                  </p>
-                </div>
-              </div>
-
-              <ul className="text-xs sm:text-sm text-muted-foreground space-y-2.5 leading-relaxed pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-500 font-bold">•</span>
-                  <span>Mọi giao dịch thu/chi được ghi nhận trực tiếp vào số dư tài khoản ngân hàng thực tế.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-500 font-bold">•</span>
-                  <span>Vốn đầu tư ban đầu được bảo toàn và phân tách rõ ràng với lợi nhuận kinh doanh ròng.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-500 font-bold">•</span>
-                  <span>Hỗ trợ sao lưu đám mây liên tục và khôi phục chỉ với 1 thao tác bấm.</span>
-                </li>
-              </ul>
-            </div>
           </div>
         )}
       </div>
