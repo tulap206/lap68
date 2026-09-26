@@ -19,17 +19,25 @@ import {
 import { Button } from "@/components/ui/button";
 import { parseDisplayDate } from "@/lib/format-date";
 import { displayMoney } from "@/lib/format-money";
+import { BusinessIcon } from "@/components/dashboard/business-icon";
 import type { Business, Transaction } from "@/lib/types";
 import {
   TrendingUp,
   TrendingDown,
-  PiggyBank,
+  Wallet,
   BarChart3,
   Layers,
   Users,
   Printer,
   Calendar,
+  Sparkles,
+  PieChart,
+  ArrowUpRight,
+  ArrowDownLeft,
+  ChevronRight,
+  Filter,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type PeriodType = "month" | "quarter" | "six_months" | "year" | "custom";
 
@@ -49,18 +57,16 @@ export function ReportDialog({
   defaultBusinessId = "all",
 }: ReportDialogProps) {
   const [periodType, setPeriodType] = useState<PeriodType>("month");
-  const [selectedBusinessId, setSelectedBusinessId] =
-    useState<string>(defaultBusinessId);
+  const [selectedBusinessId, setSelectedBusinessId] = useState<string>(defaultBusinessId);
+  const [activeTab, setActiveTab] = useState<"businesses" | "categories" | "counterparties">("businesses");
 
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth(); // 0-11
 
   const [year, setYear] = useState<number>(currentYear);
   const [month, setMonth] = useState<number>(currentMonth);
-  const [quarter, setQuarter] = useState<number>(
-    Math.floor(currentMonth / 3) + 1,
-  ); // 1-4
-  const [half, setHalf] = useState<number>(currentMonth < 6 ? 1 : 2); // 1-2
+  const [quarter, setQuarter] = useState<number>(Math.floor(currentMonth / 3) + 1);
+  const [half, setHalf] = useState<number>(currentMonth < 6 ? 1 : 2);
 
   const todayStr = new Date().toISOString().split("T")[0];
   const firstDayOfMonthStr = new Date(currentYear, currentMonth, 1)
@@ -143,6 +149,8 @@ export function ReportDialog({
   const stats = useMemo(() => {
     let income = 0;
     let expense = 0;
+    let incomeCount = 0;
+    let expenseCount = 0;
 
     const categoriesMap: Record<
       string,
@@ -150,7 +158,7 @@ export function ReportDialog({
     > = {};
     const businessesMap: Record<
       string,
-      { name: string; income: number; expense: number }
+      { id: string; name: string; color?: string; income: number; expense: number }
     > = {};
     const counterpartiesMap: Record<
       string,
@@ -158,7 +166,7 @@ export function ReportDialog({
     > = {};
 
     businesses.forEach((b) => {
-      businessesMap[b.id] = { name: b.name, income: 0, expense: 0 };
+      businessesMap[b.id] = { id: b.id, name: b.name, color: b.color, income: 0, expense: 0 };
     });
 
     filteredTransactions.forEach((t) => {
@@ -166,8 +174,10 @@ export function ReportDialog({
 
       if (t.type === "income") {
         income += amount;
+        incomeCount++;
       } else {
         expense += amount;
+        expenseCount++;
       }
 
       if (t.category_id) {
@@ -191,7 +201,7 @@ export function ReportDialog({
       }
 
       if (t.counterparty_id) {
-        const cpName = t.counterparty?.name || "Khách lẻ";
+        const cpName = t.counterparty?.name || "Khách lẻ / Đối tác";
         if (!counterpartiesMap[t.counterparty_id]) {
           counterpartiesMap[t.counterparty_id] = {
             name: cpName,
@@ -205,6 +215,7 @@ export function ReportDialog({
 
     const profit = income - expense;
     const margin = income > 0 ? (profit / income) * 100 : 0;
+    const expenseRatio = income > 0 ? (expense / income) * 100 : expense > 0 ? 100 : 0;
 
     const sortedCategories = Object.values(categoriesMap).sort(
       (a, b) => b.amount - a.amount,
@@ -223,16 +234,19 @@ export function ReportDialog({
     );
     const topCustomers = sortedCounterparties
       .filter((c) => c.type === "income")
-      .slice(0, 3);
+      .slice(0, 5);
     const topSuppliers = sortedCounterparties
       .filter((c) => c.type === "expense")
-      .slice(0, 3);
+      .slice(0, 5);
 
     return {
       income,
       expense,
       profit,
       margin,
+      expenseRatio,
+      incomeCount,
+      expenseCount,
       categories: sortedCategories,
       businesses: sortedBusinesses,
       topCustomers,
@@ -245,64 +259,44 @@ export function ReportDialog({
     window.print();
   };
 
+  const selectedBizObj = businesses.find((b) => b.id === selectedBusinessId);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto p-0 border border-border bg-card text-foreground font-sans ">
+      <DialogContent className="max-w-4xl max-h-[88vh] overflow-y-auto p-0 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl bg-card shadow-2xl text-foreground font-sans">
         <style
           dangerouslySetInnerHTML={{
             __html: `
- @media print {
- body {
- background: white !important;
- color: black !important;
- }
- body * {
- visibility: hidden;
- }
- #printable-report-area, #printable-report-area * {
- visibility: visible;
- }
- #printable-report-area {
- position: absolute;
- left: 0;
- top: 0;
- width: 100%;
- background: white !important;
- color: black !important;
- padding: 10px !important;
- }
- .no-print {
- display: none !important;
- }
- .print-border {
- border: 1px solid #ddd !important;
- }
- .print-text-dark {
- color: #000 !important;
- }
- .print-bg-light {
- background-color: #f9f9f9 !important;
- }
- }
- `,
+              @media print {
+                body * { visibility: hidden !important; }
+                #printable-report-area, #printable-report-area * { visibility: visible !important; }
+                #printable-report-area {
+                  position: absolute !important;
+                  left: 0 !important;
+                  top: 0 !important;
+                  width: 100% !important;
+                  background: white !important;
+                  color: black !important;
+                  padding: 20px !important;
+                }
+                .no-print { display: none !important; }
+              }
+            `,
           }}
         />
 
-        <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-foreground/80 via-foreground/40 to-foreground/10 z-50" />
-
-        {/* Horizontal Header Controls Bar (no-print) */}
-        <div className="p-3 sm:p-4 border-b border-border bg-muted/30 flex flex-wrap items-center justify-between gap-2.5 no-print sticky top-0 z-40 backdrop-blur-md">
+        {/* 1. TOP TOOLBAR & CONTROLS (Sticky) */}
+        <div className="p-4 sm:p-5 border-b border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 no-print sticky top-0 z-40">
           <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
-            {/* Business Select */}
-            <Select
-              value={selectedBusinessId}
-              onValueChange={setSelectedBusinessId}
-            >
-              <SelectTrigger className="w-full sm:w-40 h-9 bg-muted border-border text-xs">
-                <SelectValue placeholder="Chọn dự án" />
+            {/* Business Selector */}
+            <Select value={selectedBusinessId} onValueChange={setSelectedBusinessId}>
+              <SelectTrigger className="w-full sm:w-44 h-9 rounded-xl bg-card border-zinc-200 dark:border-zinc-800 text-xs font-medium">
+                <SelectValue placeholder="Tất cả mảng việc" />
               </SelectTrigger>
-              <SelectContent className="bg-muted border-border text-foreground/90">
-                <SelectItem value="all">Tất cả dự án</SelectItem>
+              <SelectContent className="rounded-2xl border-zinc-200 dark:border-zinc-800">
+                <SelectItem value="all">
+                  <span className="font-semibold">Tất cả mảng việc</span>
+                </SelectItem>
                 {businesses.map((b) => (
                   <SelectItem key={b.id} value={b.id}>
                     {b.name}
@@ -312,32 +306,26 @@ export function ReportDialog({
             </Select>
 
             {/* Period Type */}
-            <Select
-              value={periodType}
-              onValueChange={(val) => setPeriodType(val as PeriodType)}
-            >
-              <SelectTrigger className="flex-1 sm:flex-none sm:w-32 h-9 bg-muted border-border text-xs">
+            <Select value={periodType} onValueChange={(val) => setPeriodType(val as PeriodType)}>
+              <SelectTrigger className="flex-1 sm:flex-none sm:w-32 h-9 rounded-xl bg-card border-zinc-200 dark:border-zinc-800 text-xs font-medium">
                 <SelectValue placeholder="Kỳ báo cáo" />
               </SelectTrigger>
-              <SelectContent className="bg-muted border-border text-foreground/90">
-                <SelectItem value="month">Từng Tháng</SelectItem>
-                <SelectItem value="quarter">Từng Quý</SelectItem>
+              <SelectContent className="rounded-2xl border-zinc-200 dark:border-zinc-800">
+                <SelectItem value="month">Theo Tháng</SelectItem>
+                <SelectItem value="quarter">Theo Quý</SelectItem>
                 <SelectItem value="six_months">6 Tháng</SelectItem>
                 <SelectItem value="year">Theo Năm</SelectItem>
-                <SelectItem value="custom">Tuỳ chọn</SelectItem>
+                <SelectItem value="custom">Tùy chọn</SelectItem>
               </SelectContent>
             </Select>
 
-            {/* Year Select (If not custom) */}
+            {/* Year Select */}
             {periodType !== "custom" && (
-              <Select
-                value={String(year)}
-                onValueChange={(val) => setYear(Number(val))}
-              >
-                <SelectTrigger className="flex-1 sm:flex-none sm:w-24 h-9 bg-muted border-border text-xs">
+              <Select value={String(year)} onValueChange={(val) => setYear(Number(val))}>
+                <SelectTrigger className="w-24 h-9 rounded-xl bg-card border-zinc-200 dark:border-zinc-800 text-xs font-medium">
                   <SelectValue placeholder="Năm" />
                 </SelectTrigger>
-                <SelectContent className="bg-muted border-border text-foreground/90">
+                <SelectContent className="rounded-2xl border-zinc-200 dark:border-zinc-800">
                   {years.map((y) => (
                     <SelectItem key={y} value={String(y)}>
                       Năm {y}
@@ -349,14 +337,11 @@ export function ReportDialog({
 
             {/* Month Select */}
             {periodType === "month" && (
-              <Select
-                value={String(month)}
-                onValueChange={(val) => setMonth(Number(val))}
-              >
-                <SelectTrigger className="flex-1 sm:flex-none sm:w-26 h-9 bg-muted border-border text-xs">
+              <Select value={String(month)} onValueChange={(val) => setMonth(Number(val))}>
+                <SelectTrigger className="w-28 h-9 rounded-xl bg-card border-zinc-200 dark:border-zinc-800 text-xs font-medium">
                   <SelectValue placeholder="Tháng" />
                 </SelectTrigger>
-                <SelectContent className="bg-muted border-border text-foreground/90">
+                <SelectContent className="rounded-2xl border-zinc-200 dark:border-zinc-800">
                   {Array.from({ length: 12 }, (_, i) => (
                     <SelectItem key={i} value={String(i)}>
                       Tháng {i + 1}
@@ -368,14 +353,11 @@ export function ReportDialog({
 
             {/* Quarter Select */}
             {periodType === "quarter" && (
-              <Select
-                value={String(quarter)}
-                onValueChange={(val) => setQuarter(Number(val))}
-              >
-                <SelectTrigger className="flex-1 sm:flex-none sm:w-24 h-9 bg-muted border-border text-xs">
+              <Select value={String(quarter)} onValueChange={(val) => setQuarter(Number(val))}>
+                <SelectTrigger className="w-24 h-9 rounded-xl bg-card border-zinc-200 dark:border-zinc-800 text-xs font-medium">
                   <SelectValue placeholder="Quý" />
                 </SelectTrigger>
-                <SelectContent className="bg-muted border-border text-foreground/90">
+                <SelectContent className="rounded-2xl border-zinc-200 dark:border-zinc-800">
                   <SelectItem value="1">Quý I</SelectItem>
                   <SelectItem value="2">Quý II</SelectItem>
                   <SelectItem value="3">Quý III</SelectItem>
@@ -384,16 +366,13 @@ export function ReportDialog({
               </Select>
             )}
 
-            {/* 6 Months Select */}
+            {/* 6-Months Select */}
             {periodType === "six_months" && (
-              <Select
-                value={String(half)}
-                onValueChange={(val) => setHalf(Number(val))}
-              >
-                <SelectTrigger className="flex-1 sm:flex-none sm:w-32 h-9 bg-muted border-border text-xs">
+              <Select value={String(half)} onValueChange={(val) => setHalf(Number(val))}>
+                <SelectTrigger className="w-32 h-9 rounded-xl bg-card border-zinc-200 dark:border-zinc-800 text-xs font-medium">
                   <SelectValue placeholder="Kỳ" />
                 </SelectTrigger>
-                <SelectContent className="bg-muted border-border text-foreground/90">
+                <SelectContent className="rounded-2xl border-zinc-200 dark:border-zinc-800">
                   <SelectItem value="1">6 tháng đầu</SelectItem>
                   <SelectItem value="2">6 tháng cuối</SelectItem>
                 </SelectContent>
@@ -407,14 +386,14 @@ export function ReportDialog({
                   type="date"
                   value={customStart}
                   onChange={(e) => setCustomStart(e.target.value)}
-                  className="flex-1 sm:w-28 h-9 bg-muted border-border text-base sm:text-xs p-1 px-2"
+                  className="w-32 h-9 rounded-xl bg-card border-zinc-200 dark:border-zinc-800 text-xs"
                 />
-                <span className="text-muted-foreground text-xs">-</span>
+                <span className="text-muted-foreground text-xs">→</span>
                 <Input
                   type="date"
                   value={customEnd}
                   onChange={(e) => setCustomEnd(e.target.value)}
-                  className="flex-1 sm:w-28 h-9 bg-muted border-border text-base sm:text-xs p-1 px-2"
+                  className="w-32 h-9 rounded-xl bg-card border-zinc-200 dark:border-zinc-800 text-xs"
                 />
               </div>
             )}
@@ -424,315 +403,270 @@ export function ReportDialog({
             variant="outline"
             size="sm"
             onClick={handlePrint}
-            className="h-9 bg-muted hover:bg-muted border-border text-foreground/90 gap-1.5 text-xs cursor-pointer px-3 shrink-0"
+            className="rounded-xl h-9 px-3.5 gap-1.5 text-xs font-semibold shrink-0 border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800"
           >
-            <Printer className="h-3.5 w-3.5" /> In
+            <Printer className="h-3.5 w-3.5" /> In báo cáo
           </Button>
         </div>
 
-        {/* Report Content Panel */}
-        <div id="printable-report-area" className="p-4 sm:p-6 space-y-5 sm:space-y-6">
-          {/* Header */}
-          <div className="border-b border-border pb-4 flex justify-between items-end print-border print-text-dark">
+        {/* 2. REPORT MAIN CONTENT AREA */}
+        <div id="printable-report-area" className="p-5 sm:p-7 space-y-6">
+          {/* Document Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-zinc-200/80 dark:border-zinc-800">
             <div>
-              <span className="text-[10px] font-bold text-income uppercase tracking-widest no-print">
-                LAP68 FINANCIAL SYSTEM
+              <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest block">
+                BÁO CÁO TỔNG HỢP TÀI CHÍNH
               </span>
-              <h2 className="text-lg font-black text-foreground tracking-tight mt-0.5 print-text-dark uppercase">
-                Báo cáo tổng kết tài chính
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground mt-0.5">
+                {selectedBizObj ? selectedBizObj.name : "Toàn bộ mảng việc"}
               </h2>
-              <p className="text-xs text-muted-foreground mt-0.5 print-text-dark">
-                Dự án:{" "}
-                <span className="font-semibold text-foreground/90 print-text-dark">
-                  {selectedBusinessId === "all"
-                    ? "Tất cả các dự án"
-                    : businesses.find((b) => b.id === selectedBusinessId)
-                        ?.name || "Chưa xác định"}
-                </span>
-                <span className="mx-2 text-muted-foreground/70">•</span>
-                Kỳ báo cáo:{" "}
-                <span className="font-semibold text-income print-text-dark">
-                  {label}
-                </span>
+              <p className="text-xs text-muted-foreground mt-1 flex items-center gap-2">
+                <Calendar className="h-3.5 w-3.5" />
+                <span>Kỳ báo cáo: <strong className="text-foreground">{label}</strong></span>
+                <span>•</span>
+                <span>Ghi nhận: <strong className="text-foreground">{stats.txCount} giao dịch</strong></span>
               </p>
             </div>
-            <div className="text-right text-[11px] text-muted-foreground print-text-dark font-mono">
-              <p>Giao dịch: {stats.txCount}</p>
-              <p>Lập ngày: {new Date().toLocaleDateString("vi-VN")}</p>
+
+            <div className="flex items-center gap-2 self-start sm:self-auto">
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300">
+                LAP68 Analytics
+              </span>
             </div>
           </div>
 
-          {/* Core Metrics Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {/* Total Income */}
-            <div className="bg-muted/30 border border-border rounded-xl p-3 print-border print-text-dark print-bg-light">
-              <div className="flex justify-between items-center text-muted-foreground">
-                <span className="text-xs">Tổng Thu</span>
-                <TrendingUp className="h-3.5 w-3.5 text-income" />
+          {/* 4 BENTO SUMMARY CARDS */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+            {/* 1. TỔNG THU */}
+            <div className="p-4 sm:p-5 rounded-2xl border border-emerald-200/70 dark:border-emerald-900/40 bg-emerald-50/50 dark:bg-emerald-950/20 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-emerald-800 dark:text-emerald-300">Tổng thực thu</span>
+                <span className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                  <TrendingUp className="h-4 w-4" />
+                </span>
               </div>
-              <p className="text-base font-bold mt-1 text-income print-text-dark font-mono">
+              <p className="text-lg sm:text-2xl font-bold text-emerald-700 dark:text-emerald-400 tracking-tight">
                 {displayMoney(stats.income)}
               </p>
+              <p className="text-[11px] text-emerald-800/70 dark:text-emerald-400/70">
+                {stats.incomeCount} lượt thu tiền
+              </p>
             </div>
 
-            {/* Total Expense */}
-            <div className="bg-muted/30 border border-border rounded-xl p-3 print-border print-text-dark print-bg-light">
-              <div className="flex justify-between items-center text-muted-foreground">
-                <span className="text-xs">Tổng Chi</span>
-                <TrendingDown className="h-3.5 w-3.5 text-rose-500" />
+            {/* 2. TỔNG CHI */}
+            <div className="p-4 sm:p-5 rounded-2xl border border-rose-200/70 dark:border-rose-900/40 bg-rose-50/50 dark:bg-rose-950/20 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-rose-800 dark:text-rose-300">Tổng thực chi</span>
+                <span className="p-1.5 rounded-lg bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                  <TrendingDown className="h-4 w-4" />
+                </span>
               </div>
-              <p className="text-base font-bold mt-1 text-rose-400 print-text-dark font-mono">
+              <p className="text-lg sm:text-2xl font-bold text-rose-700 dark:text-rose-400 tracking-tight">
                 {displayMoney(stats.expense)}
               </p>
+              <p className="text-[11px] text-rose-800/70 dark:text-rose-400/70">
+                {stats.expenseCount} lượt chi tiền
+              </p>
             </div>
 
-            {/* Net Profit */}
-            <div className="bg-muted/30 border border-border rounded-xl p-3 print-border print-text-dark print-bg-light">
-              <div className="flex justify-between items-center text-muted-foreground">
-                <span className="text-xs">Lợi Nhuận</span>
-                <PiggyBank className="h-3.5 w-3.5 text-[#1f6c9f]" />
+            {/* 3. LỢI NHUẬN RÒNG */}
+            <div className="p-4 sm:p-5 rounded-2xl border border-blue-200/70 dark:border-blue-900/40 bg-blue-50/50 dark:bg-blue-950/20 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-blue-800 dark:text-blue-300">Lợi nhuận ròng</span>
+                <span className="p-1.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                  <Wallet className="h-4 w-4" />
+                </span>
               </div>
-              <p
-                className={`text-base font-bold mt-1 print-text-dark font-mono ${stats.profit >= 0 ? "text-[#1f6c9f]" : "text-rose-400"}`}
-              >
+              <p className={cn(
+                "text-lg sm:text-2xl font-bold tracking-tight",
+                stats.profit >= 0 ? "text-blue-700 dark:text-blue-400" : "text-rose-600 dark:text-rose-400"
+              )}>
                 {displayMoney(stats.profit)}
               </p>
+              <p className="text-[11px] text-blue-800/70 dark:text-blue-400/70">
+                Biên LN: <strong className="font-semibold">{stats.margin.toFixed(1)}%</strong>
+              </p>
             </div>
 
-            {/* Margin */}
-            <div className="bg-muted/30 border border-border rounded-xl p-3 print-border print-text-dark print-bg-light">
-              <div className="flex justify-between items-center text-muted-foreground">
-                <span className="text-xs">Tỷ Suất LN</span>
-                <BarChart3 className="h-3.5 w-3.5 text-amber-500" />
+            {/* 4. TỶ LỆ CHI / THU */}
+            <div className="p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/40 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-muted-foreground">Tỷ lệ Chi phí</span>
+                <span className="p-1.5 rounded-lg bg-zinc-200 dark:bg-zinc-800 text-muted-foreground">
+                  <BarChart3 className="h-4 w-4" />
+                </span>
               </div>
-              <p className="text-base font-bold mt-1 text-amber-400 print-text-dark font-mono">
-                {stats.margin.toFixed(1)}%
+              <p className="text-lg sm:text-2xl font-bold text-foreground tracking-tight">
+                {stats.expenseRatio.toFixed(1)}%
+              </p>
+              <p className="text-[11px] text-muted-foreground">
+                trên tổng doanh thu
               </p>
             </div>
           </div>
 
-          {/* Business Comparison (Only when "all" selected) */}
-          {selectedBusinessId === "all" && stats.businesses.length > 0 && (
-            <div className="space-y-2.5">
-              <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 print-text-dark">
-                <Layers className="h-3.5 w-3.5 text-teal-400" /> Doanh thu & Lợi
-                nhuận theo dự án
-              </h3>
-              <div className="rounded-xl border border-border overflow-hidden print-border bg-muted/10">
-                <table className="min-w-full divide-y divide-border text-xs">
-                  <thead className="bg-muted/40 print-bg-light">
-                    <tr>
-                      <th className="px-4 py-2 text-left font-semibold text-muted-foreground print-text-dark">
-                        Dự án
-                      </th>
-                      <th className="px-4 py-2 text-right font-semibold text-muted-foreground print-text-dark">
-                        Doanh thu
-                      </th>
-                      <th className="px-4 py-2 text-right font-semibold text-muted-foreground print-text-dark">
-                        Chi phí
-                      </th>
-                      <th className="px-4 py-2 text-right font-semibold text-muted-foreground print-text-dark">
-                        Lợi nhuận
-                      </th>
-                      <th className="px-4 py-2 text-right font-semibold text-muted-foreground print-text-dark">
-                        Tỷ suất
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border font-mono">
-                    {stats.businesses.map((b) => (
-                      <tr key={b.name} className="hover:bg-muted/10">
-                        <td className="px-4 py-2 font-sans font-medium text-foreground/90 print-text-dark">
-                          {b.name}
-                        </td>
-                        <td className="px-4 py-2 text-right text-income print-text-dark">
-                          {displayMoney(b.income)}
-                        </td>
-                        <td className="px-4 py-2 text-right text-muted-foreground print-text-dark">
-                          {displayMoney(b.expense)}
-                        </td>
-                        <td
-                          className={`px-4 py-2 text-right font-bold print-text-dark ${b.profit >= 0 ? "text-[#1f6c9f]" : "text-rose-400"}`}
-                        >
-                          {displayMoney(b.profit)}
-                        </td>
-                        <td className="px-4 py-2 text-right text-amber-400 print-text-dark">
-                          {b.margin.toFixed(1)}%
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+          {/* 3. SECTION TABS: MẢNG VIỆC / DANH MỤC / ĐỐI TÁC */}
+          <div className="space-y-4 pt-2">
+            <div className="apple-segmented grid grid-cols-3 max-w-md">
+              <button
+                type="button"
+                onClick={() => setActiveTab("businesses")}
+                className={cn("apple-segmented-item justify-center flex items-center gap-1.5", activeTab === "businesses" && "active")}
+              >
+                <Layers className="h-3.5 w-3.5" /> Mảng việc
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("categories")}
+                className={cn("apple-segmented-item justify-center flex items-center gap-1.5", activeTab === "categories" && "active")}
+              >
+                <PieChart className="h-3.5 w-3.5" /> Danh mục
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab("counterparties")}
+                className={cn("apple-segmented-item justify-center flex items-center gap-1.5", activeTab === "counterparties" && "active")}
+              >
+                <Users className="h-3.5 w-3.5" /> Đối tác
+              </button>
             </div>
-          )}
 
-          {/* Income & Expense Categories (Side-by-side) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Income breakdown */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold text-income uppercase tracking-wider flex items-center gap-1.5 print-text-dark">
-                <TrendingUp className="h-3.5 w-3.5" /> Cơ cấu khoản thu
-              </h4>
-              <div className="bg-muted/10 rounded-xl border border-border p-3 space-y-2.5 print-border">
-                {stats.categories
-                  .filter((c) => c.type === "income")
-                  .map((c) => {
-                    const pct =
-                      stats.income > 0 ? (c.amount / stats.income) * 100 : 0;
-                    return (
-                      <div key={c.name} className="space-y-1">
-                        <div className="flex justify-between text-xs font-sans">
-                          <span className="text-foreground/80 print-text-dark font-medium">
-                            {c.name}
-                          </span>
-                          <span className="text-income print-text-dark font-semibold font-mono">
-                            {displayMoney(c.amount)}{" "}
-                            <span className="text-[10px] text-muted-foreground font-normal">
-                              ({pct.toFixed(0)}%)
+            {/* TAB: MẢNG VIỆC */}
+            {activeTab === "businesses" && (
+              <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-card">
+                <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Cơ cấu theo từng mảng việc</h4>
+                  <span className="text-[11px] text-muted-foreground">{stats.businesses.length} mảng có phát sinh</span>
+                </div>
+                {stats.businesses.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-muted-foreground">Không có dữ liệu giao dịch trong kỳ này</div>
+                ) : (
+                  <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                    {stats.businesses.map((b) => {
+                      const bizIncomePct = stats.income > 0 ? (b.income / stats.income) * 100 : 0;
+                      return (
+                        <div key={b.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20 transition-colors">
+                          <div className="flex items-center gap-3 min-w-0">
+                            <BusinessIcon name={b.name} color={b.color} size="md" />
+                            <div className="min-w-0">
+                              <p className="text-xs sm:text-sm font-bold text-foreground truncate">{b.name}</p>
+                              <div className="flex items-center gap-2 mt-0.5 text-[11px] text-muted-foreground">
+                                <span className="text-emerald-600 dark:text-emerald-400 font-medium">Thu: {displayMoney(b.income)}</span>
+                                <span>•</span>
+                                <span className="text-rose-600 dark:text-rose-400 font-medium">Chi: {displayMoney(b.expense)}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex sm:flex-col items-center sm:items-end justify-between gap-1 sm:gap-0.5 shrink-0 pl-11 sm:pl-0">
+                            <span className={cn(
+                              "text-xs sm:text-sm font-bold",
+                              b.profit >= 0 ? "text-blue-600 dark:text-blue-400" : "text-rose-600 dark:text-rose-400"
+                            )}>
+                              {b.profit >= 0 ? "+" : ""}{displayMoney(b.profit)}
                             </span>
-                          </span>
+                            <div className="w-24 sm:w-32 bg-zinc-100 dark:bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+                              <div className="bg-emerald-500 h-full rounded-full" style={{ width: `${Math.min(bizIncomePct, 100)}%` }} />
+                            </div>
+                          </div>
                         </div>
-                        <div className="w-full bg-muted rounded-full h-1 no-print">
-                          <div
-                            className="bg-income h-1 rounded-full"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                {stats.categories.filter((c) => c.type === "income").length ===
-                  0 && (
-                  <p className="text-muted-foreground text-xs text-center py-4">
-                    Chưa phát sinh khoản thu
-                  </p>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
-            </div>
+            )}
 
-            {/* Expense breakdown */}
-            <div className="space-y-2">
-              <h4 className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5 print-text-dark">
-                <TrendingDown className="h-3.5 w-3.5" /> Cơ cấu khoản chi
-              </h4>
-              <div className="bg-muted/10 rounded-xl border border-border p-3 space-y-2.5 print-border">
-                {stats.categories
-                  .filter((c) => c.type === "expense")
-                  .map((c) => {
-                    const pct =
-                      stats.expense > 0 ? (c.amount / stats.expense) * 100 : 0;
-                    return (
-                      <div key={c.name} className="space-y-1">
-                        <div className="flex justify-between text-xs font-sans">
-                          <span className="text-foreground/80 print-text-dark font-medium">
-                            {c.name}
-                          </span>
-                          <span className="text-rose-400 print-text-dark font-semibold font-mono">
-                            {displayMoney(c.amount)}{" "}
-                            <span className="text-[10px] text-muted-foreground font-normal">
-                              ({pct.toFixed(0)}%)
+            {/* TAB: DANH MỤC */}
+            {activeTab === "categories" && (
+              <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-card">
+                <div className="p-4 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 flex items-center justify-between">
+                  <h4 className="text-xs font-bold text-foreground uppercase tracking-wider">Phân bổ theo hạng mục</h4>
+                  <span className="text-[11px] text-muted-foreground">{stats.categories.length} hạng mục</span>
+                </div>
+                {stats.categories.length === 0 ? (
+                  <div className="p-8 text-center text-xs text-muted-foreground">Không có danh mục nào trong kỳ này</div>
+                ) : (
+                  <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                    {stats.categories.map((c, i) => {
+                      const totalBase = c.type === "income" ? stats.income : stats.expense;
+                      const pct = totalBase > 0 ? (c.amount / totalBase) * 100 : 0;
+                      return (
+                        <div key={i} className="p-3.5 sm:p-4 flex items-center justify-between gap-3 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/20 transition-colors">
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span className={cn(
+                              "w-2 h-2 rounded-full shrink-0",
+                              c.type === "income" ? "bg-emerald-500" : "bg-rose-500"
+                            )} />
+                            <div className="min-w-0">
+                              <p className="text-xs sm:text-sm font-semibold text-foreground truncate">{c.name}</p>
+                              <span className="text-[10px] text-muted-foreground uppercase">{c.type === "income" ? "Thu nhập" : "Chi phí"}</span>
+                            </div>
+                          </div>
+
+                          <div className="text-right shrink-0 space-y-1">
+                            <span className={cn(
+                              "text-xs sm:text-sm font-bold block",
+                              c.type === "income" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                            )}>
+                              {displayMoney(c.amount)}
                             </span>
-                          </span>
+                            <span className="text-[11px] text-muted-foreground block">{pct.toFixed(1)}%</span>
+                          </div>
                         </div>
-                        <div className="w-full bg-muted rounded-full h-1 no-print">
-                          <div
-                            className="bg-rose-500 h-1 rounded-full"
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                {stats.categories.filter((c) => c.type === "expense").length ===
-                  0 && (
-                  <p className="text-muted-foreground text-xs text-center py-4">
-                    Chưa phát sinh khoản chi
-                  </p>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
-            </div>
-          </div>
+            )}
 
-          {/* Top Counterparties Section */}
-          <div className="space-y-2.5">
-            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5 print-text-dark">
-              <Users className="h-3.5 w-3.5 text-income" /> Tóm tắt đối tác
-              giao dịch chính
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Customers */}
-              <div className="bg-muted/10 rounded-xl border border-border p-3 print-border">
-                <p className="text-[11px] font-semibold text-muted-foreground mb-2 print-text-dark">
-                  Top khách hàng (Thu nhiều nhất)
-                </p>
-                <div className="space-y-1.5 text-xs">
-                  {stats.topCustomers.map((c, i) => (
-                    <div
-                      key={i}
-                      className="flex justify-between items-center py-0.5 border-b border-border"
-                    >
-                      <span className="text-foreground/80 print-text-dark font-medium">
-                        {c.name}
-                      </span>
-                      <span className="text-income print-text-dark font-mono font-semibold">
-                        {displayMoney(c.amount)}
-                      </span>
+            {/* TAB: ĐỐI TÁC */}
+            {activeTab === "counterparties" && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Top Khách hàng */}
+                <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-card">
+                  <div className="p-3.5 border-b border-zinc-100 dark:border-zinc-800 bg-emerald-50/30 dark:bg-emerald-950/10 flex items-center justify-between">
+                    <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                      <ArrowDownLeft className="h-3.5 w-3.5" /> Nguồn thu lớn nhất
+                    </span>
+                  </div>
+                  {stats.topCustomers.length === 0 ? (
+                    <div className="p-6 text-center text-xs text-muted-foreground">Chưa có giao dịch thu</div>
+                  ) : (
+                    <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                      {stats.topCustomers.map((cp, idx) => (
+                        <div key={idx} className="p-3 flex items-center justify-between text-xs">
+                          <span className="font-semibold text-foreground truncate">{cp.name}</span>
+                          <span className="font-bold text-emerald-600 dark:text-emerald-400 shrink-0">{displayMoney(cp.amount)}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                  {stats.topCustomers.length === 0 && (
-                    <p className="text-muted-foreground text-[11px] py-1">
-                      Không phát sinh đối tác thu
-                    </p>
+                  )}
+                </div>
+
+                {/* Top Nhà cung cấp / Chi */}
+                <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 overflow-hidden bg-card">
+                  <div className="p-3.5 border-b border-zinc-100 dark:border-zinc-800 bg-rose-50/30 dark:bg-rose-950/10 flex items-center justify-between">
+                    <span className="text-xs font-bold text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
+                      <ArrowUpRight className="h-3.5 w-3.5" /> Đối tác chi nhiều nhất
+                    </span>
+                  </div>
+                  {stats.topSuppliers.length === 0 ? (
+                    <div className="p-6 text-center text-xs text-muted-foreground">Chưa có giao dịch chi</div>
+                  ) : (
+                    <div className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
+                      {stats.topSuppliers.map((cp, idx) => (
+                        <div key={idx} className="p-3 flex items-center justify-between text-xs">
+                          <span className="font-semibold text-foreground truncate">{cp.name}</span>
+                          <span className="font-bold text-rose-600 dark:text-rose-400 shrink-0">{displayMoney(cp.amount)}</span>
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>
-
-              {/* Suppliers */}
-              <div className="bg-muted/10 rounded-xl border border-border p-3 print-border">
-                <p className="text-[11px] font-semibold text-muted-foreground mb-2 print-text-dark">
-                  Top nhà cung cấp (Chi nhiều nhất)
-                </p>
-                <div className="space-y-1.5 text-xs">
-                  {stats.topSuppliers.map((c, i) => (
-                    <div
-                      key={i}
-                      className="flex justify-between items-center py-0.5 border-b border-border"
-                    >
-                      <span className="text-foreground/80 print-text-dark font-medium">
-                        {c.name}
-                      </span>
-                      <span className="text-rose-400 print-text-dark font-mono font-semibold">
-                        {displayMoney(c.amount)}
-                      </span>
-                    </div>
-                  ))}
-                  {stats.topSuppliers.length === 0 && (
-                    <p className="text-muted-foreground text-[11px] py-1">
-                      Không phát sinh đối tác chi
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Signature Block for Print */}
-          <div className="hidden print:block pt-12 mt-6 border-t border-border text-muted-foreground">
-            <div className="grid grid-cols-2 text-center text-xs">
-              <div>
-                <p className="font-bold">Người lập báo cáo</p>
-                <p className="text-[10px] text-muted-foreground mt-10">
-                  (Ký và ghi rõ họ tên)
-                </p>
-              </div>
-              <div>
-                <p className="font-bold">Phê duyệt cấp trên</p>
-                <p className="text-[10px] text-muted-foreground mt-10">
-                  (Ký và đóng dấu)
-                </p>
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </DialogContent>
