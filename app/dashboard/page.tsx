@@ -285,16 +285,6 @@ export default function DashboardHubPage() {
                 <Calendar className="h-3.5 w-3.5 text-muted-foreground" />
                 Lịch thu chi
               </Button>
-              <Link href="/dashboard/businesses" className="shrink-0">
-                <Button
-                  variant="default"
-                  size="sm"
-                  className="rounded-full text-xs gap-1.5 h-8.5 px-4 font-semibold whitespace-nowrap"
-                >
-                  <LayoutGrid className="h-3.5 w-3.5" />
-                  Quản lý việc
-                </Button>
-              </Link>
             </div>
           </div>
         </div>
