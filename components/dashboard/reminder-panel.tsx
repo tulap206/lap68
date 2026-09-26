@@ -5,6 +5,7 @@ import { Bell, CheckCircle2, AlertTriangle, Clock, ArrowDownLeft, ArrowUpRight }
 import { displayMoney } from "@/lib/format-money";
 import { formatDisplayDate } from "@/lib/format-date";
 import type { ReminderItem } from "@/lib/types";
+import { BusinessIcon } from "@/components/dashboard/business-icon";
 import { AccentButton } from "./module-shell";
 import { cn } from "@/lib/utils";
 
@@ -93,9 +94,10 @@ export function ReminderPanel({
                     {schedule.title}
                   </p>
 
-                  {businessName && (
-                    <span className="text-xs text-muted-foreground">
-                      ({businessName})
+                  {(schedule.business?.name || businessName) && (
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground bg-zinc-100 dark:bg-zinc-800/80 px-2 py-0.5 rounded-lg">
+                      <BusinessIcon name={schedule.business?.name || businessName || ""} color={schedule.business?.color} size="sm" />
+                      <span>{schedule.business?.name || businessName}</span>
                     </span>
                   )}
                 </div>

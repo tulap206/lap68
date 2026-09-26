@@ -18,6 +18,7 @@ import {
 } from "@/components/dashboard/cashflow-charts";
 import { BusinessComparisonChart } from "@/components/dashboard/business-comparison-chart";
 import { displayMoney } from "@/lib/format-money";
+import { BusinessIcon } from "@/components/dashboard/business-icon";
 import { cn } from "@/lib/utils";
 import type { BusinessSummary, Transaction } from "@/lib/types";
 
@@ -175,13 +176,18 @@ export function CashflowReportsSection({
             <p className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
               Mảng sinh lời cao nhất
             </p>
-            <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="text-sm sm:text-base font-bold text-foreground truncate">
-                {insights.topBiz?.business_name || "Chưa có"}
-              </span>
+            <div className="flex items-center justify-between gap-2 mt-0.5">
+              <div className="flex items-center gap-1.5 min-w-0">
+                {insights.topBiz && (
+                  <BusinessIcon name={insights.topBiz.business_name} color={insights.topBiz.color} size="sm" />
+                )}
+                <span className="text-sm font-bold text-foreground truncate">
+                  {insights.topBiz?.business_name || "Chưa có"}
+                </span>
+              </div>
               {insights.topBizContribution != null && (
                 <span className="text-[11px] font-semibold text-blue-600 dark:text-blue-400 shrink-0">
-                  {insights.topBizContribution}% lợi nhuận
+                  {insights.topBizContribution}% LN
                 </span>
               )}
             </div>
@@ -197,10 +203,15 @@ export function CashflowReportsSection({
             <p className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider">
               Chi tiêu nhiều nhất
             </p>
-            <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="text-sm sm:text-base font-bold text-foreground truncate">
-                {insights.highestExpBiz?.business_name || "Chưa có"}
-              </span>
+            <div className="flex items-center justify-between gap-2 mt-0.5">
+              <div className="flex items-center gap-1.5 min-w-0">
+                {insights.highestExpBiz && (
+                  <BusinessIcon name={insights.highestExpBiz.business_name} color={insights.highestExpBiz.color} size="sm" />
+                )}
+                <span className="text-sm font-bold text-foreground truncate">
+                  {insights.highestExpBiz?.business_name || "Chưa có"}
+                </span>
+              </div>
               {insights.highestExpPct != null && (
                 <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 shrink-0">
                   {insights.highestExpPct}% tổng chi

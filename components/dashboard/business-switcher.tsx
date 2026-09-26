@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BusinessIcon } from "@/components/dashboard/business-icon";
 import type { Business } from "@/lib/types";
 import { useState } from "react";
 
@@ -25,13 +26,10 @@ export function BusinessSwitcher({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full sm:w-auto items-center gap-2 rounded-xl border border-border bg-muted/80 px-3 py-2 text-sm text-foreground/90 hover:border-border"
+        className="flex w-full sm:w-auto items-center gap-2.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card px-3.5 py-2 text-sm text-foreground shadow-xs hover:border-zinc-300 dark:hover:border-zinc-700 transition-colors"
       >
-        <span
-          className="h-2.5 w-2.5 rounded-full shrink-0"
-          style={{ backgroundColor: current.color }}
-        />
-        <span className="font-semibold truncate flex-1 text-left sm:max-w-[200px]">
+        <BusinessIcon name={current.name} color={current.color} size="sm" />
+        <span className="font-bold truncate flex-1 text-left sm:max-w-[200px]">
           {current.name}
         </span>
         <ChevronDown
@@ -44,30 +42,29 @@ export function BusinessSwitcher({
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 right-0 sm:right-auto top-full mt-1 z-50 sm:min-w-[220px] rounded-xl border border-border bg-card shadow-[0_4px_16px_rgba(28,28,26,0.08)] py-1 max-h-[min(60dvh,320px)] overflow-y-auto">
+          <div className="absolute left-0 right-0 sm:right-auto top-full mt-1.5 z-50 sm:min-w-[240px] rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card shadow-xl p-1.5 max-h-[min(60dvh,340px)] overflow-y-auto">
             {businesses.map((b) => (
               <Link
                 key={b.id}
                 href={pathname.replace(currentId, b.id)}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "flex items-center gap-2 px-3 py-2 text-sm hover:bg-muted",
-                  b.id === currentId ? "text-foreground font-medium" : "text-foreground/80",
+                  "flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors",
+                  b.id === currentId
+                    ? "bg-zinc-100 dark:bg-zinc-800 text-foreground"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
-                <span
-                  className="h-2 w-2 rounded-full"
-                  style={{ backgroundColor: b.color }}
-                />
-                {b.name}
+                <BusinessIcon name={b.name} color={b.color} size="sm" />
+                <span className="truncate">{b.name}</span>
               </Link>
             ))}
             <Link
               href="/dashboard"
               onClick={() => setOpen(false)}
-              className="block px-3 py-2 text-xs text-muted-foreground hover:bg-muted border-t border-border mt-1"
+              className="block px-3 py-2 text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl border-t border-zinc-100 dark:border-zinc-800 mt-1"
             >
-              ← Tất cả việc
+              ← Về trang tổng quan
             </Link>
           </div>
         </>

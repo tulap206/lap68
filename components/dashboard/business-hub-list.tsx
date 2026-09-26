@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
 import { displayMoney } from "@/lib/format-money";
+import { BusinessIcon } from "@/components/dashboard/business-icon";
 import type { BusinessSummary } from "@/lib/types";
 import type { CapitalSnapshot } from "@/lib/capital";
 import { cn } from "@/lib/utils";
@@ -54,12 +55,9 @@ export function BusinessHubList({
           >
             {/* DESKTOP LAYOUT (12 COLS) */}
             <div className="hidden md:grid grid-cols-12 gap-4 items-center">
-              {/* COL 1: TÊN MẢNG, DOT, VỐN & OVERDUE (5 COLS) */}
+              {/* COL 1: TÊN MẢNG, ICON, VỐN & OVERDUE (5 COLS) */}
               <div className="col-span-5 flex items-center gap-3 min-w-0">
-                <span
-                  className="w-3 h-3 rounded-full shrink-0 shadow-xs ring-2 ring-white dark:ring-zinc-900"
-                  style={{ backgroundColor: s.color || "#18181b" }}
-                />
+                <BusinessIcon name={s.business_name} color={s.color} size="md" />
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-sm truncate group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
@@ -145,11 +143,8 @@ export function BusinessHubList({
 
             {/* MOBILE LAYOUT */}
             <div className="md:hidden flex items-start justify-between gap-3">
-              <div className="flex items-start gap-2.5 min-w-0">
-                <span
-                  className="w-2.5 h-2.5 rounded-full shrink-0 mt-1"
-                  style={{ backgroundColor: s.color || "#18181b" }}
-                />
+              <div className="flex items-start gap-3 min-w-0">
+                <BusinessIcon name={s.business_name} color={s.color} size="sm" />
                 <div className="min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     <span className="font-bold text-zinc-900 dark:text-zinc-100 tracking-tight text-sm truncate">
@@ -208,4 +203,3 @@ export function BusinessHubList({
     </div>
   );
 }
-

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowRight, AlertTriangle, TrendingUp, TrendingDown } from "lucide-react";
 import { displayMoney } from "@/lib/format-money";
+import { BusinessIcon } from "@/components/dashboard/business-icon";
 import type { BusinessSummary } from "@/lib/types";
 import type { CapitalSnapshot } from "@/lib/capital";
 import { cn } from "@/lib/utils";
@@ -44,20 +45,18 @@ export function BusinessHubCard({
       }}
     >
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex items-center gap-2.5">
-            <span
-              className="w-2.5 h-2.5 rounded-full shrink-0"
-              style={{ backgroundColor: summary.color || "#18181b" }}
-            />
+        <div className="flex items-center gap-3 min-w-0">
+          <BusinessIcon name={summary.business_name} color={summary.color} size="md" />
+          <div className="min-w-0">
             <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight truncate group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
               {summary.business_name}
             </h3>
+            <p className="text-[11px] font-medium text-zinc-500 mt-0.5">
+              {statusLabel}
+            </p>
           </div>
-          <p className="text-[11px] font-medium text-zinc-500 mt-0.5 ml-5">
-            {statusLabel}
-          </p>
         </div>
+
         {overdueCount > 0 && (
           <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-800/60 px-2.5 py-0.5 text-xs font-semibold text-rose-700 dark:text-rose-400 shrink-0">
             <AlertTriangle className="h-3 w-3" />
@@ -121,5 +120,3 @@ export function BusinessHubCard({
     </Link>
   );
 }
-
-
