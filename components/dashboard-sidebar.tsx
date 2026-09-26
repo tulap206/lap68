@@ -253,24 +253,26 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       {/* MAIN VIEWPORT */}
       <main
         id="main-content"
-        className="flex-1 w-full min-h-dvh pt-[calc(4.25rem+env(safe-area-inset-top))] pb-[calc(6.25rem+env(safe-area-inset-bottom))] px-3.5 sm:px-6 lg:pt-6 lg:pb-10 lg:pl-[88px] lg:px-8 relative z-10"
+        className="flex-1 w-full min-h-dvh pt-[calc(3.85rem+env(safe-area-inset-top))] pb-[calc(5.75rem+env(safe-area-inset-bottom))] px-3.5 sm:px-6 lg:pt-6 lg:pb-10 lg:pl-[88px] lg:pr-8 relative z-10"
       >
-        {user && (
-          <div className="mb-4 sm:mb-6 hidden lg:flex justify-end items-center gap-3">
-            <ThemeToggle size="icon" />
-            <div className="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800" />
-            <div className="flex items-center gap-2">
-              <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
-              <span className="text-xs text-zinc-500 font-medium">
-                Xin chào,{" "}
-                <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">
-                  {user.displayName}
-                </strong>
-              </span>
+        <div className="max-w-7xl mx-auto w-full">
+          {user && (
+            <div className="mb-4 sm:mb-6 hidden lg:flex justify-end items-center gap-3">
+              <ThemeToggle size="icon" />
+              <div className="h-4 w-[1px] bg-zinc-200 dark:bg-zinc-800" />
+              <div className="flex items-center gap-2">
+                <span className="inline-flex h-2 w-2 rounded-full bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.4)]" />
+                <span className="text-xs text-zinc-500 font-medium">
+                  Xin chào,{" "}
+                  <strong className="text-zinc-900 dark:text-zinc-100 font-semibold">
+                    {user.displayName}
+                  </strong>
+                </span>
+              </div>
             </div>
-          </div>
-        )}
-        {children}
+          )}
+          {children}
+        </div>
       </main>
 
       {/* MOBILE FLOATING TAB BAR (iOS Dock) */}

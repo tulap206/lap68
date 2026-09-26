@@ -314,3 +314,21 @@
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
+
+/* Mobile Touch & Viewport Optimization */
+html {
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+button, a, input, select, textarea {
+  touch-action: manipulation;
+}
+
+@media (max-width: 640px) {
+  /* Prevent horizontal scroll jitter on mobile */
+  body {
+    overflow-x: hidden;
+  }
+}
+
