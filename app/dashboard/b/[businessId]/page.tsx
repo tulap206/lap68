@@ -23,7 +23,7 @@ import {
   ModuleSubpageHeader,
   ModuleSectionCard,
 } from "@/components/dashboard/module-shell";
-import { BusinessSubNav } from "@/components/dashboard/business-sub-nav";
+import { BusinessIcon } from "@/components/dashboard/business-icon";
 import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section";
 import { TransactionTypeBadge } from "@/components/dashboard/cashflow-ui";
 import { ReminderPanel } from "@/components/dashboard/reminder-panel";
@@ -131,16 +131,18 @@ export default function BusinessDashboardPage() {
   return (
     <ModulePageShell module="cashflow">
       <div className="space-y-6">
-        {/* SUB NAVIGATION TABS */}
-        <BusinessSubNav businessId={businessId} />
-
         {/* HEADER */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-black/[0.06] dark:border-white/[0.08]">
           <div className="flex items-center gap-3">
-            <span
-              className="w-5 h-5 rounded-full shrink-0 shadow-xs ring-4 ring-white dark:ring-zinc-900"
-              style={{ backgroundColor: business?.color || "#18181b" }}
-            />
+            {business && (
+              <BusinessIcon
+                name={business.name}
+                code={business.code}
+                color={business.color}
+                icon={business.icon}
+                size="md"
+              />
+            )}
             <div>
               <div className="flex items-center gap-2">
                 <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">

@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Plus, Edit2, Archive, Briefcase, ChevronRight, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -19,6 +18,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { BusinessIcon } from "@/components/dashboard/business-icon";
 import {
   fetchBusinesses,
   insertBusiness,
@@ -132,13 +132,12 @@ export default function BusinessesPage() {
         <ModuleSubpageHeader
           module="cashflow"
           title="Quản lý mảng kinh doanh"
-          subtitle="Tạo, tùy chỉnh màu sắc và sắp xếp các mảng thu chi độc lập"
           actions={
             <Button
               onClick={openCreate}
               className="rounded-full h-9 px-4 font-semibold text-xs gap-1.5 bg-zinc-900 text-zinc-100 hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 shadow-xs"
             >
-              <Plus className="h-4 w-4" /> Thêm mảng mới
+              <Plus className="h-4 w-4" /> Thêm mới
             </Button>
           }
         />
@@ -156,7 +155,7 @@ export default function BusinessesPage() {
               Tạo mảng kinh doanh đầu tiên để bắt đầu ghi nhận và theo dõi dòng tiền.
             </p>
             <Button onClick={openCreate} className="rounded-full">
-              <Plus className="h-4 w-4 mr-1" /> Thêm mảng mới
+              <Plus className="h-4 w-4 mr-1" /> Thêm mới
             </Button>
           </div>
         ) : (
@@ -178,13 +177,16 @@ export default function BusinessesPage() {
               >
                 <div>
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="w-4 h-4 rounded-full shrink-0 shadow-xs ring-2 ring-white dark:ring-zinc-900"
-                        style={{ backgroundColor: b.color }}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <BusinessIcon
+                        name={b.name}
+                        code={b.code}
+                        color={b.color}
+                        icon={b.icon}
+                        size="md"
                       />
-                      <div>
-                        <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
+                      <div className="min-w-0">
+                        <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-100 tracking-tight truncate group-hover:text-zinc-600 dark:group-hover:text-zinc-300 transition-colors">
                           {b.name}
                         </h3>
                         {b.code && (
@@ -195,7 +197,7 @@ export default function BusinessesPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity shrink-0">
                       <button
                         type="button"
                         onClick={(e) => openEdit(b, e)}
@@ -215,16 +217,11 @@ export default function BusinessesPage() {
                         <Archive className="h-4 w-4" />
                       </button>
                     </div>
-
                   </div>
-
-                  <p className="text-xs text-zinc-500 mt-3 line-clamp-2 min-h-[32px]">
-                    {b.description || "Chưa có mô tả chi tiết."}
-                  </p>
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500">
-                  <span className="font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <div className="pt-4 mt-4 border-t border-zinc-100 dark:border-zinc-800/80 flex items-center justify-between text-xs text-zinc-500">
+                  <span className="font-medium text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> Đang hoạt động
                   </span>
                   <span className="flex items-center gap-0.5 text-zinc-400 group-hover:text-zinc-900 dark:group-hover:text-zinc-100 font-medium group-hover:translate-x-0.5 transition-all">
@@ -252,7 +249,7 @@ export default function BusinessesPage() {
                 <Input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="Ví dụ: Bán hàng online, Dịch vụ sửa chữa..."
+                  placeholder="Ví dụ: Cho thuê xe 3LMoto, Camera 247..."
                   className="rounded-xl h-10 text-base sm:text-xs"
                 />
               </div>
@@ -264,7 +261,7 @@ export default function BusinessesPage() {
                 <Input
                   value={form.code}
                   onChange={(e) => setForm({ ...form, code: e.target.value })}
-                  placeholder="Ví dụ: ONL, SVC, LAP68..."
+                  placeholder="Ví dụ: THUEXE, CAMERA, 79..."
                   className="rounded-xl h-10 text-base sm:text-xs font-mono uppercase"
                 />
               </div>
@@ -332,4 +329,3 @@ export default function BusinessesPage() {
     </ModulePageShell>
   );
 }
-

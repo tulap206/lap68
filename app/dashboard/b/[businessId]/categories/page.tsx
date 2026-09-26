@@ -9,7 +9,6 @@ import {
   ModulePageShell,
   ModuleSubpageHeader,
 } from "@/components/dashboard/module-shell";
-import { BusinessSubNav } from "@/components/dashboard/business-sub-nav";
 import { SkeletonTable } from "@/components/ui/skeleton-loader";
 import {
   fetchCategories,
@@ -137,9 +136,6 @@ export default function BusinessCategoriesPage() {
   return (
     <ModulePageShell module="cashflow">
       <div className="space-y-6">
-        {/* SUB NAVIGATION */}
-        <BusinessSubNav businessId={businessId} />
-
         {/* HEADER */}
         <ModuleSubpageHeader
           module="cashflow"
