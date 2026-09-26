@@ -8,7 +8,6 @@ import {
   LogOut,
   Bell,
   Send,
-  Sparkles,
   Zap,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -153,9 +152,9 @@ export default function SettingsPage() {
         {/* TAB 2: TELEGRAM NOTIFICATIONS & AUTOMATION */}
         {activeTab === "telegram" && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="max-w-2xl">
               {/* Bot Info Card */}
-              <div className="p-5 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-4 shadow-xs">
+              <div className="p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-4 shadow-xs">
                 <div className="flex items-center gap-3">
                   <div className="p-2.5 rounded-2xl bg-[#0088cc]/10 text-[#0088cc] shrink-0">
                     <Send className="h-5 w-5" />
@@ -197,38 +196,6 @@ export default function SettingsPage() {
                   <Zap className="h-3.5 w-3.5 text-amber-500" />
                   {testingTelegram ? "Đang gửi..." : "Kiểm tra gửi tin nhắn thử nghiệm"}
                 </Button>
-              </div>
-
-              {/* Bot Guide Card */}
-              <div className="p-5 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-3.5 shadow-xs">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 shrink-0">
-                    <Sparkles className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="text-base font-bold text-foreground">
-                      Cơ chế nhắc hẹn thông minh
-                    </h3>
-                    <p className="text-xs text-muted-foreground">
-                      Chống gửi lặp và tối ưu hóa tin nhắn
-                    </p>
-                  </div>
-                </div>
-
-                <ul className="space-y-2.5 text-xs text-muted-foreground leading-relaxed pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 font-bold">•</span>
-                    <span>Tự động kiểm tra và ghi nhật ký <code className="font-mono text-foreground bg-zinc-100 dark:bg-zinc-800 px-1 py-0.2 rounded">lap68_reminder_logs</code> để mỗi khoản chỉ gửi 1 lần trong ngày.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 font-bold">•</span>
-                    <span>Hiển thị đầy đủ số tiền, tên việc kinh doanh và ngày đến hạn của từng khoản.</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span className="text-emerald-500 font-bold">•</span>
-                    <span>Đồng bộ tự động mỗi khi người dùng bấm "Hoàn thành" trên Dashboard hoặc trang Lịch.</span>
-                  </li>
-                </ul>
               </div>
             </div>
           </div>
