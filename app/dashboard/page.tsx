@@ -15,7 +15,6 @@ import {
   AlertTriangle,
   ArrowUpRight,
   ChevronRight,
-  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
@@ -216,18 +215,10 @@ export default function DashboardHubPage() {
       <div className="space-y-6">
         {/* TOP BAR: Title, Apple Segmented Switcher & Pill Action Buttons */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-3 border-b border-black/[0.06] dark:border-white/[0.08]">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2.5">
-              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
-                Tổng quan dòng tiền & kinh doanh
-              </h1>
-              <span className="hidden sm:inline-flex items-center gap-1 text-[11px] font-semibold bg-[#007aff]/10 text-[#007aff] px-2.5 py-0.5 rounded-full">
-                <Sparkles className="h-3 w-3" /> Trực quan & Tự động
-              </span>
-            </div>
-            <p className="text-xs sm:text-sm text-muted-foreground">
-              Theo dõi hiệu quả tài chính, vốn đầu tư và phân tích toàn bộ mảng kinh doanh
-            </p>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+              Tổng quan dòng tiền & kinh doanh
+            </h1>
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full lg:w-auto">
@@ -572,9 +563,6 @@ export default function DashboardHubPage() {
                       <h2 className="text-base sm:text-lg font-bold text-foreground tracking-tight">
                         Báo cáo & Phân tích chuyên sâu
                       </h2>
-                      <p className="text-xs text-muted-foreground">
-                        Biểu đồ xu hướng dòng tiền và tỷ trọng đóng góp của từng mảng kinh doanh
-                      </p>
                     </div>
                     <Button
                       variant="ghost"
