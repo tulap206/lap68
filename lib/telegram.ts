@@ -15,15 +15,39 @@ export function escapeTelegramHtml(text: string): string {
   return escapeHtml(text)
 }
 
+export async function getTelegramBotInfo(customToken?: string): Promise<{
+  ok: boolean
+  botUsername?: string
+  botName?: string
+  error?: string
+}> {
+  const token = customToken || process.env.TELEGRAM_BOT_TOKEN
+  if (!token) return { ok: false, error: "Chưa cấu hình TELEGRAM_BOT_TOKEN" }
+  try {
+    const res = await fetch(`${TELEGRAM_API}/bot${token}/getMe`)
+    const data = (await res.json()) as { ok?: boolean; result?: { username?: string; first_name?: string }; description?: string }
+    if (!res.ok || !data.ok) {
+      return { ok: false, error: data.description || "Token không hợp lệ" }
+    }
+    return {
+      ok: true,
+      botUsername: data.result?.username,
+      botName: data.result?.first_name,
+    }
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : "Không thể kết nối Telegram API" }
+  }
+}
+
 export async function sendTelegramMessage(
   text: string,
-  options?: { chatId?: string; parseMode?: "HTML" | "Markdown" }
+  options?: { token?: string; chatId?: string; parseMode?: "HTML" | "Markdown" }
 ): Promise<{ ok: boolean; error?: string }> {
-  const token = process.env.TELEGRAM_BOT_TOKEN
+  const token = options?.token || process.env.TELEGRAM_BOT_TOKEN
   const chatId = options?.chatId || process.env.TELEGRAM_CHAT_ID
 
   if (!token || !chatId) {
-    return { ok: false, error: "Missing TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID" }
+    return { ok: false, error: "Chưa cấu hình TELEGRAM_BOT_TOKEN hoặc TELEGRAM_CHAT_ID" }
   }
 
   try {
@@ -44,6 +68,6 @@ export async function sendTelegramMessage(
     }
     return { ok: true }
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "Telegram request failed" }
+    return { ok: false, error: e instanceof Error ? e.message : "Không thể gửi tin nhắn Telegram" }
   }
 }

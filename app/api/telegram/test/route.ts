@@ -1,32 +1,89 @@
 import { NextRequest, NextResponse } from "next/server"
 import { isTelegramConfigured, sendTelegramMessage } from "@/lib/telegram"
 
-/** Send a one-off test message to TELEGRAM_CHAT_ID. */
-export async function GET(req: NextRequest) {
-  const secret = process.env.CRON_SECRET
-  const auth = req.headers.get("authorization")
-  const q = req.nextUrl.searchParams.get("secret")
-  const allowed =
-    (!secret && process.env.NODE_ENV !== "production") ||
-    (secret && (auth === `Bearer ${secret}` || q === secret))
+/** Send a test message to verify Telegram bot connection. */
+export async function POST(req: NextRequest) {
+  try {
+    let customToken: string | undefined
+    let customChatId: string | undefined
 
-  if (!allowed) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
+    try {
+      const body = await req.json()
+      customToken = body?.token
+      customChatId = body?.chatId
+    } catch {
+      // JSON body is optional
+    }
 
-  if (!isTelegramConfigured()) {
+    const token = customToken || process.env.TELEGRAM_BOT_TOKEN
+    const chatId = customChatId || process.env.TELEGRAM_CHAT_ID
+
+    if (!token) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Chưa cấu hình TELEGRAM_BOT_TOKEN trong biến môi trường (.env.local / Vercel)",
+        },
+        { status: 400 }
+      )
+    }
+
+    if (!chatId) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "Chưa cấu hình TELEGRAM_CHAT_ID trong biến môi trường (.env.local / Vercel)",
+        },
+        { status: 400 }
+      )
+    }
+
+    const now = new Date().toLocaleString("vi-VN", {
+      timeZone: "Asia/Ho_Chi_Minh",
+      dateStyle: "full",
+      timeStyle: "medium",
+    })
+
+    const message = [
+      `🔔 <b>LAP68 — KIỂM TRA KẾT NỐI BOT</b>`,
+      `━━━━━━━━━━━━━━━━━━━`,
+      `✅ Kết nối Telegram Bot thành công!`,
+      `⏱️ <i>Thời gian: ${now}</i>`,
+      `📌 <i>Hệ thống tự động nhắc hẹn thu/chi sẵn sàng hoạt động.</i>`,
+    ].join("\n")
+
+    const send = await sendTelegramMessage(message, {
+      token,
+      chatId,
+      parseMode: "HTML",
+    })
+
+    if (!send.ok) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: send.error || "Gửi tin nhắn Telegram thất bại",
+        },
+        { status: 502 }
+      )
+    }
+
+    return NextResponse.json({
+      ok: true,
+      message: "Đã gửi tin nhắn thử nghiệm thành công tới Telegram!",
+      sentAt: now,
+    })
+  } catch (e) {
     return NextResponse.json(
-      { error: "Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID first" },
-      { status: 400 }
+      {
+        ok: false,
+        error: e instanceof Error ? e.message : "Đã xảy ra lỗi không xác định",
+      },
+      { status: 500 }
     )
   }
+}
 
-  const now = new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })
-  const send = await sendTelegramMessage(
-    `<b>LAP68 — Test</b>\nKết nối Telegram OK.\n${now}`
-  )
-
-  return NextResponse.json(send.ok ? { ok: true } : { ok: false, error: send.error }, {
-    status: send.ok ? 200 : 502,
-  })
+export async function GET(req: NextRequest) {
+  return POST(req)
 }
