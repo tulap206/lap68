@@ -13,15 +13,13 @@ import {
   Sparkles,
   Zap,
   Palette,
-  Monitor,
-  Smartphone,
   Sun,
   Moon,
+  Monitor,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
-import { useViewMode } from "@/contexts/view-mode-context";
 import { useTheme } from "next-themes";
 import {
   ModulePageShell,
@@ -31,14 +29,12 @@ import { BackupPanel } from "@/components/dashboard/backup-panel";
 import { ActivityLogPanel } from "@/components/dashboard/activity-log-panel";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { ViewModeToggle } from "@/components/view-mode-toggle";
 import { cn } from "@/lib/utils";
 
 type SettingsTab = "appearance" | "backup" | "telegram" | "logs" | "about";
 
 export default function SettingsPage() {
   const { user, logout, logAction } = useAuth();
-  const { viewMode, setViewMode } = useViewMode();
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<SettingsTab>("appearance");
@@ -133,7 +129,7 @@ export default function SettingsPage() {
                 activeTab === "appearance" && "active",
               )}
             >
-              <Palette className="h-3.5 w-3.5" /> Giao diện & Hiển thị
+              <Palette className="h-3.5 w-3.5" /> Giao diện & Chủ đề
             </button>
             <button
               type="button"
@@ -179,7 +175,7 @@ export default function SettingsPage() {
         </div>
 
         {/* 3. TAB CONTENT PANELS */}
-        {/* TAB 0: APPEARANCE & DISPLAY (NEW) */}
+        {/* TAB 0: APPEARANCE & DISPLAY */}
         {activeTab === "appearance" && (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -192,10 +188,10 @@ export default function SettingsPage() {
                     </div>
                     <div>
                       <h3 className="text-base font-bold text-foreground">
-                        Chủ đề màu sắc (Theme)
+                        Chủ đề màu sắc (Light / Dark)
                       </h3>
                       <p className="text-xs text-muted-foreground">
-                        Chuyển đổi giữa chế độ Sáng, Tối và Hệ thống
+                        Chuyển đổi giữa chế độ Sáng, Tối và Tự động theo Hệ thống
                       </p>
                     </div>
                   </div>
@@ -264,104 +260,37 @@ export default function SettingsPage() {
                 </div>
               </div>
 
-              {/* VIEW MODE SETTINGS CARD */}
-              <div className="p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-5 shadow-xs">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 rounded-2xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 shrink-0">
-                      <Monitor className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="text-base font-bold text-foreground">
-                        Bố cục Desktop & Mobile
-                      </h3>
-                      <p className="text-xs text-muted-foreground">
-                        Chuyển đổi giao diện máy tính và ứng dụng di động
-                      </p>
-                    </div>
+              {/* RESPONSIVE DISPLAY CARD */}
+              <div className="p-5 sm:p-6 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-4 shadow-xs">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 shrink-0">
+                    <Sparkles className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-bold text-foreground">
+                      Nhận diện hiển thị thông minh
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Tự động tối ưu theo từng kích thước màn hình
+                    </p>
                   </div>
                 </div>
 
-                <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                  <div className="mb-4">
-                    <span className="text-xs font-semibold text-muted-foreground block mb-2">
-                      Chọn chế độ bố cục:
-                    </span>
-                    <ViewModeToggle variant="segmented" className="w-full justify-between" />
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-2.5 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setViewMode("auto")}
-                      className={cn(
-                        "p-3 rounded-2xl border text-left transition-all relative overflow-hidden",
-                        viewMode === "auto"
-                          ? "border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-zinc-50 dark:bg-zinc-900"
-                          : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300"
-                      )}
-                    >
-                      <div className="w-full h-10 rounded-lg bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-2 shadow-xs">
-                        <Sparkles className="h-4 w-4 text-zinc-500" />
-                      </div>
-                      <span className="text-xs font-bold block text-foreground">Tự động</span>
-                      <span className="text-[10px] text-muted-foreground">Theo kích thước màn</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setViewMode("desktop")}
-                      className={cn(
-                        "p-3 rounded-2xl border text-left transition-all relative overflow-hidden",
-                        viewMode === "desktop"
-                          ? "border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-zinc-50 dark:bg-zinc-900"
-                          : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300"
-                      )}
-                    >
-                      <div className="w-full h-10 rounded-lg bg-blue-50 dark:bg-blue-950/40 border border-blue-200/40 flex items-center justify-center mb-2 shadow-xs">
-                        <Monitor className="h-4 w-4 text-blue-500" />
-                      </div>
-                      <span className="text-xs font-bold block text-foreground">Máy tính</span>
-                      <span className="text-[10px] text-muted-foreground">Sidebar & Bảng rộng</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setViewMode("mobile")}
-                      className={cn(
-                        "p-3 rounded-2xl border text-left transition-all relative overflow-hidden",
-                        viewMode === "mobile"
-                          ? "border-zinc-900 dark:border-zinc-100 ring-2 ring-zinc-900/10 dark:ring-zinc-100/20 bg-zinc-50 dark:bg-zinc-900"
-                          : "border-zinc-200/80 dark:border-zinc-800 hover:border-zinc-300"
-                      )}
-                    >
-                      <div className="w-full h-10 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/40 flex items-center justify-center mb-2 shadow-xs">
-                        <Smartphone className="h-4 w-4 text-emerald-500" />
-                      </div>
-                      <span className="text-xs font-bold block text-foreground">Di động</span>
-                      <span className="text-[10px] text-muted-foreground">iOS Dock & Thẻ gọn</span>
-                    </button>
-                  </div>
-                </div>
+                <ul className="space-y-3 text-xs text-muted-foreground leading-relaxed pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    <span><strong>Màn hình máy tính (Desktop):</strong> Hiển thị đầy đủ thanh Sidebar điều hướng bên trái và các bảng phân tích chi tiết.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    <span><strong>Điện thoại & Máy tính bảng (Mobile / Tablet):</strong> Tự động kích hoạt thanh điều hướng nổi (Floating Dock) ở đáy màn hình và rút gọn thẻ danh mục để tối ưu thao tác cảm ứng 1 tay.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <span className="text-emerald-500 font-bold">•</span>
+                    <span>Nút chuyển đổi chế độ <strong>Sáng / Tối</strong> luôn sẵn sàng ở góc trên cùng trên mọi thiết bị.</span>
+                  </li>
+                </ul>
               </div>
-            </div>
-
-            {/* QUICK FEATURE SUMMARY */}
-            <div className="p-5 rounded-3xl border border-zinc-200/80 dark:border-zinc-800 bg-card space-y-3 shadow-xs">
-              <h4 className="text-sm font-bold text-foreground flex items-center gap-2">
-                <Sparkles className="h-4 w-4 text-amber-500" />
-                Mẹo sử dụng nhanh
-              </h4>
-              <ul className="text-xs text-muted-foreground space-y-2 leading-relaxed">
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 font-bold">•</span>
-                  <span>Bạn có thể chuyển đổi nhanh chế độ <strong>Sáng / Tối</strong> và <strong>Desktop / Mobile</strong> bất kỳ lúc nào bằng các nút trên thanh Header trên cùng hoặc thanh Sidebar.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 font-bold">•</span>
-                  <span>Lựa chọn của bạn sẽ được lưu tự động trên trình duyệt và áp dụng cho toàn bộ các trang của hệ thống LAP68.</span>
-                </li>
-              </ul>
             </div>
           </div>
         )}

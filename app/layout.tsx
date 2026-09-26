@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "sonner";
 import { AuthProvider } from "@/contexts/auth-context";
-import { ViewModeProvider } from "@/contexts/view-mode-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import "./globals.css";
 
@@ -50,12 +49,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <ViewModeProvider>
-            <AuthProvider>
-              {children}
-              <Toaster position="top-right" richColors closeButton />
-            </AuthProvider>
-          </ViewModeProvider>
+          <AuthProvider>
+            {children}
+            <Toaster position="top-right" richColors closeButton />
+          </AuthProvider>
         </ThemeProvider>
         <Analytics />
       </body>
