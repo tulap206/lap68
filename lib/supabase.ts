@@ -436,11 +436,39 @@ export async function upsertBudget(item: Omit<Budget, "id" | "created_at">) {
   return data as Budget
 }
 
-// --- Access logs ---
+// --- Access logs (Tự động xoá sau 60 ngày) ---
+const RETENTION_DAYS = 60;
+
+function getRetentionCutoffIso(): string {
+  const d = new Date();
+  d.setDate(d.getDate() - RETENTION_DAYS);
+  return d.toISOString();
+}
+
+async function pruneExpiredLogsAndBackups(userId?: string) {
+  try {
+    const cutoff = getRetentionCutoffIso();
+    // Xoá log cũ hơn 60 ngày
+    let logQuery = supabase.from("lap68_access_logs").delete().lt("created_at", cutoff);
+    if (userId) logQuery = logQuery.eq("user_id", userId);
+    await logQuery;
+
+    // Xoá backup cũ hơn 60 ngày
+    if (userId) {
+      await supabase.from("lap68_backups").delete().eq("user_id", userId).lt("created_at", cutoff);
+    }
+  } catch {
+    // Không chặn luồng chính nếu lỗi ngầm
+  }
+}
+
 export async function fetchAccessLogs(userId?: string, limit = 100) {
+  pruneExpiredLogsAndBackups(userId).catch(() => {});
+  const cutoff = getRetentionCutoffIso();
   let q = supabase
     .from("lap68_access_logs")
     .select("*")
+    .gte("created_at", cutoff)
     .order("created_at", { ascending: false })
     .limit(limit)
   if (userId) q = q.eq("user_id", userId)
@@ -486,10 +514,13 @@ const BACKUP_TABLES = [
 const MAX_CLOUD_BACKUPS = 15
 
 export async function fetchCloudBackups(userId: string) {
+  pruneExpiredLogsAndBackups(userId).catch(() => {});
+  const cutoff = getRetentionCutoffIso();
   const { data, error } = await supabase
     .from("lap68_backups")
     .select("*")
     .eq("user_id", userId)
+    .gte("created_at", cutoff)
     .order("created_at", { ascending: false })
     .limit(MAX_CLOUD_BACKUPS)
   if (error) throw error
@@ -527,6 +558,7 @@ export async function createCloudBackup(userId: string, label?: string) {
     .single()
   if (error) throw error
   await pruneCloudBackups(userId)
+  pruneExpiredLogsAndBackups(userId).catch(() => {});
   return data as Lap68Backup
 }
 

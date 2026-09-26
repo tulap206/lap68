@@ -8,12 +8,11 @@ import {
   RotateCcw,
   Trash2,
   HardDrive,
-  CheckCircle2,
+  Plus,
   Clock,
-  Sparkles,
+  CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { AccentButton } from "@/components/dashboard/module-shell";
 import { SkeletonTable } from "@/components/ui/skeleton-loader";
 import { Button } from "@/components/ui/button";
 import {
@@ -172,33 +171,28 @@ export function BackupPanel({
   };
 
   return (
-    <div className="p-4 sm:p-6 space-y-6">
-      {/* ACTION HERO BANNER */}
-      <div className="p-4 sm:p-5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm sm:text-base font-bold text-foreground">
-              Sao lưu & Xuất nhập dữ liệu an toàn
-            </h3>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200/60">
-              Supabase Cloud
-            </span>
-          </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Hệ thống lưu trữ tối đa 15 bản snapshot trên Cloud. Có thể tải tệp JSON về máy để chuyển dữ liệu.
-          </p>
+    <div className="p-4 sm:p-6 space-y-5">
+      {/* ACTION TOOLBAR */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card shadow-xs">
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-bold text-foreground">
+            Bản sao lưu ({backups.length})
+          </span>
+          <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-900/40">
+            Tự động lưu 60 ngày
+          </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2 shrink-0">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="default"
             size="sm"
             onClick={handleCloudBackup}
             disabled={creating}
-            className="rounded-full text-xs gap-1.5 h-9 px-4 font-semibold shadow-xs"
+            className="rounded-xl text-xs gap-1.5 h-8.5 px-3.5 font-semibold bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-950 shadow-xs"
           >
-            <Cloud className={cn("h-4 w-4", creating && "animate-spin")} />
-            {creating ? "Đang lưu..." : "Sao lưu ngay"}
+            <Cloud className={cn("h-3.5 w-3.5", creating && "animate-spin")} />
+            {creating ? "Đang sao lưu..." : "Tạo bản sao lưu"}
           </Button>
 
           <Button
@@ -206,7 +200,7 @@ export function BackupPanel({
             size="sm"
             onClick={handleExport}
             disabled={exporting}
-            className="rounded-full text-xs gap-1.5 h-9 px-3.5"
+            className="rounded-xl text-xs gap-1.5 h-8.5 px-3"
           >
             <Download className="h-3.5 w-3.5" />
             {exporting ? "Đang xuất..." : "Xuất JSON"}
@@ -223,7 +217,7 @@ export function BackupPanel({
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full text-xs gap-1.5 h-9 px-3.5 cursor-pointer"
+              className="rounded-xl text-xs gap-1.5 h-8.5 px-3 cursor-pointer"
               asChild
             >
               <span>
@@ -236,95 +230,108 @@ export function BackupPanel({
       </div>
 
       {/* BACKUPS LIST */}
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <h4 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-            <Clock className="h-3.5 w-3.5 text-foreground/70" /> Danh sách bản sao lưu đám mây ({backups.length})
-          </h4>
-          <span className="text-xs text-muted-foreground">
-            Tối đa 15 bản gần nhất
-          </span>
+      {loading ? (
+        <SkeletonTable />
+      ) : backups.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 p-10 text-center bg-card space-y-2">
+          <HardDrive className="h-8 w-8 text-muted-foreground/40 mx-auto" />
+          <p className="text-sm font-semibold text-foreground">
+            Chưa có bản sao lưu nào trên đám mây
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Nhấn nút &quot;Tạo bản sao lưu&quot; để lưu trữ dữ liệu an toàn.
+          </p>
         </div>
+      ) : (
+        <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card overflow-hidden shadow-xs">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/75 dark:bg-zinc-900/50 text-muted-foreground font-semibold">
+                  <th className="py-3 px-3.5 sm:px-4 w-14 text-center">STT</th>
+                  <th className="py-3 px-3.5 sm:px-4">Tên bản sao lưu</th>
+                  <th className="py-3 px-3.5 sm:px-4 w-44 whitespace-nowrap">Thời gian tạo</th>
+                  <th className="py-3 px-3.5 sm:px-4 w-28 whitespace-nowrap">Kích thước</th>
+                  <th className="py-3 px-3.5 sm:px-4 w-44 text-right">Thao tác</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/80">
+                {backups.map((b, idx) => (
+                  <tr
+                    key={b.id}
+                    className="hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors"
+                  >
+                    {/* STT */}
+                    <td className="py-3 px-3.5 sm:px-4 text-center font-mono font-medium text-muted-foreground/80">
+                      #{String(idx + 1).padStart(2, "0")}
+                    </td>
 
-        {loading ? (
-          <SkeletonTable />
-        ) : backups.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center bg-card space-y-2">
-            <HardDrive className="h-8 w-8 text-muted-foreground/40 mx-auto" />
-            <p className="text-sm font-semibold text-foreground">
-              Chưa có bản sao lưu nào trên đám mây
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Nhấn nút &quot;Sao lưu ngay&quot; để tạo bản snapshot đầu tiên của bạn.
-            </p>
+                    {/* TÊN */}
+                    <td className="py-3 px-3.5 sm:px-4 font-semibold text-foreground">
+                      <div className="flex items-center gap-2">
+                        <Cloud className="h-3.5 w-3.5 text-blue-500 shrink-0" />
+                        <span className="truncate max-w-[200px] sm:max-w-xs">{b.label || "Bản sao lưu"}</span>
+                      </div>
+                    </td>
+
+                    {/* THỜI GIAN */}
+                    <td className="py-3 px-3.5 sm:px-4 whitespace-nowrap font-mono text-[11px] text-zinc-600 dark:text-zinc-400">
+                      {formatDisplayDateTime(b.created_at)}
+                    </td>
+
+                    {/* KÍCH THƯỚC */}
+                    <td className="py-3 px-3.5 sm:px-4 whitespace-nowrap font-mono text-[11px] text-zinc-500">
+                      {formatBytes(b.file_size)}
+                    </td>
+
+                    {/* THAO TÁC */}
+                    <td className="py-3 px-3.5 sm:px-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-7.5 text-[11px] font-medium gap-1 rounded-lg px-2.5"
+                          onClick={() => handleRestore(b)}
+                          disabled={restoringId === b.id}
+                          title="Khôi phục dữ liệu"
+                        >
+                          <RotateCcw
+                            className={cn(
+                              "h-3 w-3",
+                              restoringId === b.id && "animate-spin"
+                            )}
+                          />
+                          Khôi phục
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-7.5 text-[11px] font-medium gap-1 rounded-lg px-2 text-zinc-600 dark:text-zinc-400"
+                          onClick={() => handleDownloadCloud(b)}
+                          title="Tải về máy"
+                        >
+                          <Download className="h-3 w-3" />
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-7.5 w-7.5 rounded-lg text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400"
+                          onClick={() => handleDelete(b)}
+                          title="Xóa bản sao lưu"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        ) : (
-          <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-800 shadow-xs">
-            {backups.map((b) => (
-              <div
-                key={b.id}
-                className="p-3.5 sm:p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/40 transition-colors"
-              >
-                <div className="flex items-start gap-3 min-w-0">
-                  <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5">
-                    <Cloud className="h-4 w-4" />
-                  </div>
-                  <div className="min-w-0 space-y-0.5">
-                    <p className="text-sm font-semibold text-foreground truncate">
-                      {b.label || "Bản sao lưu tự động"}
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <span>{formatDisplayDateTime(b.created_at)}</span>
-                      <span>•</span>
-                      <span className="font-mono">{formatBytes(b.file_size)}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-end gap-1.5 pt-2 sm:pt-0 border-t sm:border-t-0 border-zinc-100 dark:border-zinc-800">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="h-8 text-xs gap-1 rounded-lg px-2.5"
-                    onClick={() => handleRestore(b)}
-                    disabled={restoringId === b.id}
-                    title="Khôi phục dữ liệu từ bản này"
-                  >
-                    <RotateCcw
-                      className={cn(
-                        "h-3.5 w-3.5",
-                        restoringId === b.id && "animate-spin",
-                      )}
-                    />
-                    Khôi phục
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 text-xs gap-1 rounded-lg px-2.5 text-zinc-600 dark:text-zinc-400"
-                    onClick={() => handleDownloadCloud(b)}
-                    title="Tải tệp JSON về máy"
-                  >
-                    <Download className="h-3.5 w-3.5" />
-                    Tải về
-                  </Button>
-
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-8 w-8 rounded-lg text-zinc-400 hover:text-rose-600 dark:hover:text-rose-400"
-                    onClick={() => handleDelete(b)}
-                    title="Xóa bản sao lưu"
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }
