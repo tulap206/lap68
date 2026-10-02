@@ -74,7 +74,7 @@ export async function fetchBusinesses(userId: string) {
     .select("*")
     .eq("user_id", userId)
     .neq("status", "archived")
-    .order("sort_order")
+    .order("created_at", { ascending: false })
   if (error) throw error
   return (data || []) as Business[]
 }
@@ -139,7 +139,11 @@ export async function adjustBusinessCapital(
 
 // --- Categories ---
 export async function fetchCategories(userId: string, businessId?: string) {
-  let q = supabase.from("lap68_categories").select("*").eq("user_id", userId).order("name")
+  let q = supabase
+    .from("lap68_categories")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false })
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error
@@ -172,7 +176,7 @@ export async function fetchCounterparties(userId: string, businessId?: string) {
     .select("*")
     .eq("user_id", userId)
     .neq("name", PORTFOLIO_SETTINGS_COUNTERPARTY_NAME)
-    .order("name")
+    .order("created_at", { ascending: false })
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error
@@ -268,6 +272,7 @@ export async function fetchTransactions(userId: string, businessId?: string) {
     .select("*, category:lap68_categories(*), counterparty:lap68_counterparties(*), business:lap68_businesses(*)")
     .eq("user_id", userId)
     .order("transaction_date", { ascending: false })
+    .order("created_at", { ascending: false })
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error
@@ -319,7 +324,7 @@ export async function fetchSchedules(userId: string, businessId?: string) {
     .from("lap68_schedules")
     .select("*, business:lap68_businesses(*), category:lap68_categories(*), counterparty:lap68_counterparties(*)")
     .eq("user_id", userId)
-    .order("next_due_date", { ascending: true })
+    .order("created_at", { ascending: false })
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error
@@ -418,7 +423,12 @@ export async function completeSchedule(
 
 // --- Budgets ---
 export async function fetchBudgets(userId: string, businessId?: string) {
-  let q = supabase.from("lap68_budgets").select("*").eq("user_id", userId)
+  let q = supabase
+    .from("lap68_budgets")
+    .select("*")
+    .eq("user_id", userId)
+    .order("month_key", { ascending: false })
+    .order("created_at", { ascending: false })
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error

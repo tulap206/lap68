@@ -25,6 +25,7 @@ import {
 } from "@/lib/format-money";
 import {
   formatDisplayDate,
+  parseDisplayDate,
   todayStoredDate,
   toDateInputValue,
   toStoredDateValue,
@@ -92,15 +93,22 @@ export default function BusinessTransactionsPage() {
 
   const filtered = useMemo(
     () =>
-      transactions.filter((t) => {
-        if (typeFilter !== "all" && t.type !== typeFilter) return false;
-        const q = search.toLowerCase();
-        if (!q) return true;
-        return (
-          (t.description || "").toLowerCase().includes(q) ||
-          displayMoney(t.amount).includes(q)
-        );
-      }),
+      transactions
+        .filter((t) => {
+          if (typeFilter !== "all" && t.type !== typeFilter) return false;
+          const q = search.toLowerCase();
+          if (!q) return true;
+          return (
+            (t.description || "").toLowerCase().includes(q) ||
+            displayMoney(t.amount).includes(q)
+          );
+        })
+        .sort((a, b) => {
+          const dateA = parseDisplayDate(a.transaction_date)?.getTime() || 0;
+          const dateB = parseDisplayDate(b.transaction_date)?.getTime() || 0;
+          if (dateB !== dateA) return dateB - dateA;
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        }),
     [transactions, search, typeFilter],
   );
 

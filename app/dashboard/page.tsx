@@ -177,9 +177,18 @@ export default function DashboardHubPage() {
     };
   }, [transactions, timeframe, currentYear, currentMonth, lastMonthYear, lastMonth]);
 
+  const sortedSummaries = useMemo(() => {
+    const bizOrder = new Map(businesses.map((b, idx) => [b.id, idx]));
+    return [...summaries].sort((a, b) => {
+      const orderA = bizOrder.has(a.business_id) ? bizOrder.get(a.business_id)! : 999;
+      const orderB = bizOrder.has(b.business_id) ? bizOrder.get(b.business_id)! : 999;
+      return orderA - orderB;
+    });
+  }, [summaries, businesses]);
+
   const capitalSnapshot = useMemo(
-    () => computePortfolioCapital(businesses, summaries),
-    [businesses, summaries],
+    () => computePortfolioCapital(businesses, sortedSummaries),
+    [businesses, sortedSummaries],
   );
 
   const liquidTotal = useMemo(
@@ -189,7 +198,7 @@ export default function DashboardHubPage() {
 
   const capitalByBusiness = useMemo(() => {
     const map = new Map<string, ReturnType<typeof computeCapitalSnapshot>>();
-    for (const s of summaries) {
+    for (const s of sortedSummaries) {
       const b = businesses.find((x) => x.id === s.business_id);
       if (!b) continue;
       map.set(
@@ -201,7 +210,7 @@ export default function DashboardHubPage() {
       );
     }
     return map;
-  }, [summaries, businesses]);
+  }, [sortedSummaries, businesses]);
 
   const timeframeLabel =
     timeframe === "month"
@@ -515,7 +524,7 @@ export default function DashboardHubPage() {
                   </div>
                 </div>
 
-                {summaries.length === 0 ? (
+                {sortedSummaries.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-zinc-200 dark:border-zinc-800 p-8 text-center bg-card">
                     <p className="text-zinc-500 mb-3 text-sm">
                       Chưa có việc kinh doanh nào được thiết lập.
@@ -526,13 +535,13 @@ export default function DashboardHubPage() {
                   </div>
                 ) : businessViewMode === "list" ? (
                   <BusinessHubList
-                    summaries={summaries}
+                    summaries={sortedSummaries}
                     capitalMap={capitalByBusiness}
                     overdueMap={overdueByBusiness}
                   />
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                    {summaries.map((s, i) => (
+                    {sortedSummaries.map((s, i) => (
                       <BusinessHubCard
                         key={s.business_id}
                         summary={s}
@@ -566,7 +575,7 @@ export default function DashboardHubPage() {
 
                   <CashflowReportsSection
                     transactions={transactions}
-                    summaries={summaries}
+                    summaries={sortedSummaries}
                   />
                 </section>
               )}

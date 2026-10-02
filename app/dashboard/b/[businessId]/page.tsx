@@ -122,7 +122,7 @@ export default function BusinessDashboardPage() {
   const capitalLedger = useMemo(() => {
     if (!business) return [];
     return [...parseBusinessCapital(business.ghi_chu).capital_ledger]
-      .reverse()
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 5);
   }, [business]);
 
