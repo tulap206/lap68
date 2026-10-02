@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { TablePagination } from "@/components/dashboard/table-pagination";
 import { BusinessIcon } from "@/components/dashboard/business-icon";
 import { displayMoney } from "@/lib/format-money";
-import { formatDisplayDate, parseDisplayDate } from "@/lib/format-date";
+import { formatDisplayDate, parseDateForSort, parseDisplayDate } from "@/lib/format-date";
 import type { Transaction } from "@/lib/types";
 import {
   Search,
@@ -50,10 +50,10 @@ export function TransactionHistoryDialog({
   // Sort transactions by date descending (newest first)
   const sortedTransactions = useMemo(() => {
     return [...transactions].sort((a, b) => {
-      const dateA = parseDisplayDate(a.transaction_date)?.getTime() || 0;
-      const dateB = parseDisplayDate(b.transaction_date)?.getTime() || 0;
+      const dateA = parseDateForSort(a.transaction_date) || parseDateForSort(a.created_at);
+      const dateB = parseDateForSort(b.transaction_date) || parseDateForSort(b.created_at);
       if (dateB !== dateA) return dateB - dateA;
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      return parseDateForSort(b.created_at) - parseDateForSort(a.created_at);
     });
   }, [transactions]);
 

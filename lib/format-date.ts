@@ -1,5 +1,5 @@
-const DD_MM_YYYY = /^(\d{2})\/(\d{2})\/(\d{4})$/
-const ISO_DATE = /^(\d{4})-(\d{2})-(\d{2})/
+const DD_MM_YYYY = /^(\d{1,2})\/(\d{1,2})\/(\d{4})/
+const ISO_DATE = /^(\d{4})-(\d{1,2})-(\d{1,2})/
 
 function pad2(n: number) {
   return String(n).padStart(2, "0")
@@ -22,6 +22,12 @@ export function parseDisplayDate(value: string | Date | null | undefined): Date 
 
   const parsed = new Date(raw)
   return Number.isNaN(parsed.getTime()) ? null : parsed
+}
+
+export function parseDateForSort(value: string | Date | null | undefined): number {
+  if (!value) return 0
+  const d = parseDisplayDate(value)
+  return d ? d.getTime() : 0
 }
 
 export function formatDisplayDate(value: string | Date | null | undefined): string {

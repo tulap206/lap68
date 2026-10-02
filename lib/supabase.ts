@@ -6,7 +6,7 @@ import {
   getEffectiveDueDate,
   scheduleToTransactionType,
 } from "./schedule-engine"
-import { toStoredDateValue } from "./format-date"
+import { parseDateForSort, toStoredDateValue } from "./format-date"
 import {
   buildPortfolioSettings,
   defaultLiquidAccounts,
@@ -76,7 +76,8 @@ export async function fetchBusinesses(userId: string) {
     .neq("status", "archived")
     .order("created_at", { ascending: false })
   if (error) throw error
-  return (data || []) as Business[]
+  const rows = (data || []) as Business[]
+  return rows.sort((a, b) => parseDateForSort(b.created_at) - parseDateForSort(a.created_at))
 }
 
 export async function fetchBusinessSummaries(userId: string) {
@@ -147,7 +148,8 @@ export async function fetchCategories(userId: string, businessId?: string) {
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error
-  return (data || []) as Category[]
+  const rows = (data || []) as Category[]
+  return rows.sort((a, b) => parseDateForSort(b.created_at) - parseDateForSort(a.created_at))
 }
 
 export async function insertCategory(category: Omit<Category, "id" | "created_at">) {
@@ -180,7 +182,8 @@ export async function fetchCounterparties(userId: string, businessId?: string) {
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error
-  return (data || []) as Counterparty[]
+  const rows = (data || []) as Counterparty[]
+  return rows.sort((a, b) => parseDateForSort(b.created_at) - parseDateForSort(a.created_at))
 }
 
 export async function fetchPortfolioSettings(userId: string): Promise<UserPortfolioSettings> {
@@ -271,12 +274,17 @@ export async function fetchTransactions(userId: string, businessId?: string) {
     .from("lap68_transactions")
     .select("*, category:lap68_categories(*), counterparty:lap68_counterparties(*), business:lap68_businesses(*)")
     .eq("user_id", userId)
-    .order("transaction_date", { ascending: false })
     .order("created_at", { ascending: false })
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error
-  return (data || []) as Transaction[]
+  const rows = (data || []) as Transaction[]
+  return rows.sort((a, b) => {
+    const timeA = parseDateForSort(a.transaction_date) || parseDateForSort(a.created_at)
+    const timeB = parseDateForSort(b.transaction_date) || parseDateForSort(b.created_at)
+    if (timeB !== timeA) return timeB - timeA
+    return parseDateForSort(b.created_at) - parseDateForSort(a.created_at)
+  })
 }
 
 export async function insertTransaction(transaction: Omit<Transaction, "id" | "created_at" | "category" | "counterparty" | "business">) {
@@ -328,7 +336,12 @@ export async function fetchSchedules(userId: string, businessId?: string) {
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error
-  return (data || []) as Schedule[]
+  const rows = (data || []) as Schedule[]
+  return rows.sort((a, b) => {
+    const timeA = parseDateForSort(a.created_at) || parseDateForSort(a.due_date)
+    const timeB = parseDateForSort(b.created_at) || parseDateForSort(b.due_date)
+    return timeB - timeA
+  })
 }
 
 export async function insertSchedule(item: Omit<Schedule, "id" | "created_at" | "updated_at" | "business" | "category" | "counterparty">) {
@@ -432,7 +445,11 @@ export async function fetchBudgets(userId: string, businessId?: string) {
   if (businessId) q = q.eq("business_id", businessId)
   const { data, error } = await q
   if (error) throw error
-  return (data || []) as Budget[]
+  const rows = (data || []) as Budget[]
+  return rows.sort((a, b) => {
+    if (b.month_key !== a.month_key) return b.month_key.localeCompare(a.month_key)
+    return parseDateForSort(b.created_at) - parseDateForSort(a.created_at)
+  })
 }
 
 export async function upsertBudget(item: Omit<Budget, "id" | "created_at">) {
