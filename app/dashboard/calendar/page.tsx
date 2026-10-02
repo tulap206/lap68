@@ -60,7 +60,7 @@ import {
   formatMoneyInput,
   parseMoneyInput,
 } from "@/lib/format-money";
-import { formatDisplayDate } from "@/lib/format-date";
+import { formatDisplayDate, parseDateForSort } from "@/lib/format-date";
 import { cn } from "@/lib/utils";
 import type { Schedule, Business } from "@/lib/types";
 
@@ -241,18 +241,25 @@ function CalendarContent() {
 
   // Filtered for All view
   const allFilteredSchedules = useMemo(() => {
-    return schedules.filter((s) => {
-      if (directionFilter !== "all" && s.direction !== directionFilter) return false;
-      if (businessFilter !== "all" && s.business_id !== businessFilter) return false;
-      if (search.trim()) {
-        const q = search.toLowerCase();
-        const titleMatch = s.title.toLowerCase().includes(q);
-        const bizName = (businessMap.get(s.business_id)?.name || "").toLowerCase();
-        const bizMatch = bizName.includes(q);
-        if (!titleMatch && !bizMatch) return false;
-      }
-      return true;
-    });
+    return schedules
+      .filter((s) => {
+        if (directionFilter !== "all" && s.direction !== directionFilter) return false;
+        if (businessFilter !== "all" && s.business_id !== businessFilter) return false;
+        if (search.trim()) {
+          const q = search.toLowerCase();
+          const titleMatch = s.title.toLowerCase().includes(q);
+          const bizName = (businessMap.get(s.business_id)?.name || "").toLowerCase();
+          const bizMatch = bizName.includes(q);
+          if (!titleMatch && !bizMatch) return false;
+        }
+        return true;
+      })
+      .sort((a, b) => {
+        const dateA = parseDateForSort(a.due_date) || parseDateForSort(a.created_at);
+        const dateB = parseDateForSort(b.due_date) || parseDateForSort(b.created_at);
+        if (dateB !== dateA) return dateB - dateA;
+        return parseDateForSort(b.created_at) - parseDateForSort(a.created_at);
+      });
   }, [schedules, directionFilter, businessFilter, search, businessMap]);
 
   const handleOpenComplete = (s: Schedule) => {

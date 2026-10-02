@@ -22,11 +22,12 @@ import {
   deleteSchedule,
 } from "@/lib/supabase";
 import { displayMoney } from "@/lib/format-money";
-import { formatDisplayDate } from "@/lib/format-date";
+import { formatDisplayDate, parseDateForSort } from "@/lib/format-date";
 import { getEffectiveDueDate } from "@/lib/schedule-engine";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { Schedule, Category } from "@/lib/types";
+import { useMemo } from "react";
 
 const STATUS_CONFIG: Record<string, { label: string; class: string }> = {
   pending: { label: "Chờ xử lý", class: "bg-blue-50 text-blue-700 border-blue-200/60 dark:bg-blue-950/40 dark:text-blue-400" },
@@ -45,6 +46,15 @@ export default function BusinessSchedulesPage() {
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Schedule | null>(null);
+
+  const sortedSchedules = useMemo(() => {
+    return [...schedules].sort((a, b) => {
+      const dateA = parseDateForSort(a.due_date) || parseDateForSort(a.created_at);
+      const dateB = parseDateForSort(b.due_date) || parseDateForSort(b.created_at);
+      if (dateB !== dateA) return dateB - dateA;
+      return parseDateForSort(b.created_at) - parseDateForSort(a.created_at);
+    });
+  }, [schedules]);
 
   const load = useCallback(async () => {
     if (!user) return;
@@ -156,7 +166,7 @@ export default function BusinessSchedulesPage() {
           </div>
         ) : (
           <div className="rounded-2xl border border-zinc-200/80 dark:border-zinc-800 bg-card overflow-hidden divide-y divide-zinc-100 dark:divide-zinc-800/70 shadow-xs">
-            {schedules.map((s) => {
+            {sortedSchedules.map((s) => {
               const statusCfg = STATUS_CONFIG[s.status] || {
                 label: s.status,
                 class: "bg-zinc-100 text-zinc-600 border-zinc-200",
