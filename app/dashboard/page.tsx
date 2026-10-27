@@ -36,6 +36,7 @@ import { Button } from "@/components/ui/button";
 import {
   fetchBusinessSummaries,
   fetchBusinesses,
+  fetchCategories,
   fetchPortfolioSettings,
   fetchSchedules,
   fetchTransactions,
@@ -53,6 +54,7 @@ import type { UserPortfolioSettings } from "@/lib/account-balance";
 import type {
   Business,
   BusinessSummary,
+  Category,
   Schedule,
   Transaction,
 } from "@/lib/types";
@@ -68,6 +70,7 @@ export default function DashboardHubPage() {
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [timeframe, setTimeframe] = useState<TimeframeOption>("month");
   const [businessViewMode, setBusinessViewMode] = useState<"list" | "grid">("list");
@@ -87,18 +90,20 @@ export default function DashboardHubPage() {
       if (syncStatus) {
         syncScheduleStatuses(user.id).catch(() => {});
       }
-      const [s, biz, txs, sch, portfolio] = await Promise.all([
+      const [s, biz, txs, sch, portfolio, cats] = await Promise.all([
         fetchBusinessSummaries(user.id),
         fetchBusinesses(user.id),
         fetchTransactions(user.id),
         fetchSchedules(user.id),
         fetchPortfolioSettings(user.id),
+        fetchCategories(user.id),
       ]);
       setSummaries(s);
       setBusinesses(biz);
       setTransactions(txs);
       setSchedules(sch);
       setPortfolioSettings(portfolio);
+      setCategories(cats);
     } catch {
       toast.error("Không tải được dữ liệu");
     } finally {
@@ -659,11 +664,17 @@ export default function DashboardHubPage() {
         open={historyOpen}
         onOpenChange={setHistoryOpen}
         transactions={transactions}
+        businesses={businesses}
+        categories={categories}
+        onSuccess={load}
       />
       <SchedulesSummaryDialog
         open={schedulesOpen}
         onOpenChange={setSchedulesOpen}
         schedules={schedules}
+        businesses={businesses}
+        categories={categories}
+        onSuccess={load}
       />
     </ModulePageShell>
   );

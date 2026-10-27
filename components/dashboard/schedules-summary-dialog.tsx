@@ -11,9 +11,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { TablePagination } from "@/components/dashboard/table-pagination";
 import { BusinessIcon } from "@/components/dashboard/business-icon";
+import {
+  ScheduleFormDialog,
+  scheduleFormToPayload,
+  type ScheduleFormValues,
+} from "@/components/dashboard/schedule-form-dialog";
 import { displayMoney } from "@/lib/format-money";
 import { formatDisplayDate, parseDisplayDate } from "@/lib/format-date";
-import type { Schedule, ScheduleDirection } from "@/lib/types";
+import {
+  updateSchedule,
+  deleteSchedule,
+  completeSchedule,
+} from "@/lib/supabase";
+import { useAuth } from "@/contexts/auth-context";
+import { toast } from "sonner";
+import type { Business, Category, Schedule, ScheduleDirection } from "@/lib/types";
 import {
   CalendarClock,
   Search,
@@ -24,6 +36,9 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   Sparkles,
+  Pencil,
+  Trash2,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -62,16 +77,77 @@ export function SchedulesSummaryDialog({
   open,
   onOpenChange,
   schedules,
+  businesses = [],
+  categories = [],
+  onSuccess,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   schedules: Schedule[];
+  businesses?: Business[];
+  categories?: Category[];
+  onSuccess?: () => void;
 }) {
+  const { user, logAction } = useAuth();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [directionFilter, setDirectionFilter] = useState<DirectionFilter>("all");
+  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [completingId, setCompletingId] = useState<string | null>(null);
   const pageSize = 12;
+
+  const handleSaveSchedule = async (form: ScheduleFormValues) => {
+    if (!editingSchedule || !user) return;
+    const targetBizId = form.businessId || editingSchedule.business_id;
+    const payload = scheduleFormToPayload(form, user.id, targetBizId);
+    try {
+      await updateSchedule(editingSchedule.id, {
+        ...payload,
+        status: editingSchedule.status,
+        linked_transaction_id: editingSchedule.linked_transaction_id,
+        completed_at: editingSchedule.completed_at,
+      });
+      logAction("Sửa lịch", form.title);
+      toast.success("Đã cập nhật lịch thu chi");
+      setEditingSchedule(null);
+      onSuccess?.();
+    } catch {
+      toast.error("Không thể cập nhật lịch thu chi");
+    }
+  };
+
+  const handleDelete = async (s: Schedule, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!confirm(`Bạn có chắc muốn xóa lịch "${s.title}"?`)) return;
+    setDeletingId(s.id);
+    try {
+      await deleteSchedule(s.id);
+      logAction("Xóa lịch", s.title);
+      toast.success("Đã xóa lịch");
+      onSuccess?.();
+    } catch {
+      toast.error("Không thể xóa lịch");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleComplete = async (s: Schedule, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCompletingId(s.id);
+    try {
+      await completeSchedule(s, s.amount || 0);
+      logAction("Hoàn tất lịch", s.title);
+      toast.success(`Đã hoàn tất lịch "${s.title}"`);
+      onSuccess?.();
+    } catch {
+      toast.error("Không thể hoàn tất lịch");
+    } finally {
+      setCompletingId(null);
+    }
+  };
 
   // Sort schedules: Overdue first, then upcoming by due_date ascending
   const sortedSchedules = useMemo(() => {
@@ -291,6 +367,7 @@ export function SchedulesSummaryDialog({
                   <th className="py-3 px-4">Hạn thanh toán</th>
                   <th className="py-3 px-4 text-right">Số tiền</th>
                   <th className="py-3 px-4 text-center w-28">Trạng thái</th>
+                  <th className="py-3 px-4 text-center w-28">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
@@ -377,6 +454,43 @@ export function SchedulesSummaryDialog({
                           {cfg.label}
                         </span>
                       </td>
+
+                      {/* Thao tác */}
+                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-1">
+                          {s.status !== "done" && (
+                            <button
+                              type="button"
+                              onClick={(e) => handleComplete(s, e)}
+                              disabled={completingId === s.id}
+                              className="p-1.5 rounded-lg text-zinc-400 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:text-emerald-400 dark:hover:bg-emerald-950/30 transition-colors"
+                              title="Đánh dấu hoàn tất"
+                            >
+                              <Check className="h-3.5 w-3.5" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingSchedule(s);
+                            }}
+                            className="p-1.5 rounded-lg text-zinc-400 hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            title="Sửa lịch"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDelete(s, e)}
+                            disabled={deletingId === s.id}
+                            className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-950/30 transition-colors"
+                            title="Xóa lịch"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
@@ -396,6 +510,17 @@ export function SchedulesSummaryDialog({
           />
         </div>
       </DialogContent>
+
+      <ScheduleFormDialog
+        open={!!editingSchedule}
+        onOpenChange={(v) => {
+          if (!v) setEditingSchedule(null);
+        }}
+        categories={categories}
+        businesses={businesses}
+        editing={editingSchedule}
+        onSave={handleSaveSchedule}
+      />
     </Dialog>
   );
 }

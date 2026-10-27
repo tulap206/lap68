@@ -26,6 +26,7 @@ import {
   todayStoredDate,
 } from "@/lib/format-date";
 import type {
+  Business,
   Category,
   Schedule,
   ScheduleDirection,
@@ -33,6 +34,7 @@ import type {
 } from "@/lib/types";
 
 export type ScheduleFormValues = {
+  businessId?: string;
   direction: ScheduleDirection;
   title: string;
   description: string;
@@ -49,7 +51,8 @@ export type ScheduleFormValues = {
   reminderDays: string;
 };
 
-const defaultForm = (): ScheduleFormValues => ({
+const defaultForm = (defaultBizId?: string): ScheduleFormValues => ({
+  businessId: defaultBizId || "",
   direction: "collect",
   title: "",
   description: "",
@@ -66,12 +69,13 @@ const defaultForm = (): ScheduleFormValues => ({
   reminderDays: "3,1,0",
 });
 
-function scheduleToForm(editing: Schedule | null): ScheduleFormValues {
-  if (!editing) return defaultForm();
+function scheduleToForm(editing: Schedule | null, defaultBizId?: string): ScheduleFormValues {
+  if (!editing) return defaultForm(defaultBizId);
 
   const dueSource = editing.next_due_date || editing.due_date;
 
   return {
+    businessId: editing.business_id || defaultBizId || "",
     direction: editing.direction,
     title: editing.title,
     description: editing.description || "",
@@ -96,24 +100,27 @@ export function ScheduleFormDialog({
   open,
   onOpenChange,
   categories,
+  businesses,
   editing,
   onSave,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   categories: Category[];
+  businesses?: Business[];
   editing: Schedule | null;
   onSave: (values: ScheduleFormValues) => Promise<void>;
 }) {
-  const [form, setForm] = useState<ScheduleFormValues>(defaultForm());
+  const defaultBiz = businesses?.[0]?.id || "";
+  const [form, setForm] = useState<ScheduleFormValues>(defaultForm(defaultBiz));
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (open) setForm(scheduleToForm(editing));
-  }, [open, editing]);
+    if (open) setForm(scheduleToForm(editing, defaultBiz));
+  }, [open, editing, defaultBiz]);
 
   const handleOpenChange = (v: boolean) => {
-    if (!v) setForm(defaultForm());
+    if (!v) setForm(defaultForm(defaultBiz));
     onOpenChange(v);
   };
 
@@ -145,6 +152,26 @@ export function ScheduleFormDialog({
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
+          {businesses && businesses.length > 0 && (
+            <div className="space-y-2">
+              <Label className="text-xs">Mảng việc</Label>
+              <Select
+                value={form.businessId}
+                onValueChange={(v) => setForm({ ...form, businessId: v })}
+              >
+                <SelectTrigger className="h-10 text-base sm:text-xs rounded-xl">
+                  <SelectValue placeholder="Chọn mảng việc" />
+                </SelectTrigger>
+                <SelectContent>
+                  {businesses.map((b) => (
+                    <SelectItem key={b.id} value={b.id}>
+                      {b.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label>Loại</Label>
@@ -323,7 +350,7 @@ export function ScheduleFormDialog({
 export function scheduleFormToPayload(
   form: ScheduleFormValues,
   userId: string,
-  businessId: string,
+  businessId?: string,
 ) {
   const reminder_days = form.reminderDays
     .split(",")
@@ -344,7 +371,7 @@ export function scheduleFormToPayload(
 
   return {
     user_id: userId,
-    business_id: businessId,
+    business_id: form.businessId || businessId || "",
     direction: form.direction,
     title: form.title.trim(),
     description: form.description || null,

@@ -11,9 +11,21 @@ import {
 import { Input } from "@/components/ui/input";
 import { TablePagination } from "@/components/dashboard/table-pagination";
 import { BusinessIcon } from "@/components/dashboard/business-icon";
-import { displayMoney } from "@/lib/format-money";
-import { formatDisplayDate, parseDateForSort, parseDisplayDate } from "@/lib/format-date";
-import type { Transaction } from "@/lib/types";
+import {
+  TransactionFormDialog,
+  TransactionFormValues,
+} from "@/components/dashboard/transaction-form-dialog";
+import { displayMoney, parseMoneyInput } from "@/lib/format-money";
+import {
+  formatDisplayDate,
+  parseDateForSort,
+  parseDisplayDate,
+  toStoredDateValue,
+} from "@/lib/format-date";
+import { updateTransaction, deleteTransaction } from "@/lib/supabase";
+import { useAuth } from "@/contexts/auth-context";
+import { toast } from "sonner";
+import type { Business, Category, Transaction } from "@/lib/types";
 import {
   Search,
   History,
@@ -24,6 +36,8 @@ import {
   ArrowDownLeft,
   ArrowUpRight,
   ReceiptText,
+  Pencil,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,18 +48,72 @@ export function TransactionHistoryDialog({
   open,
   onOpenChange,
   transactions,
+  businesses = [],
+  categories = [],
+  onSuccess,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   transactions: Transaction[];
+  businesses?: Business[];
+  categories?: Category[];
+  onSuccess?: () => void;
 }) {
+  const { user, logAction } = useAuth();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [datePreset, setDatePreset] = useState<DatePreset>("month");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [editingTx, setEditingTx] = useState<Transaction | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const pageSize = 12;
+
+  const handleSaveEdit = async (values: TransactionFormValues) => {
+    if (!editingTx || !user) return;
+    const amount = parseMoneyInput(values.amount);
+    const payload = {
+      user_id: user.id,
+      business_id: values.businessId || editingTx.business_id,
+      type: values.type,
+      amount,
+      category_id: values.categoryId || null,
+      description: values.description || null,
+      transaction_date: toStoredDateValue(values.transactionDate),
+    };
+    try {
+      await updateTransaction(editingTx.id, payload);
+      logAction("Sửa giao dịch", displayMoney(amount));
+      toast.success("Đã cập nhật giao dịch");
+      setEditingTx(null);
+      onSuccess?.();
+    } catch {
+      toast.error("Không thể cập nhật giao dịch");
+    }
+  };
+
+  const handleDelete = async (t: Transaction, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (
+      !confirm(
+        `Bạn có chắc muốn xóa giao dịch "${t.description || "này"}" (${displayMoney(t.amount)})?`
+      )
+    ) {
+      return;
+    }
+    setDeletingId(t.id);
+    try {
+      await deleteTransaction(t.id);
+      logAction("Xóa giao dịch", displayMoney(t.amount));
+      toast.success("Đã xóa giao dịch");
+      onSuccess?.();
+    } catch {
+      toast.error("Không thể xóa giao dịch");
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   // Sort transactions by date descending (newest first)
   const sortedTransactions = useMemo(() => {
@@ -281,6 +349,7 @@ export function TransactionHistoryDialog({
                   <th className="py-3 px-4 hidden sm:table-cell">Mảng việc</th>
                   <th className="py-3 px-4 text-center w-20">Loại</th>
                   <th className="py-3 px-4 text-right">Số tiền</th>
+                  <th className="py-3 px-4 text-center w-20">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
@@ -352,6 +421,32 @@ export function TransactionHistoryDialog({
                           {isIncome ? "+" : "-"}{displayMoney(t.amount)}
                         </span>
                       </td>
+
+                      {/* Thao tác */}
+                      <td className="py-3 px-4 text-center whitespace-nowrap">
+                        <div className="flex items-center justify-center gap-1">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditingTx(t);
+                            }}
+                            className="p-1.5 rounded-lg text-zinc-400 hover:text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                            title="Sửa giao dịch"
+                          >
+                            <Pencil className="h-3.5 w-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={(e) => handleDelete(t, e)}
+                            disabled={deletingId === t.id}
+                            className="p-1.5 rounded-lg text-zinc-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:text-rose-400 dark:hover:bg-rose-950/30 transition-colors"
+                            title="Xóa giao dịch"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   );
                 })}
@@ -371,6 +466,17 @@ export function TransactionHistoryDialog({
           />
         </div>
       </DialogContent>
+
+      <TransactionFormDialog
+        open={!!editingTx}
+        onOpenChange={(v) => {
+          if (!v) setEditingTx(null);
+        }}
+        editing={editingTx}
+        businesses={businesses}
+        categories={categories}
+        onSave={handleSaveEdit}
+      />
     </Dialog>
   );
 }
