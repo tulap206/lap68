@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "LAP68",
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
   },
 };
 

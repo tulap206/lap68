@@ -193,35 +193,41 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-background flex flex-col">
       {/* MOBILE TOP BAR */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 flex flex-col bg-background border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+      <header
+        className="lg:hidden fixed top-0 left-0 right-0 z-40 flex flex-col bg-background border-b border-zinc-200/80 dark:border-zinc-800/90 shadow-[0_1px_3px_rgba(0,0,0,0.05)] select-none"
+        style={{ WebkitTransform: "translateZ(0)", transform: "translateZ(0)" }}
+      >
         <div className="h-[env(safe-area-inset-top,0px)] w-full shrink-0 bg-background" aria-hidden />
         <div className="h-14 flex items-center justify-between px-4 bg-background">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-xs">
-              <Wallet className="h-4 w-4" />
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-white dark:bg-zinc-800 dark:text-zinc-100 border border-zinc-300/40 dark:border-zinc-700/60 shadow-xs">
+              <Wallet className="h-4.5 w-4.5 text-emerald-500" />
             </div>
             <div className="min-w-0">
-              <span className="text-foreground font-bold tracking-tight block text-sm leading-tight">
+              <span className="text-foreground font-extrabold tracking-tight block text-sm leading-tight">
                 LAP68
               </span>
               {user && (
-                <span className="text-[10px] text-muted-foreground truncate block max-w-[150px] leading-tight">
+                <span className="text-[11px] font-medium text-zinc-500 dark:text-zinc-300 truncate block max-w-[150px] leading-tight mt-0.5">
                   {user.displayName}
                 </span>
               )}
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
-            <ThemeToggle size="icon" />
+          <div className="flex items-center gap-1.5">
+            <ThemeToggle
+              size="icon"
+              className="h-9 w-9 rounded-full bg-zinc-100/90 dark:bg-zinc-800/80 border border-zinc-200/70 dark:border-zinc-700/60 text-foreground"
+            />
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setMobileOpen(!mobileOpen)}
-              className="shrink-0 rounded-full h-9 w-9 text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              className="shrink-0 rounded-full h-9 w-9 bg-zinc-100/90 dark:bg-zinc-800/80 border border-zinc-200/70 dark:border-zinc-700/60 text-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700"
               aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
             >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              {mobileOpen ? <X className="h-4.5 w-4.5" /> : <Menu className="h-4.5 w-4.5" />}
             </Button>
           </div>
         </div>
