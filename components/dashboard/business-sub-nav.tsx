@@ -17,7 +17,7 @@ export function BusinessSubNav({ businessId }: { businessId: string }) {
   const items = tabs(businessId);
 
   return (
-    <div className="mb-5 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
+    <div className="hidden lg:block mb-5 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
       <div className="inline-flex p-1 bg-zinc-200/60 dark:bg-zinc-800/70 backdrop-blur-md rounded-2xl border border-black/[0.04] dark:border-white/[0.06] gap-1 min-w-full sm:min-w-0">
         {items.map((item) => {
           const active = pathname === item.href;

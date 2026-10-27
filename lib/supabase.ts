@@ -377,14 +377,16 @@ export async function deleteSchedule(id: string) {
 export async function syncScheduleStatuses(userId: string) {
   const schedules = await fetchSchedules(userId)
   const today = new Date()
-  await Promise.all(
-    schedules.map(async (s) => {
-      const status = computeScheduleStatus(s, today)
-      if (status !== s.status && !["done", "skipped", "cancelled"].includes(s.status)) {
-        await updateSchedule(s.id, { status })
-      }
-    })
-  )
+  const updates: Promise<unknown>[] = []
+  for (const s of schedules) {
+    const status = computeScheduleStatus(s, today)
+    if (status !== s.status && !["done", "skipped", "cancelled"].includes(s.status)) {
+      updates.push(updateSchedule(s.id, { status }))
+    }
+  }
+  if (updates.length > 0) {
+    await Promise.all(updates)
+  }
 }
 
 export async function completeSchedule(
@@ -606,14 +608,23 @@ export async function getCloudBackupSnapshot(backupId: string) {
 }
 
 export function subscribeLap68Tables(userId: string, onChange: () => void) {
+  let timer: NodeJS.Timeout | null = null;
+  const debouncedOnChange = () => {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      onChange();
+    }, 400);
+  };
+
   const channel = supabase
     .channel(`lap68-${userId}`)
-    .on("postgres_changes", { event: "*", schema: "public", table: "lap68_transactions" }, onChange)
-    .on("postgres_changes", { event: "*", schema: "public", table: "lap68_schedules" }, onChange)
-    .on("postgres_changes", { event: "*", schema: "public", table: "lap68_businesses" }, onChange)
-    .on("postgres_changes", { event: "*", schema: "public", table: "lap68_counterparties" }, onChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "lap68_transactions" }, debouncedOnChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "lap68_schedules" }, debouncedOnChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "lap68_businesses" }, debouncedOnChange)
+    .on("postgres_changes", { event: "*", schema: "public", table: "lap68_counterparties" }, debouncedOnChange)
     .subscribe()
   return () => {
+    if (timer) clearTimeout(timer);
     supabase.removeChannel(channel)
   }
 }

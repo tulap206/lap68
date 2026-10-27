@@ -68,7 +68,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
     router.push("/login");
   };
 
-  const NavContent = ({ labeled }: { labeled: boolean }) => (
+  const renderNavContent = (labeled: boolean) => (
     <>
       {!labeled && (
         <div className="hidden lg:block w-full h-3 mb-4 shrink-0" aria-hidden />
@@ -193,34 +193,37 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-background flex flex-col">
       {/* MOBILE TOP BAR */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 h-14 flex items-center justify-between px-4 safe-top bg-card/92 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800">
-        <div className="flex items-center gap-2.5 min-w-0">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-xs">
-            <Wallet className="h-4 w-4" />
-          </div>
-          <div className="min-w-0">
-            <span className="text-foreground font-bold tracking-tight block text-sm leading-tight">
-              LAP68
-            </span>
-            {user && (
-              <span className="text-[10px] text-muted-foreground truncate block max-w-[150px] leading-tight">
-                {user.displayName}
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 flex flex-col bg-card/95 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800 transition-colors">
+        <div className="h-[env(safe-area-inset-top,0px)] w-full shrink-0 bg-transparent" aria-hidden />
+        <div className="h-14 flex items-center justify-between px-4">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-xs">
+              <Wallet className="h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-foreground font-bold tracking-tight block text-sm leading-tight">
+                LAP68
               </span>
-            )}
+              {user && (
+                <span className="text-[10px] text-muted-foreground truncate block max-w-[150px] leading-tight">
+                  {user.displayName}
+                </span>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-1">
-          <ThemeToggle size="icon" />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="shrink-0 rounded-full h-9 w-9 text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
-            aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
-          >
-            {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+          <div className="flex items-center gap-1">
+            <ThemeToggle size="icon" />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="shrink-0 rounded-full h-9 w-9 text-foreground hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              aria-label={mobileOpen ? "Đóng menu" : "Mở menu"}
+            >
+              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -243,17 +246,17 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
         )}
       >
         <div className="lg:hidden flex flex-col flex-1 min-h-0 w-full">
-          <NavContent labeled />
+          {renderNavContent(true)}
         </div>
         <div className="hidden lg:flex flex-col flex-1 items-center w-full">
-          <NavContent labeled={false} />
+          {renderNavContent(false)}
         </div>
       </aside>
 
       {/* MAIN VIEWPORT */}
       <main
         id="main-content"
-        className="flex-1 w-full min-h-dvh pt-[calc(3.85rem+env(safe-area-inset-top))] pb-[calc(5.75rem+env(safe-area-inset-bottom))] px-3.5 sm:px-6 lg:pt-6 lg:pb-10 lg:pl-[88px] lg:pr-8 relative z-10"
+        className="flex-1 w-full min-h-dvh pt-[calc(3.5rem+env(safe-area-inset-top,0px))] pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] px-3.5 sm:px-6 lg:pt-6 lg:pb-10 lg:pl-[88px] lg:pr-8 relative z-10"
       >
         <div className="max-w-7xl mx-auto w-full">
           {user && (

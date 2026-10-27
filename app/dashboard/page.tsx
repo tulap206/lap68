@@ -82,10 +82,12 @@ export default function DashboardHubPage() {
   const [portfolioSettings, setPortfolioSettings] =
     useState<UserPortfolioSettings>({ liquid_accounts: [], updated_at: null });
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (syncStatus = false) => {
     if (!user) return;
     try {
-      await syncScheduleStatuses(user.id);
+      if (syncStatus) {
+        syncScheduleStatuses(user.id).catch(() => {});
+      }
       const [s, biz, txs, sch, portfolio] = await Promise.all([
         fetchBusinessSummaries(user.id),
         fetchBusinesses(user.id),
@@ -106,11 +108,11 @@ export default function DashboardHubPage() {
   }, [user]);
 
   useEffect(() => {
-    load();
+    load(true);
   }, [load]);
   useEffect(() => {
     if (!user) return;
-    return subscribeLap68Tables(user.id, load);
+    return subscribeLap68Tables(user.id, () => load(false));
   }, [user, load]);
 
   const reminders = useMemo(() => buildReminderItems(schedules), [schedules]);

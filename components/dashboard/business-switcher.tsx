@@ -22,7 +22,7 @@ export function BusinessSwitcher({
   if (!currentId || !current) return null;
 
   return (
-    <div className="relative mb-4 w-full sm:w-auto">
+    <div className="relative w-full sm:w-auto">
       <button
         type="button"
         onClick={() => setOpen(!open)}

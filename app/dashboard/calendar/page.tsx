@@ -107,10 +107,12 @@ function CalendarContent() {
   const [amount, setAmount] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (syncStatus = false) => {
     if (!user) return;
     try {
-      await syncScheduleStatuses(user.id);
+      if (syncStatus) {
+        syncScheduleStatuses(user.id).catch(() => {});
+      }
       const [sch, biz] = await Promise.all([
         fetchSchedules(user.id),
         fetchBusinesses(user.id),
@@ -125,12 +127,12 @@ function CalendarContent() {
   }, [user]);
 
   useEffect(() => {
-    load();
+    load(true);
   }, [load]);
 
   useEffect(() => {
     if (!user) return;
-    return subscribeLap68Tables(user.id, load);
+    return subscribeLap68Tables(user.id, () => load(false));
   }, [user, load]);
 
   const businessMap = useMemo(

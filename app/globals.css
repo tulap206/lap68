@@ -139,6 +139,7 @@
   }
   html {
     color-scheme: light dark;
+    background-color: var(--background);
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -147,6 +148,7 @@
   }
   body {
     @apply bg-background text-foreground antialiased selection:bg-[#007aff]/20 selection:text-[#007aff];
+    background-color: var(--background);
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     letter-spacing: -0.011em;
     min-height: 100dvh;

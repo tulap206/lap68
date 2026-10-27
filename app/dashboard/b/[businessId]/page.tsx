@@ -64,10 +64,12 @@ export default function BusinessDashboardPage() {
   const [capitalOpen, setCapitalOpen] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (syncStatus = false) => {
     if (!user) return;
     try {
-      await syncScheduleStatuses(user.id);
+      if (syncStatus) {
+        syncScheduleStatuses(user.id).catch(() => {});
+      }
       const [b, txs, sch, biz] = await Promise.all([
         fetchBusiness(businessId),
         fetchTransactions(user.id, businessId),
@@ -86,11 +88,11 @@ export default function BusinessDashboardPage() {
   }, [user, businessId]);
 
   useEffect(() => {
-    load();
+    load(true);
   }, [load]);
   useEffect(() => {
     if (!user) return;
-    return subscribeLap68Tables(user.id, load);
+    return subscribeLap68Tables(user.id, () => load(false));
   }, [user, load]);
 
   const stats = useMemo(() => {

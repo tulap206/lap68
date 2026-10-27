@@ -55,7 +55,9 @@ export function BusinessLayoutShell({
 
   return (
     <div>
-      <BusinessSwitcher businesses={businesses} currentId={businessId} />
+      <div className="flex items-center justify-between gap-3 mb-4">
+        <BusinessSwitcher businesses={businesses} currentId={businessId} />
+      </div>
       <BusinessSubNav businessId={businessId} />
       {children}
     </div>

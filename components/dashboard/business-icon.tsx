@@ -115,22 +115,8 @@ export function BusinessIcon({
   className,
   size = "md",
 }: BusinessIconProps) {
-  const IconComponent = getIconComponent(name, code, icon);
   const themeColor = color || "#3b82f6";
-
-  const sizeClasses = {
-    sm: "w-7 h-7 rounded-lg",
-    md: "w-9 h-9 rounded-xl",
-    lg: "w-11 h-11 rounded-2xl",
-    xl: "w-14 h-14 rounded-2xl",
-  };
-
-  const iconSizes = {
-    sm: "h-3.5 w-3.5",
-    md: "h-4.5 w-4.5",
-    lg: "h-5.5 w-5.5",
-    xl: "h-7 w-7",
-  };
+  const iconProps = { className: cn(iconSizes[size], "shrink-0") };
 
   return (
     <div
@@ -145,7 +131,7 @@ export function BusinessIcon({
         border: `1px solid ${themeColor}30`,
       }}
     >
-      <IconComponent className={cn(iconSizes[size], "shrink-0")} />
+      {React.createElement(getIconComponent(name, code, icon), iconProps)}
     </div>
   );
 }
