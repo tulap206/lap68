@@ -255,11 +255,11 @@
 }
 
 .mobile-header-safe {
-  padding-top: env(safe-area-inset-top, 0px);
+  padding-top: calc(env(safe-area-inset-top, 0px) + 18px);
 }
 
 .mobile-main-safe {
-  padding-top: calc(3.5rem + env(safe-area-inset-top, 0px));
+  padding-top: calc(3.5rem + env(safe-area-inset-top, 0px) + 18px);
   padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
 }
 

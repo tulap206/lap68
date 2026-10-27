@@ -195,7 +195,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       {/* MOBILE TOP BAR */}
       <header
         className="lg:hidden fixed top-0 left-0 right-0 z-40 flex flex-col bg-background border-b border-zinc-200/80 dark:border-zinc-800/90 shadow-[0_1px_3px_rgba(0,0,0,0.05)] select-none mobile-header-safe"
-        style={{ WebkitTransform: "translateZ(0)", transform: "translateZ(0)" }}
+        style={{ isolation: "isolate" }}
       >
         <div className="h-14 flex items-center justify-between px-4 bg-background">
           <div className="flex items-center gap-2.5 min-w-0">
