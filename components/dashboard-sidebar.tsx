@@ -193,9 +193,9 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-dvh bg-background flex flex-col">
       {/* MOBILE TOP BAR */}
-      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 flex flex-col bg-card/95 backdrop-blur-xl border-b border-zinc-200/80 dark:border-zinc-800 transition-colors">
-        <div className="h-[env(safe-area-inset-top,0px)] w-full shrink-0 bg-transparent" aria-hidden />
-        <div className="h-14 flex items-center justify-between px-4">
+      <header className="lg:hidden fixed top-0 left-0 right-0 z-40 flex flex-col bg-background border-b border-zinc-200/80 dark:border-zinc-800/80 transition-colors">
+        <div className="h-[env(safe-area-inset-top,0px)] w-full shrink-0 bg-background" aria-hidden />
+        <div className="h-14 flex items-center justify-between px-4 bg-background">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-zinc-900 text-white dark:bg-white dark:text-zinc-950 shadow-xs">
               <Wallet className="h-4 w-4" />
