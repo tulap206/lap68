@@ -56,7 +56,7 @@ export default function LoginPage() {
       />
 
       {/* TOP RIGHT THEME TOGGLE */}
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute top-[calc(env(safe-area-inset-top,0px)+12px)] right-4 z-20">
         <ThemeToggle size="icon" className="bg-card/80 backdrop-blur-md border border-zinc-200/80 dark:border-zinc-800 shadow-xs" />
       </div>
 
@@ -104,7 +104,7 @@ export default function LoginPage() {
               placeholder="admin"
               required
               autoComplete="username"
-              className="rounded-xl h-11 text-sm bg-zinc-100/60 dark:bg-zinc-800/60 border-none focus-visible:ring-1"
+              className="rounded-xl h-11 bg-zinc-100/60 dark:bg-zinc-800/60 border-none focus-visible:ring-1"
             />
           </div>
 
@@ -119,7 +119,7 @@ export default function LoginPage() {
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                className="pr-10 rounded-xl h-11 text-sm bg-zinc-100/60 dark:bg-zinc-800/60 border-none focus-visible:ring-1"
+                className="pr-11 rounded-xl h-11 bg-zinc-100/60 dark:bg-zinc-800/60 border-none focus-visible:ring-1"
                 required
                 autoComplete="current-password"
                 placeholder="••••••••"
@@ -127,7 +127,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors p-1"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors h-9 w-9 flex items-center justify-center rounded-lg active:bg-zinc-200/60 dark:active:bg-zinc-700/60"
                 aria-label={showPassword ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
               >
                 {showPassword ? (

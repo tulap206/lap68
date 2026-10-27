@@ -286,7 +286,7 @@ export function ReportDialog({
         />
 
         {/* 1. TOP TOOLBAR & CONTROLS (Sticky) */}
-        <div className="p-4 sm:p-5 border-b border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 no-print sticky top-0 z-40">
+        <div className="p-4 sm:p-5 pr-12 sm:pr-14 border-b border-zinc-200/70 dark:border-zinc-800 bg-zinc-50/80 dark:bg-zinc-900/60 backdrop-blur-md flex flex-wrap items-center justify-between gap-3 no-print sticky top-0 z-40">
           <div className="flex flex-wrap items-center gap-2 flex-1 min-w-0">
             {/* Business Selector */}
             <Select value={selectedBusinessId} onValueChange={setSelectedBusinessId}>

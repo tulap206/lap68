@@ -200,11 +200,11 @@ export default function BusinessCategoriesPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                <div className="flex items-center gap-1 opacity-90 sm:opacity-70 sm:group-hover:opacity-100 transition-opacity">
                   <button
                     type="button"
                     onClick={(e) => openEdit(c, e)}
-                    className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors p-1"
+                    className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors h-8 w-8 flex items-center justify-center rounded-lg active:bg-zinc-100 dark:active:bg-zinc-800"
                     title="Sửa"
                     aria-label="Sửa"
                   >
@@ -213,7 +213,7 @@ export default function BusinessCategoriesPage() {
                   <button
                     type="button"
                     onClick={(e) => handleDelete(c, e)}
-                    className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors p-1"
+                    className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors h-8 w-8 flex items-center justify-center rounded-lg active:bg-zinc-100 dark:active:bg-zinc-800"
                     title="Xóa"
                     aria-label="Xóa"
                   >
@@ -278,7 +278,7 @@ export default function BusinessCategoriesPage() {
                       type="button"
                       onClick={() => setForm({ ...form, color: c })}
                       className={cn(
-                        "h-7 w-7 rounded-full transition-transform flex items-center justify-center shadow-xs",
+                        "h-8 w-8 rounded-full transition-transform flex items-center justify-center shadow-xs",
                         form.color === c
                           ? "ring-2 ring-offset-2 ring-zinc-900 dark:ring-zinc-100 scale-110"
                           : "hover:scale-105",

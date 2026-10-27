@@ -197,11 +197,11 @@ export default function BusinessesPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-1 opacity-70 group-hover:opacity-100 transition-opacity shrink-0">
+                    <div className="flex items-center gap-1 opacity-90 sm:opacity-70 sm:group-hover:opacity-100 transition-opacity shrink-0">
                       <button
                         type="button"
                         onClick={(e) => openEdit(b, e)}
-                        className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors p-1"
+                        className="text-zinc-400 hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-100 transition-colors h-8 w-8 flex items-center justify-center rounded-lg active:bg-zinc-100 dark:active:bg-zinc-800"
                         title="Chỉnh sửa"
                         aria-label="Chỉnh sửa"
                       >
@@ -210,7 +210,7 @@ export default function BusinessesPage() {
                       <button
                         type="button"
                         onClick={(e) => archive(b, e)}
-                        className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors p-1"
+                        className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors h-8 w-8 flex items-center justify-center rounded-lg active:bg-zinc-100 dark:active:bg-zinc-800"
                         title="Lưu trữ"
                         aria-label="Lưu trữ"
                       >

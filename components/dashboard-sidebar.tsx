@@ -245,7 +245,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       <aside
         className={cn(
           "fixed top-0 left-0 z-40 h-dvh bg-card/95 backdrop-blur-xl border-r border-zinc-200/80 dark:border-zinc-800 flex flex-col transition-transform duration-200 ease-out",
-          "w-[min(280px,85vw)] px-3.5 py-5 safe-top safe-bottom shadow-xl lg:shadow-none",
+          "w-[min(280px,85vw)] px-3.5 pb-5 mobile-header-safe safe-bottom shadow-xl lg:shadow-none",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           "lg:translate-x-0 lg:w-[72px] lg:items-center lg:px-0 lg:pt-6 lg:pb-6",
         )}

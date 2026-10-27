@@ -149,7 +149,7 @@ export function AccountBalanceDialog({
                 </Label>
                 <button
                   type="button"
-                  className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors p-1 disabled:opacity-30 disabled:hover:text-zinc-400"
+                  className="text-zinc-400 hover:text-rose-600 dark:text-zinc-500 dark:hover:text-rose-400 transition-colors h-7 w-7 flex items-center justify-center rounded-lg active:bg-zinc-100 dark:active:bg-zinc-800 disabled:opacity-30 disabled:hover:text-zinc-400"
                   onClick={() => removeRow(row.id)}
                   disabled={rows.length <= 1}
                   aria-label="Xóa tài khoản"

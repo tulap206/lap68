@@ -220,7 +220,7 @@ export function TransactionHistoryDialog({
     >
       <DialogContent className="max-w-4xl max-h-[88vh] overflow-hidden flex flex-col p-0 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl bg-card shadow-2xl text-foreground font-sans">
         {/* 1. DIALOG HEADER & SUMMARY METRICS */}
-        <div className="p-5 sm:p-6 border-b border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/50 space-y-4">
+        <div className="p-5 sm:p-6 pr-12 sm:pr-14 border-b border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/50 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 flex items-center justify-center shrink-0 shadow-xs">
@@ -330,7 +330,7 @@ export function TransactionHistoryDialog({
         </div>
 
         {/* 3. TRANSACTION LIST TABLE */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto overflow-x-auto overscroll-contain">
           {filteredTransactions.length === 0 ? (
             <div className="p-12 text-center space-y-3">
               <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-muted-foreground flex items-center justify-center mx-auto">
@@ -340,16 +340,16 @@ export function TransactionHistoryDialog({
               <p className="text-xs text-muted-foreground">Thử đổi bộ lọc hoặc từ khóa tìm kiếm</p>
             </div>
           ) : (
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full text-left border-collapse text-xs min-w-[500px] sm:min-w-0">
               <thead>
                 <tr className="border-b border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 text-muted-foreground font-semibold">
-                  <th className="py-3 px-4 w-12 text-center">#STT</th>
-                  <th className="py-3 px-4 w-28">Ngày</th>
-                  <th className="py-3 px-4">Diễn giải & Danh mục</th>
-                  <th className="py-3 px-4 hidden sm:table-cell">Mảng việc</th>
-                  <th className="py-3 px-4 text-center w-20">Loại</th>
-                  <th className="py-3 px-4 text-right">Số tiền</th>
-                  <th className="py-3 px-4 text-center w-20">Thao tác</th>
+                  <th className="py-3 px-3 sm:px-4 w-12 text-center hidden sm:table-cell">#STT</th>
+                  <th className="py-3 px-3 sm:px-4 w-24 sm:w-28">Ngày</th>
+                  <th className="py-3 px-3 sm:px-4">Diễn giải & Danh mục</th>
+                  <th className="py-3 px-3 sm:px-4 hidden sm:table-cell">Mảng việc</th>
+                  <th className="py-3 px-2 sm:px-4 text-center w-16 sm:w-20">Loại</th>
+                  <th className="py-3 px-3 sm:px-4 text-right">Số tiền</th>
+                  <th className="py-3 px-2 sm:px-4 text-center w-16 sm:w-20">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
@@ -363,17 +363,17 @@ export function TransactionHistoryDialog({
                       className="hover:bg-zinc-50/80 dark:hover:bg-zinc-900/30 transition-colors"
                     >
                       {/* #STT */}
-                      <td className="py-3 px-4 text-center font-mono text-[11px] text-muted-foreground">
+                      <td className="py-3 px-3 sm:px-4 text-center font-mono text-[11px] text-muted-foreground hidden sm:table-cell">
                         {stt}
                       </td>
 
                       {/* Ngày */}
-                      <td className="py-3 px-4 text-foreground/90 whitespace-nowrap font-medium text-[11px]">
+                      <td className="py-3 px-3 sm:px-4 text-foreground/90 whitespace-nowrap font-medium text-[11px]">
                         {formatDisplayDate(t.transaction_date)}
                       </td>
 
                       {/* Diễn giải & Danh mục */}
-                      <td className="py-3 px-4 max-w-[220px]">
+                      <td className="py-3 px-3 sm:px-4 max-w-[200px] sm:max-w-[220px]">
                         <p className="font-bold text-foreground truncate text-xs">{t.description || "Giao dịch không tiêu đề"}</p>
                         <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground">
                           {t.category?.name && (
@@ -388,7 +388,7 @@ export function TransactionHistoryDialog({
                       </td>
 
                       {/* Mảng việc */}
-                      <td className="py-3 px-4 hidden sm:table-cell">
+                      <td className="py-3 px-3 sm:px-4 hidden sm:table-cell">
                         {t.business ? (
                           <div className="flex items-center gap-1.5">
                             <BusinessIcon name={t.business.name} color={t.business.color} size="sm" />
@@ -402,7 +402,7 @@ export function TransactionHistoryDialog({
                       </td>
 
                       {/* Loại */}
-                      <td className="py-3 px-4 text-center">
+                      <td className="py-3 px-2 sm:px-4 text-center">
                         <span
                           className={cn(
                             "inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold uppercase",
@@ -416,14 +416,14 @@ export function TransactionHistoryDialog({
                       </td>
 
                       {/* Số tiền */}
-                      <td className="py-3 px-4 text-right font-mono font-bold text-xs sm:text-sm whitespace-nowrap">
+                      <td className="py-3 px-3 sm:px-4 text-right font-mono font-bold text-xs sm:text-sm whitespace-nowrap">
                         <span className={isIncome ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}>
                           {isIncome ? "+" : "-"}{displayMoney(t.amount)}
                         </span>
                       </td>
 
                       {/* Thao tác */}
-                      <td className="py-3 px-4 text-center whitespace-nowrap">
+                      <td className="py-3 px-2 sm:px-4 text-center whitespace-nowrap">
                         <div className="flex items-center justify-center gap-1">
                           <button
                             type="button"

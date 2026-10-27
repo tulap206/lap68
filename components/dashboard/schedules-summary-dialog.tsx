@@ -232,7 +232,7 @@ export function SchedulesSummaryDialog({
     >
       <DialogContent className="max-w-4xl max-h-[88vh] overflow-hidden flex flex-col p-0 border border-zinc-200/80 dark:border-zinc-800 rounded-3xl bg-card shadow-2xl text-foreground font-sans">
         {/* 1. DIALOG HEADER & SUMMARY BANNER */}
-        <div className="p-5 sm:p-6 border-b border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/50 space-y-4">
+        <div className="p-5 sm:p-6 pr-12 sm:pr-14 border-b border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/70 dark:bg-zinc-900/50 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-950 flex items-center justify-center shrink-0 shadow-xs">
@@ -348,7 +348,7 @@ export function SchedulesSummaryDialog({
         </div>
 
         {/* 3. SCHEDULES TABLE */}
-        <div className="flex-1 overflow-y-auto">
+        <div className="flex-1 overflow-y-auto overflow-x-auto overscroll-contain">
           {filteredSchedules.length === 0 ? (
             <div className="p-12 text-center space-y-3">
               <div className="w-12 h-12 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-muted-foreground flex items-center justify-center mx-auto">
@@ -358,16 +358,16 @@ export function SchedulesSummaryDialog({
               <p className="text-xs text-muted-foreground">Thử điều chỉnh lại bộ lọc tìm kiếm</p>
             </div>
           ) : (
-            <table className="w-full text-left border-collapse text-xs">
+            <table className="w-full text-left border-collapse text-xs min-w-[500px] sm:min-w-0">
               <thead>
                 <tr className="border-b border-zinc-200/80 dark:border-zinc-800 bg-zinc-50/50 dark:bg-zinc-900/30 text-muted-foreground font-semibold">
-                  <th className="py-3 px-4 w-12 text-center">#STT</th>
-                  <th className="py-3 px-4">Tiêu đề lịch</th>
-                  <th className="py-3 px-4 hidden sm:table-cell">Mảng việc</th>
-                  <th className="py-3 px-4">Hạn thanh toán</th>
-                  <th className="py-3 px-4 text-right">Số tiền</th>
-                  <th className="py-3 px-4 text-center w-28">Trạng thái</th>
-                  <th className="py-3 px-4 text-center w-28">Thao tác</th>
+                  <th className="py-3 px-3 sm:px-4 w-12 text-center hidden sm:table-cell">#STT</th>
+                  <th className="py-3 px-3 sm:px-4">Tiêu đề lịch</th>
+                  <th className="py-3 px-3 sm:px-4 hidden sm:table-cell">Mảng việc</th>
+                  <th className="py-3 px-3 sm:px-4">Hạn thanh toán</th>
+                  <th className="py-3 px-3 sm:px-4 text-right">Số tiền</th>
+                  <th className="py-3 px-2 sm:px-4 text-center w-24 sm:w-28">Trạng thái</th>
+                  <th className="py-3 px-2 sm:px-4 text-center w-24 sm:w-28">Thao tác</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-100 dark:divide-zinc-800/60">
@@ -386,12 +386,12 @@ export function SchedulesSummaryDialog({
                       )}
                     >
                       {/* #STT */}
-                      <td className="py-3.5 px-4 text-center font-mono text-[11px] text-muted-foreground">
+                      <td className="py-3.5 px-3 sm:px-4 text-center font-mono text-[11px] text-muted-foreground hidden sm:table-cell">
                         {stt}
                       </td>
 
                       {/* Tiêu đề */}
-                      <td className="py-3.5 px-4 max-w-[220px]">
+                      <td className="py-3.5 px-3 sm:px-4 max-w-[200px] sm:max-w-[220px]">
                         <p className="font-bold text-foreground truncate text-xs">{s.title}</p>
                         <div className="flex items-center gap-1.5 mt-0.5 text-[11px] text-muted-foreground">
                           <span className={cn(
@@ -410,7 +410,7 @@ export function SchedulesSummaryDialog({
                       </td>
 
                       {/* Mảng việc */}
-                      <td className="py-3.5 px-4 hidden sm:table-cell">
+                      <td className="py-3.5 px-3 sm:px-4 hidden sm:table-cell">
                         {s.business ? (
                           <div className="flex items-center gap-1.5">
                             <BusinessIcon name={s.business.name} color={s.business.color} size="sm" />
@@ -424,7 +424,7 @@ export function SchedulesSummaryDialog({
                       </td>
 
                       {/* Hạn thanh toán */}
-                      <td className="py-3.5 px-4 whitespace-nowrap">
+                      <td className="py-3.5 px-3 sm:px-4 whitespace-nowrap">
                         <span className="text-foreground/90 font-medium text-xs block">
                           {formatDisplayDate(s.due_date)}
                         </span>
@@ -436,17 +436,17 @@ export function SchedulesSummaryDialog({
                       </td>
 
                       {/* Số tiền */}
-                      <td className="py-3.5 px-4 text-right font-mono font-bold text-xs sm:text-sm whitespace-nowrap">
+                      <td className="py-3.5 px-3 sm:px-4 text-right font-mono font-bold text-xs sm:text-sm whitespace-nowrap">
                         <span className={isCollect ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}>
                           {displayMoney(s.amount || 0)}
                         </span>
                       </td>
 
                       {/* Trạng thái */}
-                      <td className="py-3.5 px-4 text-center">
+                      <td className="py-3.5 px-2 sm:px-4 text-center">
                         <span
                           className={cn(
-                            "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] border shadow-2xs whitespace-nowrap",
+                            "inline-flex items-center gap-1.5 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] border shadow-2xs whitespace-nowrap",
                             cfg.class
                           )}
                         >
@@ -456,7 +456,7 @@ export function SchedulesSummaryDialog({
                       </td>
 
                       {/* Thao tác */}
-                      <td className="py-3.5 px-4 text-center whitespace-nowrap">
+                      <td className="py-3.5 px-2 sm:px-4 text-center whitespace-nowrap">
                         <div className="flex items-center justify-center gap-1">
                           {s.status !== "done" && (
                             <button
