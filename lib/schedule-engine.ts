@@ -1,4 +1,4 @@
-import { parseDisplayDate, toStoredDateValue } from "./format-date"
+import { parseDisplayDate } from "./format-date"
 import type { Schedule, ScheduleRecurrence, ScheduleStatus, ReminderItem } from "./types"
 
 function pad2(n: number) {
@@ -113,7 +113,7 @@ export function scheduleToTransactionType(direction: Schedule["direction"]) {
   return direction === "collect" ? "income" as const : "expense" as const
 }
 
-export function initNextDueDate(dueDate: string, kind: Schedule["schedule_kind"], recurrence: ScheduleRecurrence) {
+export function initNextDueDate(dueDate: string, kind: Schedule["schedule_kind"], _recurrence: ScheduleRecurrence) {
   if (kind === "once") return dueDate
   return dueDate
 }

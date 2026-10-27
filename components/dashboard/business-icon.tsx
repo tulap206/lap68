@@ -7,18 +7,14 @@ import {
   Camera,
   Landmark,
   Coins,
-  CircleDollarSign,
   Globe,
   Code,
   Laptop,
-  Briefcase,
-  Layers,
   Store,
   Building2,
   Coffee,
   ShoppingBag,
   Gem,
-  Scale,
   FolderKanban,
   Wrench,
   LucideIcon,
@@ -33,6 +29,20 @@ interface BusinessIconProps {
   className?: string;
   size?: "sm" | "md" | "lg" | "xl";
 }
+
+const sizeClasses: Record<"sm" | "md" | "lg" | "xl", string> = {
+  sm: "h-7 w-7 rounded-lg",
+  md: "h-9 w-9 rounded-xl",
+  lg: "h-11 w-11 rounded-2xl",
+  xl: "h-14 w-14 rounded-2xl",
+};
+
+const iconSizes: Record<"sm" | "md" | "lg" | "xl", string> = {
+  sm: "h-3.5 w-3.5",
+  md: "h-4.5 w-4.5",
+  lg: "h-5 w-5",
+  xl: "h-7 w-7",
+};
 
 export function getIconComponent(name: string, code?: string | null, icon?: string | null): LucideIcon {
   if (icon) {

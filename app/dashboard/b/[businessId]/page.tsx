@@ -6,8 +6,6 @@ import {
   Plus,
   TrendingUp,
   TrendingDown,
-  PiggyBank,
-  CalendarClock,
   Landmark,
   SlidersHorizontal,
   BarChart3,
@@ -20,8 +18,6 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import {
   ModulePageShell,
-  ModuleSubpageHeader,
-  ModuleSectionCard,
 } from "@/components/dashboard/module-shell";
 import { BusinessIcon } from "@/components/dashboard/business-icon";
 import { CashflowReportsSection } from "@/components/dashboard/cashflow-reports-section";

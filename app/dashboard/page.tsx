@@ -20,7 +20,6 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import {
   ModulePageShell,
-  AccentButton,
 } from "@/components/dashboard/module-shell";
 import { BusinessHubCard } from "@/components/dashboard/business-hub-card";
 import { BusinessHubList } from "@/components/dashboard/business-hub-list";
