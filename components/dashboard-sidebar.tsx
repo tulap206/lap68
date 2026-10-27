@@ -194,10 +194,9 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
     <div className="min-h-dvh bg-background flex flex-col">
       {/* MOBILE TOP BAR */}
       <header
-        className="lg:hidden fixed top-0 left-0 right-0 z-40 flex flex-col bg-background border-b border-zinc-200/80 dark:border-zinc-800/90 shadow-[0_1px_3px_rgba(0,0,0,0.05)] select-none"
+        className="lg:hidden fixed top-0 left-0 right-0 z-40 flex flex-col bg-background border-b border-zinc-200/80 dark:border-zinc-800/90 shadow-[0_1px_3px_rgba(0,0,0,0.05)] select-none mobile-header-safe"
         style={{ WebkitTransform: "translateZ(0)", transform: "translateZ(0)" }}
       >
-        <div className="h-[env(safe-area-inset-top,0px)] w-full shrink-0 bg-background" aria-hidden />
         <div className="h-14 flex items-center justify-between px-4 bg-background">
           <div className="flex items-center gap-2.5 min-w-0">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-zinc-900 text-white dark:bg-zinc-800 dark:text-zinc-100 border border-zinc-300/40 dark:border-zinc-700/60 shadow-xs">
@@ -262,7 +261,7 @@ export function DashboardSidebar({ children }: { children: React.ReactNode }) {
       {/* MAIN VIEWPORT */}
       <main
         id="main-content"
-        className="flex-1 w-full min-h-dvh pt-[calc(3.5rem+env(safe-area-inset-top,0px))] pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] px-3.5 sm:px-6 lg:pt-6 lg:pb-10 lg:pl-[88px] lg:pr-8 relative z-10"
+        className="flex-1 w-full min-h-dvh mobile-main-safe px-3.5 sm:px-6 lg:pl-[88px] lg:pr-8 relative z-10"
       >
         <div className="max-w-7xl mx-auto w-full">
           {user && (

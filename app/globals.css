@@ -254,6 +254,22 @@
   padding-top: env(safe-area-inset-top);
 }
 
+.mobile-header-safe {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
+.mobile-main-safe {
+  padding-top: calc(3.5rem + env(safe-area-inset-top, 0px));
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 1024px) {
+  .mobile-main-safe {
+    padding-top: 1.5rem;
+    padding-bottom: 2.5rem;
+  }
+}
+
 .gradient-bg {
   background: var(--background);
 }
